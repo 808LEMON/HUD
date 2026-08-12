@@ -3,7 +3,7 @@ game 'gta5'
 
 author '808Lemon'
 description '808Lemon QBCore HUD Replacement'
-version '1.0.0'
+version '1.1.0'
 
 lua54 'yes'
 
@@ -16,7 +16,8 @@ client_scripts {
     'client/vehicle.lua',
     'client/compass.lua',
     'client/minimap.lua',
-    'client/compatibility.lua'
+    'client/compatibility.lua',
+    'client/editor.lua'
 }
 
 ui_page 'html/index.html'
@@ -29,8 +30,10 @@ files {
     'html/css/vehicle.css',
     'html/css/compass.css',
     'html/css/status.css',
+    'html/css/editor.css',
 
-    'html/js/app.js'
+    'html/js/app.js',
+    'html/js/editor.js'
 }
 
 dependency 'qb-core'

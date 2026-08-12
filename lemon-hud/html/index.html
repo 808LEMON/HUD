@@ -12,11 +12,21 @@
 
     <title>808Lemon HUD</title>
 
+    <!--==================================================
+        MAIN HUD CSS
+    ===================================================-->
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/player.css">
     <link rel="stylesheet" href="css/compass.css">
     <link rel="stylesheet" href="css/status.css">
     <link rel="stylesheet" href="css/vehicle.css">
+
+    <!--==================================================
+        HUD EDITOR CSS
+    ===================================================-->
+
+    <link rel="stylesheet" href="css/editor.css">
 
 </head>
 
@@ -32,11 +42,16 @@
 
         <div class="player-header">
 
-            <span>PLAYER STATS</span>
+            <span>
+                PLAYER STATS
+            </span>
 
             <div class="online-dot"></div>
 
         </div>
+
+
+        <!-- PLAYER ID -->
 
         <div class="player-row">
 
@@ -58,6 +73,9 @@
 
         </div>
 
+
+        <!-- CASH -->
+
         <div class="player-row">
 
             <div class="player-icon">
@@ -78,6 +96,9 @@
 
         </div>
 
+
+        <!-- BANK -->
+
         <div class="player-row">
 
             <div class="player-icon">
@@ -97,6 +118,9 @@
             </div>
 
         </div>
+
+
+        <!-- JOB -->
 
         <div class="player-row">
 
@@ -124,12 +148,14 @@
 
 
     <!--==================================================
-        COMPASS
+        COMPASS / STREET
     ===================================================-->
 
     <div id="compass-wrapper">
 
         <div class="compass-top">
+
+            <!-- CURRENT DIRECTION -->
 
             <div class="direction-pill">
 
@@ -139,11 +165,15 @@
 
             </div>
 
+
+            <!-- COMPASS TAPE -->
+
             <div class="compass-tape">
 
                 <div id="compass-label-left">
                     NW
                 </div>
+
 
                 <div class="compass-center">
 
@@ -155,6 +185,7 @@
 
                 </div>
 
+
                 <div id="compass-label-right">
                     NE
                 </div>
@@ -162,6 +193,9 @@
             </div>
 
         </div>
+
+
+        <!-- STREET -->
 
         <div id="street-wrapper">
 
@@ -177,17 +211,22 @@
 
 
     <!--==================================================
-        STATUS
+        STATUS HUD
     ===================================================-->
 
     <div id="status-bars">
+
+
+        <!-- HEALTH -->
 
         <div
             id="health-row"
             class="status-row"
         >
 
-            <div class="status-icon health-icon">
+            <div
+                class="status-icon health-icon"
+            >
                 ♥
             </div>
 
@@ -203,12 +242,16 @@
         </div>
 
 
+        <!-- ARMOR -->
+
         <div
             id="armor-row"
             class="status-row"
         >
 
-            <div class="status-icon armor-icon">
+            <div
+                class="status-icon armor-icon"
+            >
                 ◆
             </div>
 
@@ -224,12 +267,16 @@
         </div>
 
 
+        <!-- HUNGER -->
+
         <div
             id="hunger-row"
             class="status-row"
         >
 
-            <div class="status-icon hunger-icon">
+            <div
+                class="status-icon hunger-icon"
+            >
                 ●
             </div>
 
@@ -245,12 +292,16 @@
         </div>
 
 
+        <!-- THIRST -->
+
         <div
             id="thirst-row"
             class="status-row"
         >
 
-            <div class="status-icon thirst-icon">
+            <div
+                class="status-icon thirst-icon"
+            >
                 ▼
             </div>
 
@@ -275,6 +326,10 @@
     <div id="vehicle-hud">
 
         <div class="gauge-shell">
+
+            <!--==========================================
+                RPM SVG
+            ===========================================-->
 
             <svg
                 class="gauge-svg"
@@ -306,21 +361,58 @@
             </svg>
 
 
+            <!--==========================================
+                RPM NUMBERS
+            ===========================================-->
+
             <div class="rpm-scale">
 
-                <span class="rpm-number n1">1</span>
-                <span class="rpm-number n2">2</span>
-                <span class="rpm-number n3">3</span>
-                <span class="rpm-number n4">4</span>
-                <span class="rpm-number n5">5</span>
-                <span class="rpm-number n6">6</span>
-                <span class="rpm-number n7">7</span>
-                <span class="rpm-number n8">8</span>
-                <span class="rpm-number n9">9</span>
-                <span class="rpm-number n10">10</span>
+                <span class="rpm-number n1">
+                    1
+                </span>
+
+                <span class="rpm-number n2">
+                    2
+                </span>
+
+                <span class="rpm-number n3">
+                    3
+                </span>
+
+                <span class="rpm-number n4">
+                    4
+                </span>
+
+                <span class="rpm-number n5">
+                    5
+                </span>
+
+                <span class="rpm-number n6">
+                    6
+                </span>
+
+                <span class="rpm-number n7">
+                    7
+                </span>
+
+                <span class="rpm-number n8">
+                    8
+                </span>
+
+                <span class="rpm-number n9">
+                    9
+                </span>
+
+                <span class="rpm-number n10">
+                    10
+                </span>
 
             </div>
 
+
+            <!--==========================================
+                CENTER SPEED
+            ===========================================-->
 
             <div class="vehicle-center">
 
@@ -342,30 +434,47 @@
             </div>
 
 
+            <!-- RPM LABEL -->
+
             <div class="rpm-label">
                 x1000 RPM
             </div>
 
 
+            <!--==========================================
+                VEHICLE INDICATORS
+            ===========================================-->
+
             <div class="vehicle-icons">
+
+                <!-- HEADLIGHTS -->
 
                 <div
                     id="headlight-icon"
                     class="vehicle-icon"
+                    title="Headlights"
                 >
                     ◉
                 </div>
 
+
+                <!-- SEATBELT -->
+
                 <div
                     id="seatbelt-icon"
                     class="vehicle-icon warning"
+                    title="Seatbelt"
                 >
                     ▰
                 </div>
 
+
+                <!-- CRUISE -->
+
                 <div
                     id="cruise-icon"
                     class="vehicle-icon"
+                    title="Cruise Control"
                 >
                     C
                 </div>
@@ -373,7 +482,13 @@
             </div>
 
 
-            <div class="side-meter fuel-meter">
+            <!--==========================================
+                FUEL
+            ===========================================-->
+
+            <div
+                class="side-meter fuel-meter"
+            >
 
                 <div class="side-meter-label">
                     F
@@ -391,7 +506,13 @@
             </div>
 
 
-            <div class="side-meter engine-meter">
+            <!--==========================================
+                ENGINE
+            ===========================================-->
+
+            <div
+                class="side-meter engine-meter"
+            >
 
                 <div class="side-meter-label">
                     E
@@ -409,20 +530,150 @@
             </div>
 
 
+            <!--==========================================
+                ODOMETER
+            ===========================================-->
+
             <div
                 id="mileage"
                 class="mileage"
             >
-                000000 MI
+                0000.0 MI
             </div>
 
         </div>
 
     </div>
 
+
+    <!--==================================================
+        NATIVE MINIMAP DRAG HANDLE
+
+        This handle DOES NOT represent the radar bounds.
+        Dragging it moves the actual native GTA minimap.
+    ===================================================-->
+
+    <div id="minimap-editor-handle">
+
+        <div class="minimap-handle-icon">
+            ✥
+        </div>
+
+        <div class="minimap-handle-text">
+
+            <span>
+                MINIMAP
+            </span>
+
+            <small>
+                DRAG TO MOVE
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!--==================================================
+        EDITOR SCREEN OVERLAY
+    ===================================================-->
+
+    <div id="hud-editor-overlay"></div>
+
+
+    <!--==================================================
+        HUD EDITOR CONTROL PANEL
+    ===================================================-->
+
+    <div id="hud-editor-panel">
+
+
+        <!-- HEADER -->
+
+        <div class="editor-title-row">
+
+            <div class="editor-title">
+                808LEMON HUD EDITOR
+            </div>
+
+            <div class="editor-version">
+                EDIT MODE
+            </div>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="editor-description">
+
+            Drag each highlighted HUD component anywhere
+            on your screen.
+
+            Use the MINIMAP drag handle to move the actual
+            native GTA radar.
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="editor-buttons">
+
+
+            <!-- SAVE -->
+
+            <button
+                id="editor-save"
+                class="editor-button editor-save"
+                type="button"
+            >
+                SAVE
+            </button>
+
+
+            <!-- RESET -->
+
+            <button
+                id="editor-reset"
+                class="editor-button editor-reset"
+                type="button"
+            >
+                RESET
+            </button>
+
+
+            <!-- CANCEL -->
+
+            <button
+                id="editor-cancel"
+                class="editor-button editor-cancel"
+                type="button"
+            >
+                CANCEL
+            </button>
+
+
+        </div>
+
+
+        <!-- POSITION READOUT -->
+
+        <div id="editor-position-readout">
+            DRAG A HUD COMPONENT
+        </div>
+
+    </div>
+
 </div>
 
+
+<!--======================================================
+    JAVASCRIPT
+=======================================================-->
+
 <script src="js/app.js"></script>
+<script src="js/editor.js"></script>
 
 </body>
 

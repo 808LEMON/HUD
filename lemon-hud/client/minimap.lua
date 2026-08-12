@@ -1,12 +1,21 @@
 local radarVisible = false
 
-local function ApplyMinimapPosition()
+local function ApplyBaseMinimapPosition()
 
-    local map = Config.Minimap.Map
-    local mask = Config.Minimap.Mask
-    local blur = Config.Minimap.Blur
+    local map =
+        Config.Minimap.Map
+
+    local mask =
+        Config.Minimap.Mask
+
+    local blur =
+        Config.Minimap.Blur
 
     SetMinimapClipType(0)
+
+    --=====================================================
+    -- MAP
+    --=====================================================
 
     SetMinimapComponentPosition(
         'minimap',
@@ -18,6 +27,10 @@ local function ApplyMinimapPosition()
         map.height
     )
 
+    --=====================================================
+    -- MASK
+    --=====================================================
+
     SetMinimapComponentPosition(
         'minimap_mask',
         'L',
@@ -27,6 +40,10 @@ local function ApplyMinimapPosition()
         mask.width,
         mask.height
     )
+
+    --=====================================================
+    -- BLUR
+    --=====================================================
 
     SetMinimapComponentPosition(
         'minimap_blur',
@@ -38,12 +55,16 @@ local function ApplyMinimapPosition()
         blur.height
     )
 
+end
+
+local function RefreshRadar()
+
     SetRadarBigmapEnabled(
         true,
         false
     )
 
-    Wait(100)
+    Wait(75)
 
     SetRadarBigmapEnabled(
         false,
@@ -52,15 +73,23 @@ local function ApplyMinimapPosition()
 
 end
 
+--=========================================================
+-- INITIALIZE
+--=========================================================
 
 CreateThread(function()
 
-    Wait(1000)
+    Wait(750)
 
-    ApplyMinimapPosition()
+    ApplyBaseMinimapPosition()
+
+    RefreshRadar()
 
 end)
 
+--=========================================================
+-- RADAR VISIBILITY
+--=========================================================
 
 CreateThread(function()
 
@@ -99,12 +128,17 @@ CreateThread(function()
 
 end)
 
+--=========================================================
+-- MANUAL REFRESH
+--=========================================================
 
 RegisterNetEvent(
     'lemon-hud:client:refreshMinimap',
     function()
 
-        ApplyMinimapPosition()
+        ApplyBaseMinimapPosition()
+
+        RefreshRadar()
 
     end
 )
