@@ -464,3 +464,11 @@ body.hud-editing
 
     font-size: 8px;
 }
+
+#minimap-editor-handle {
+    left: 1.5vw !important;
+    bottom: 24vh !important;
+
+    top: auto !important;
+    right: auto !important;
+}

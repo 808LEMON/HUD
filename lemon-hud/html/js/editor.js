@@ -3,13 +3,9 @@
 //=========================================================
 
 const editorState = {
-
     open: false,
-
     layout: null,
-
     savedLayout: null,
-
     defaults: null,
 
     dragging: null,
@@ -17,14 +13,13 @@ const editorState = {
     offsetX: 0,
     offsetY: 0,
 
-    minimapStartMouseX: 0,
-    minimapStartMouseY: 0,
+    lastMouseX: 0,
+    lastMouseY: 0,
 
-    minimapStartX: 0,
-    minimapStartY: 0,
+    minimapBusy: false,
 
-    previewTimeout: null
-
+    queuedMinimapDX: 0,
+    queuedMinimapDY: 0
 }
 
 
@@ -78,7 +73,7 @@ const editableComponents = {
 
 
 //=========================================================
-// MINIMAP MOVE HANDLE
+// MINIMAP HANDLE
 //=========================================================
 
 const minimapHandle =
@@ -140,30 +135,60 @@ function cloneLayout(layout) {
 }
 
 
+function getResourceName() {
+
+    /*
+        Using window.GetParentResourceName prevents
+        VS Code from flagging GetParentResourceName
+        as an undefined global.
+    */
+
+    if (
+        typeof window.GetParentResourceName ===
+        'function'
+    ) {
+
+        return window.GetParentResourceName()
+
+    }
+
+    /*
+        Browser testing fallback.
+    */
+
+    return 'lemon-hud'
+}
+
+
 function nuiPost(
     callback,
     data = {}
 ) {
 
     return fetch(
-        `https://${GetParentResourceName()}/${callback}`,
+        `https://${getResourceName()}/${callback}`,
         {
-            method: 'POST',
+
+            method:
+                'POST',
 
             headers: {
+
                 'Content-Type':
                     'application/json; charset=UTF-8'
+
             },
 
             body:
                 JSON.stringify(data)
+
         }
     )
 }
 
 
 //=========================================================
-// NORMAL NUI POSITION
+// NORMAL HUD COMPONENT POSITION
 //=========================================================
 
 function applyComponentPosition(
@@ -200,78 +225,36 @@ function applyComponentPosition(
 
 
 //=========================================================
-// MINIMAP HANDLE POSITION
-//=========================================================
-
-function applyMinimapHandlePosition(position) {
-
-    if (
-        !minimapHandle ||
-        !position
-    ) {
-        return
-    }
-
-    /*
-        The handle does NOT represent the radar bounds.
-
-        It is simply attached to the saved minimap
-        coordinate so you can grab it and move the
-        real native radar.
-
-        A small visual offset puts it approximately above
-        the radar without pretending to match its edges.
-    */
-
-    minimapHandle.style.left =
-        `${position.x}%`
-
-    minimapHandle.style.top =
-        `${Math.max(position.y - 3.0, 0)}%`
-
-    minimapHandle.style.right =
-        'auto'
-
-    minimapHandle.style.bottom =
-        'auto'
-}
-
-
-//=========================================================
-// APPLY WHOLE LAYOUT
+// APPLY NUI LAYOUT
 //=========================================================
 
 function applyLayout(layout) {
 
-    if (!layout)
+    if (!layout) {
         return
+    }
 
     Object.keys(
         editableComponents
-    ).forEach(name => {
+    ).forEach(
+        name => {
 
-        if (!layout[name])
-            return
+            if (!layout[name]) {
+                return
+            }
 
-        applyComponentPosition(
-            name,
-            layout[name]
-        )
+            applyComponentPosition(
+                name,
+                layout[name]
+            )
 
-    })
-
-    if (layout.minimap) {
-
-        applyMinimapHandlePosition(
-            layout.minimap
-        )
-
-    }
+        }
+    )
 }
 
 
 //=========================================================
-// DECORATIONS
+// EDITOR DECORATIONS
 //=========================================================
 
 function prepareEditableElements() {
@@ -281,12 +264,15 @@ function prepareEditableElements() {
     ).forEach(
         ([name, component]) => {
 
-            if (!component.element)
+            if (!component.element) {
                 return
+            }
 
             component.element
                 .classList
-                .add('hud-editable')
+                .add(
+                    'hud-editable'
+                )
 
             component.element
                 .dataset
@@ -307,16 +293,21 @@ function removeEditableElements() {
 
     Object.values(
         editableComponents
-    ).forEach(component => {
+    ).forEach(
+        component => {
 
-        if (!component.element)
-            return
+            if (!component.element) {
+                return
+            }
 
-        component.element
-            .classList
-            .remove('hud-editable')
+            component.element
+                .classList
+                .remove(
+                    'hud-editable'
+                )
 
-    })
+        }
+    )
 }
 
 
@@ -324,13 +315,14 @@ function removeEditableElements() {
 // NORMAL COMPONENT DRAG START
 //=========================================================
 
-function startDrag(
+function startNormalDrag(
     event,
     name
 ) {
 
-    if (!editorState.open)
+    if (!editorState.open) {
         return
+    }
 
     if (
         event.target.closest(
@@ -367,8 +359,12 @@ function startDrag(
         event.clientY -
         rect.top
 
-    positionReadout.textContent =
-        `MOVING ${component.label}`
+    if (positionReadout) {
+
+        positionReadout.textContent =
+            `MOVING ${component.label}`
+
+    }
 }
 
 
@@ -378,36 +374,176 @@ function startDrag(
 
 function startMinimapDrag(event) {
 
-    if (!editorState.open)
+    if (
+        !editorState.open ||
+        !minimapHandle
+    ) {
         return
+    }
 
     event.preventDefault()
+
+    event.stopPropagation()
 
     editorState.dragging =
         'minimap'
 
-    editorState.minimapStartMouseX =
+    editorState.lastMouseX =
         event.clientX
 
-    editorState.minimapStartMouseY =
+    editorState.lastMouseY =
         event.clientY
 
-    editorState.minimapStartX =
-        Number(
-            editorState.layout.minimap.x
-        ) || 0
+    editorState.queuedMinimapDX =
+        0
 
-    editorState.minimapStartY =
-        Number(
-            editorState.layout.minimap.y
-        ) || 0
+    editorState.queuedMinimapDY =
+        0
 
-    minimapHandle.classList.add(
-        'dragging'
-    )
+    minimapHandle
+        .classList
+        .add(
+            'dragging'
+        )
 
-    positionReadout.textContent =
-        'MOVING NATIVE MINIMAP'
+    if (positionReadout) {
+
+        positionReadout.textContent =
+            'MOVING NATIVE MINIMAP'
+
+    }
+}
+
+
+//=========================================================
+// SEND MINIMAP MOVEMENT TO LUA
+//=========================================================
+
+async function flushMinimapMovement() {
+
+    /*
+        Don't send another callback while one is
+        already waiting for Lua.
+    */
+
+    if (editorState.minimapBusy) {
+        return
+    }
+
+    /*
+        Nothing queued.
+    */
+
+    if (
+        editorState.queuedMinimapDX === 0 &&
+        editorState.queuedMinimapDY === 0
+    ) {
+        return
+    }
+
+    editorState.minimapBusy =
+        true
+
+    const dx =
+        editorState.queuedMinimapDX
+
+    const dy =
+        editorState.queuedMinimapDY
+
+    /*
+        Clear current queue.
+
+        Any mouse movement while Lua is handling the
+        callback will be added back into the queue.
+    */
+
+    editorState.queuedMinimapDX =
+        0
+
+    editorState.queuedMinimapDY =
+        0
+
+    try {
+
+        const response =
+            await nuiPost(
+                'moveMinimap',
+                {
+                    dx,
+                    dy
+                }
+            )
+
+        const result =
+            await response.json()
+
+        if (
+            result &&
+            result.success
+        ) {
+
+            editorState.layout.minimap = {
+
+                offsetX:
+                    Number(
+                        result.offsetX
+                    ) || 0,
+
+                offsetY:
+                    Number(
+                        result.offsetY
+                    ) || 0
+
+            }
+
+            if (positionReadout) {
+
+                positionReadout.textContent =
+                    `MINIMAP  X OFFSET: ${
+                        editorState.layout
+                            .minimap
+                            .offsetX
+                            .toFixed(4)
+                    }  Y OFFSET: ${
+                        editorState.layout
+                            .minimap
+                            .offsetY
+                            .toFixed(4)
+                    }`
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            '[LEMON HUD] Minimap movement error:',
+            error
+        )
+
+    } finally {
+
+        editorState.minimapBusy =
+            false
+
+    }
+
+    /*
+        More mouse movement may have happened while
+        the previous NUI callback was running.
+    */
+
+    if (
+        editorState.queuedMinimapDX !== 0 ||
+        editorState.queuedMinimapDY !== 0
+    ) {
+
+        requestAnimationFrame(
+            flushMinimapMovement
+        )
+
+    }
 }
 
 
@@ -424,120 +560,70 @@ function moveDrag(event) {
         return
     }
 
-    //-----------------------------------------------------
-    // MINIMAP
-    //-----------------------------------------------------
+
+    //=====================================================
+    // NATIVE MINIMAP
+    //=====================================================
 
     if (
         editorState.dragging ===
         'minimap'
     ) {
 
-        const viewportWidth =
+        const dxPixels =
+            event.clientX -
+            editorState.lastMouseX
+
+        const dyPixels =
+            event.clientY -
+            editorState.lastMouseY
+
+
+        /*
+            Update last known cursor position immediately
+            so every movement is relative to the previous
+            mouse event.
+        */
+
+        editorState.lastMouseX =
+            event.clientX
+
+        editorState.lastMouseY =
+            event.clientY
+
+
+        /*
+            Convert pixel movement into FiveM normalized
+            screen movement.
+        */
+
+        const dx =
+            dxPixels /
             window.innerWidth
 
-        const viewportHeight =
+        const dy =
+            dyPixels /
             window.innerHeight
 
 
-        const mouseDeltaX =
-            event.clientX -
-            editorState.minimapStartMouseX
+        editorState.queuedMinimapDX +=
+            dx
 
-        const mouseDeltaY =
-            event.clientY -
-            editorState.minimapStartMouseY
+        editorState.queuedMinimapDY +=
+            dy
 
 
-        /*
-            Convert exact mouse movement into screen
-            percentage movement.
-
-            This means:
-
-            mouse moves 100px right
-                    ↓
-            minimap moves equivalent normalized amount
-            right
-
-            We no longer care about the fake HTML radar
-            dimensions.
-        */
-
-        const deltaX =
-            (
-                mouseDeltaX /
-                viewportWidth
-            ) * 100
-
-        const deltaY =
-            (
-                mouseDeltaY /
-                viewportHeight
-            ) * 100
-
-
-        let x =
-            editorState.minimapStartX +
-            deltaX
-
-        let y =
-            editorState.minimapStartY +
-            deltaY
-
-
-        /*
-            Give the minimap a little safety boundary.
-        */
-
-        x =
-            clamp(
-                x,
-                -5,
-                92
-            )
-
-        y =
-            clamp(
-                y,
-                5,
-                92
-            )
-
-
-        editorState.layout.minimap = {
-
-            x:
-                Number(
-                    x.toFixed(4)
-                ),
-
-            y:
-                Number(
-                    y.toFixed(4)
-                )
-
-        }
-
-
-        applyMinimapHandlePosition(
-            editorState.layout.minimap
+        requestAnimationFrame(
+            flushMinimapMovement
         )
-
-
-        positionReadout.textContent =
-            `MINIMAP  X: ${x.toFixed(2)}%  Y: ${y.toFixed(2)}%`
-
-
-        schedulePreview()
 
         return
     }
 
 
-    //-----------------------------------------------------
-    // NORMAL HTML HUD
-    //-----------------------------------------------------
+    //=====================================================
+    // NORMAL HTML COMPONENT
+    //=====================================================
 
     const name =
         editorState.dragging
@@ -577,6 +663,10 @@ function moveDrag(event) {
         editorState.offsetY
 
 
+    /*
+        Prevent components from leaving the screen.
+    */
+
     leftPx =
         clamp(
             leftPx,
@@ -593,6 +683,10 @@ function moveDrag(event) {
             rect.height
         )
 
+
+    /*
+        Convert pixels into screen percentages.
+    */
 
     const x =
         (
@@ -628,8 +722,12 @@ function moveDrag(event) {
     )
 
 
-    positionReadout.textContent =
-        `${component.label}  X: ${x.toFixed(2)}%  Y: ${y.toFixed(2)}%`
+    if (positionReadout) {
+
+        positionReadout.textContent =
+            `${component.label}  X: ${x.toFixed(2)}%  Y: ${y.toFixed(2)}%`
+
+    }
 }
 
 
@@ -639,80 +737,22 @@ function moveDrag(event) {
 
 function stopDrag() {
 
-    if (
-        !editorState.open ||
-        !editorState.dragging
-    ) {
+    if (!editorState.dragging) {
         return
     }
-
-    const wasMinimap =
-        editorState.dragging ===
-        'minimap'
 
     editorState.dragging =
         null
 
+    if (minimapHandle) {
 
-    if (
         minimapHandle
-    ) {
-
-        minimapHandle.classList.remove(
-            'dragging'
-        )
-
-    }
-
-
-    if (wasMinimap) {
-
-        /*
-            Send one final exact update.
-        */
-
-        previewLayout()
+            .classList
+            .remove(
+                'dragging'
+            )
 
     }
-}
-
-
-//=========================================================
-// MINIMAP PREVIEW
-//=========================================================
-
-function schedulePreview() {
-
-    if (
-        editorState.previewTimeout
-    ) {
-        return
-    }
-
-    editorState.previewTimeout =
-        setTimeout(
-            () => {
-
-                editorState.previewTimeout =
-                    null
-
-                previewLayout()
-
-            },
-            16
-        )
-}
-
-
-function previewLayout() {
-
-    nuiPost(
-        'previewHudLayout',
-        {
-            layout:
-                editorState.layout
-        }
-    )
 }
 
 
@@ -756,13 +796,17 @@ function openEditor(data) {
     )
 
 
-    positionReadout.textContent =
-        'DRAG A HUD COMPONENT'
+    if (positionReadout) {
+
+        positionReadout.textContent =
+            'DRAG A HUD COMPONENT'
+
+    }
 }
 
 
 //=========================================================
-// CLOSE UI
+// CLOSE EDITOR UI
 //=========================================================
 
 function closeEditorUI() {
@@ -772,6 +816,12 @@ function closeEditorUI() {
 
     editorState.dragging =
         null
+
+    editorState.queuedMinimapDX =
+        0
+
+    editorState.queuedMinimapDY =
+        0
 
 
     document.body
@@ -786,9 +836,11 @@ function closeEditorUI() {
 
     if (minimapHandle) {
 
-        minimapHandle.classList.remove(
-            'dragging'
-        )
+        minimapHandle
+            .classList
+            .remove(
+                'dragging'
+            )
 
     }
 }
@@ -798,28 +850,39 @@ function closeEditorUI() {
 // SAVE
 //=========================================================
 
-function saveLayout() {
+async function saveLayout() {
 
-    if (!editorState.open)
+    if (!editorState.open) {
         return
+    }
 
+    try {
 
-    nuiPost(
-        'saveHudLayout',
-        {
-            layout:
-                editorState.layout
-        }
-    )
-
-
-    editorState.savedLayout =
-        cloneLayout(
-            editorState.layout
+        await nuiPost(
+            'saveHudLayout',
+            {
+                layout:
+                    editorState.layout
+            }
         )
 
 
-    closeEditorUI()
+        editorState.savedLayout =
+            cloneLayout(
+                editorState.layout
+            )
+
+
+        closeEditorUI()
+
+    } catch (error) {
+
+        console.error(
+            '[LEMON HUD] Save layout error:',
+            error
+        )
+
+    }
 }
 
 
@@ -827,10 +890,11 @@ function saveLayout() {
 // RESET
 //=========================================================
 
-function resetLayout() {
+async function resetLayout() {
 
-    if (!editorState.open)
+    if (!editorState.open) {
         return
+    }
 
 
     editorState.layout =
@@ -844,17 +908,29 @@ function resetLayout() {
     )
 
 
-    previewLayout()
+    try {
+
+        await nuiPost(
+            'resetHudLayout',
+            {}
+        )
 
 
-    nuiPost(
-        'resetHudLayout',
-        {}
-    )
+        if (positionReadout) {
 
+            positionReadout.textContent =
+                'DEFAULT LAYOUT RESTORED'
 
-    positionReadout.textContent =
-        'DEFAULT LAYOUT RESTORED'
+        }
+
+    } catch (error) {
+
+        console.error(
+            '[LEMON HUD] Reset layout error:',
+            error
+        )
+
+    }
 }
 
 
@@ -862,10 +938,11 @@ function resetLayout() {
 // CANCEL
 //=========================================================
 
-function cancelEditor() {
+async function cancelEditor() {
 
-    if (!editorState.open)
+    if (!editorState.open) {
         return
+    }
 
 
     applyLayout(
@@ -873,10 +950,21 @@ function cancelEditor() {
     )
 
 
-    nuiPost(
-        'closeHudEditor',
-        {}
-    )
+    try {
+
+        await nuiPost(
+            'closeHudEditor',
+            {}
+        )
+
+    } catch (error) {
+
+        console.error(
+            '[LEMON HUD] Close editor error:',
+            error
+        )
+
+    }
 
 
     closeEditorUI()
@@ -884,7 +972,7 @@ function cancelEditor() {
 
 
 //=========================================================
-// NORMAL COMPONENT DRAG EVENTS
+// NORMAL DRAG EVENTS
 //=========================================================
 
 Object.entries(
@@ -892,16 +980,16 @@ Object.entries(
 ).forEach(
     ([name, component]) => {
 
-        if (!component.element)
+        if (!component.element) {
             return
-
+        }
 
         component.element
             .addEventListener(
                 'mousedown',
                 event => {
 
-                    startDrag(
+                    startNormalDrag(
                         event,
                         name
                     )
@@ -914,21 +1002,22 @@ Object.entries(
 
 
 //=========================================================
-// MINIMAP HANDLE DRAG
+// MINIMAP DRAG EVENT
 //=========================================================
 
 if (minimapHandle) {
 
-    minimapHandle.addEventListener(
-        'mousedown',
-        startMinimapDrag
-    )
+    minimapHandle
+        .addEventListener(
+            'mousedown',
+            startMinimapDrag
+        )
 
 }
 
 
 //=========================================================
-// GLOBAL MOUSE
+// GLOBAL MOUSE EVENTS
 //=========================================================
 
 window.addEventListener(
@@ -943,26 +1032,44 @@ window.addEventListener(
 )
 
 
+window.addEventListener(
+    'blur',
+    stopDrag
+)
+
+
 //=========================================================
-// BUTTONS
+// EDITOR BUTTONS
 //=========================================================
 
-saveButton.addEventListener(
-    'click',
-    saveLayout
-)
+if (saveButton) {
+
+    saveButton.addEventListener(
+        'click',
+        saveLayout
+    )
+
+}
 
 
-resetButton.addEventListener(
-    'click',
-    resetLayout
-)
+if (resetButton) {
+
+    resetButton.addEventListener(
+        'click',
+        resetLayout
+    )
+
+}
 
 
-cancelButton.addEventListener(
-    'click',
-    cancelEditor
-)
+if (cancelButton) {
+
+    cancelButton.addEventListener(
+        'click',
+        cancelEditor
+    )
+
+}
 
 
 //=========================================================
@@ -973,12 +1080,13 @@ window.addEventListener(
     'keydown',
     event => {
 
-        if (!editorState.open)
+        if (!editorState.open) {
             return
-
+        }
 
         if (
-            event.key === 'Escape'
+            event.key ===
+            'Escape'
         ) {
 
             cancelEditor()
@@ -1014,6 +1122,10 @@ window.addEventListener(
         ) {
 
 
+            //=================================================
+            // APPLY SAVED LAYOUT
+            //=================================================
+
             case 'applyHudLayout':
 
                 applyLayout(
@@ -1022,6 +1134,10 @@ window.addEventListener(
 
                 break
 
+
+            //=================================================
+            // OPEN EDITOR
+            //=================================================
 
             case 'openHudEditor':
 
@@ -1032,12 +1148,20 @@ window.addEventListener(
                 break
 
 
+            //=================================================
+            // CLOSE EDITOR
+            //=================================================
+
             case 'closeHudEditor':
 
                 closeEditorUI()
 
                 break
 
+
+            //=================================================
+            // RESET
+            //=================================================
 
             case 'hudEditorReset':
 
@@ -1050,16 +1174,23 @@ window.addEventListener(
                             data.layout
                         )
 
+
                     editorState.savedLayout =
                         cloneLayout(
                             data.layout
                         )
+
 
                     applyLayout(
                         data.layout
                     )
 
                 }
+
+                break
+
+
+            default:
 
                 break
 
