@@ -10,7 +10,9 @@ console.log('[808LEMON HUD] app.js loaded')
 // DOM REFERENCES
 //=========================================================
 
+
 // PLAYER
+
 const playerStats =
     document.getElementById('player-stats')
 
@@ -30,7 +32,10 @@ const playerGrade =
     document.getElementById('player-grade')
 
 
+//=========================================================
 // COMPASS
+//=========================================================
+
 const compassWrapper =
     document.getElementById('compass-wrapper')
 
@@ -52,8 +57,14 @@ const streetName =
 const crossingName =
     document.getElementById('crossing-name')
 
+const cityName =
+    document.getElementById('city-name')
 
+
+//=========================================================
 // STATUS
+//=========================================================
+
 const statusBars =
     document.getElementById('status-bars')
 
@@ -82,7 +93,10 @@ const thirstFill =
     document.getElementById('thirst-fill')
 
 
+//=========================================================
 // VEHICLE
+//=========================================================
+
 const vehicleHud =
     document.getElementById('vehicle-hud')
 
@@ -117,25 +131,23 @@ const cruiseIcon =
     document.getElementById('cruise-icon')
 
 
-// MINIMAP BORDER
+//=========================================================
+// MINIMAP
+//=========================================================
+
 const minimapBorder =
     document.getElementById('minimap-border')
 
-
-//=========================================================
-// MINIMAP GEOMETRY
-//=========================================================
-
-let lastMinimapGeometry = null
+let lastMinimapGeometry =
+    null
 
 
-//=========================================================
-// STATUS POSITION
-//=========================================================
+const STATUS_MINIMAP_GAP =
+    4
 
-const STATUS_MINIMAP_GAP = 4
 
-const CENTER_STATUS_OVER_MINIMAP = false
+const CENTER_STATUS_OVER_MINIMAP =
+    false
 
 
 //=========================================================
@@ -151,9 +163,15 @@ function clamp(
     const number =
         Number(value)
 
-    if (!Number.isFinite(number)) {
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
         return minimum
+
     }
+
 
     return Math.min(
         maximum,
@@ -162,6 +180,7 @@ function clamp(
             number
         )
     )
+
 }
 
 
@@ -172,17 +191,21 @@ function clamp(
 function formatMoney(value) {
 
     const number =
-        Number(value) || 0
+        Number(value)
+        || 0
+
 
     return '$' +
         Math.floor(number)
-            .toLocaleString('en-US')
+            .toLocaleString(
+                'en-US'
+            )
 
 }
 
 
 //=========================================================
-// STATUS BAR WIDTH
+// PERCENTAGE
 //=========================================================
 
 function setPercentage(
@@ -194,15 +217,9 @@ function setPercentage(
         return
     }
 
-    const percentage =
-        clamp(
-            value,
-            0,
-            100
-        )
 
     element.style.width =
-        `${percentage}%`
+        `${clamp(value)}%`
 
 }
 
@@ -218,19 +235,13 @@ function updatePlayer(data) {
     }
 
 
-    const incomingId =
-        data.id !== undefined
-            ? data.id
-            : data.playerId
-
-
     if (
-        incomingId !== undefined &&
+        data.id !== undefined &&
         playerId
     ) {
 
         playerId.textContent =
-            incomingId
+            data.id
 
     }
 
@@ -267,8 +278,8 @@ function updatePlayer(data) {
     ) {
 
         playerJob.textContent =
-            data.job ||
-            'Unemployed'
+            data.job
+            || 'Unemployed'
 
     }
 
@@ -279,7 +290,8 @@ function updatePlayer(data) {
     ) {
 
         playerGrade.textContent =
-            data.grade || ''
+            data.grade
+            || ''
 
     }
 
@@ -310,10 +322,6 @@ function updateStatus(data) {
     }
 
 
-    //=====================================================
-    // HEALTH
-    //=====================================================
-
     if (
         data.health !== undefined
     ) {
@@ -325,10 +333,6 @@ function updateStatus(data) {
 
     }
 
-
-    //=====================================================
-    // ARMOR
-    //=====================================================
 
     if (
         data.armor !== undefined
@@ -342,10 +346,6 @@ function updateStatus(data) {
     }
 
 
-    //=====================================================
-    // HUNGER
-    //=====================================================
-
     if (
         data.hunger !== undefined
     ) {
@@ -357,10 +357,6 @@ function updateStatus(data) {
 
     }
 
-
-    //=====================================================
-    // THIRST
-    //=====================================================
 
     if (
         data.thirst !== undefined
@@ -375,7 +371,7 @@ function updateStatus(data) {
 
 
     //=====================================================
-    // HEALTH ROW
+    // HEALTH
     //=====================================================
 
     if (
@@ -392,7 +388,7 @@ function updateStatus(data) {
 
 
     //=====================================================
-    // ARMOR ROW
+    // ARMOR
     //=====================================================
 
     if (
@@ -400,7 +396,7 @@ function updateStatus(data) {
         data.showArmor !== undefined
     ) {
 
-        const armor =
+        const currentArmor =
             Number(
                 data.armor
             ) || 0
@@ -412,16 +408,18 @@ function updateStatus(data) {
             )
 
 
-        const shouldShowArmor =
-            Boolean(data.showArmor) &&
+        const shouldShow =
+            Boolean(
+                data.showArmor
+            ) &&
             !(
                 hideWhenEmpty &&
-                armor <= 0
+                currentArmor <= 0
             )
 
 
         armorRow.style.display =
-            shouldShowArmor
+            shouldShow
                 ? 'grid'
                 : 'none'
 
@@ -429,7 +427,7 @@ function updateStatus(data) {
 
 
     //=====================================================
-    // HUNGER ROW
+    // HUNGER
     //=====================================================
 
     if (
@@ -446,7 +444,7 @@ function updateStatus(data) {
 
 
     //=====================================================
-    // THIRST ROW
+    // THIRST
     //=====================================================
 
     if (
@@ -461,11 +459,6 @@ function updateStatus(data) {
 
     }
 
-
-    /*
-        Armor disappearing changes the total status panel
-        height, so snap the panel back above the minimap.
-    */
 
     requestAnimationFrame(
         anchorStatusToMinimap
@@ -485,6 +478,27 @@ function updateCompass(data) {
     }
 
 
+    //=====================================================
+    // VISIBILITY
+    //=====================================================
+
+    if (
+        data.visible !== undefined &&
+        compassWrapper
+    ) {
+
+        compassWrapper.style.display =
+            data.visible
+                ? 'block'
+                : 'none'
+
+    }
+
+
+    //=====================================================
+    // DIRECTION
+    //=====================================================
+
     if (
         data.direction !== undefined &&
         compassDirection
@@ -495,6 +509,10 @@ function updateCompass(data) {
 
     }
 
+
+    //=====================================================
+    // HEADING
+    //=====================================================
 
     if (
         data.heading !== undefined &&
@@ -511,18 +529,25 @@ function updateCompass(data) {
 
         heading =
             (
-                (
-                    heading % 360
-                ) + 360
+                heading % 360
+                + 360
             ) % 360
 
 
         compassHeading.textContent =
-            `${String(heading)
-                .padStart(3, '0')}°`
+            `${String(
+                heading
+            ).padStart(
+                3,
+                '0'
+            )}°`
 
     }
 
+
+    //=====================================================
+    // LEFT
+    //=====================================================
 
     if (
         data.left !== undefined &&
@@ -535,6 +560,10 @@ function updateCompass(data) {
     }
 
 
+    //=====================================================
+    // RIGHT
+    //=====================================================
+
     if (
         data.right !== undefined &&
         compassLabelRight
@@ -546,17 +575,25 @@ function updateCompass(data) {
     }
 
 
+    //=====================================================
+    // STREET
+    //=====================================================
+
     if (
         data.street !== undefined &&
         streetName
     ) {
 
         streetName.textContent =
-            data.street ||
-            'UNKNOWN ROAD'
+            data.street
+            || 'UNKNOWN ROAD'
 
     }
 
+
+    //=====================================================
+    // CROSS STREET
+    //=====================================================
 
     if (
         data.crossing !== undefined &&
@@ -564,13 +601,30 @@ function updateCompass(data) {
     ) {
 
         crossingName.textContent =
-            data.crossing || ''
+            data.crossing
+            || ''
 
 
         crossingName.style.display =
             data.crossing
                 ? 'block'
                 : 'none'
+
+    }
+
+
+    //=====================================================
+    // CITY
+    //=====================================================
+
+    if (
+        data.city !== undefined &&
+        cityName
+    ) {
+
+        cityName.textContent =
+            data.city
+            || 'SAN ANDREAS'
 
     }
 
@@ -604,13 +658,13 @@ function updateVehicle(data) {
     if (
         data.visible === false
     ) {
+
         return
+
     }
 
 
-    //=====================================================
     // SPEED
-    //=====================================================
 
     if (
         data.speed !== undefined &&
@@ -627,9 +681,7 @@ function updateVehicle(data) {
     }
 
 
-    //=====================================================
-    // SPEED UNIT
-    //=====================================================
+    // UNIT
 
     const unit =
         data.speedUnit !== undefined
@@ -649,9 +701,7 @@ function updateVehicle(data) {
     }
 
 
-    //=====================================================
     // GEAR
-    //=====================================================
 
     if (
         data.gear !== undefined &&
@@ -674,9 +724,7 @@ function updateVehicle(data) {
     }
 
 
-    //=====================================================
     // RPM
-    //=====================================================
 
     if (
         data.rpm !== undefined &&
@@ -687,9 +735,7 @@ function updateVehicle(data) {
             clamp(
                 Number(
                     data.rpm
-                ) * 100,
-                0,
-                100
+                ) * 100
             )
 
 
@@ -715,9 +761,7 @@ function updateVehicle(data) {
     }
 
 
-    //=====================================================
     // FUEL
-    //=====================================================
 
     if (
         data.fuel !== undefined &&
@@ -726,17 +770,13 @@ function updateVehicle(data) {
 
         fuelFill.style.height =
             `${clamp(
-                data.fuel,
-                0,
-                100
+                data.fuel
             )}%`
 
     }
 
 
-    //=====================================================
     // ENGINE
-    //=====================================================
 
     const engineValue =
         data.engine !== undefined
@@ -749,37 +789,38 @@ function updateVehicle(data) {
         engineFill
     ) {
 
-        let engine =
+        let currentEngine =
             Number(
                 engineValue
             ) || 0
 
 
-        if (engine > 100) {
-            engine /= 10
+        if (
+            currentEngine > 100
+        ) {
+
+            currentEngine /=
+                10
+
         }
 
 
         engineFill.style.height =
             `${clamp(
-                engine,
-                0,
-                100
+                currentEngine
             )}%`
 
     }
 
 
-    //=====================================================
     // MILEAGE
-    //=====================================================
 
     if (
         data.mileage !== undefined &&
         mileage
     ) {
 
-        const mileageValue =
+        const currentMileage =
             Number(
                 data.mileage
             ) || 0
@@ -798,16 +839,17 @@ function updateVehicle(data) {
 
 
         mileage.textContent =
-            `${mileageValue
+            `${currentMileage
                 .toFixed(1)
-                .padStart(6, '0')} ${distanceUnit}`
+                .padStart(
+                    6,
+                    '0'
+                )} ${distanceUnit}`
 
     }
 
 
-    //=====================================================
     // HEADLIGHTS
-    //=====================================================
 
     if (headlightIcon) {
 
@@ -821,58 +863,62 @@ function updateVehicle(data) {
             lights !== undefined
         ) {
 
-            headlightIcon.classList.toggle(
-                'active',
-                Boolean(lights)
-            )
+            headlightIcon
+                .classList
+                .toggle(
+                    'active',
+                    Boolean(lights)
+                )
 
         }
 
     }
 
 
-    //=====================================================
     // SEATBELT
-    //=====================================================
 
     if (
         data.seatbelt !== undefined &&
         seatbeltIcon
     ) {
 
-        seatbeltIcon.classList.toggle(
-            'active',
-            Boolean(
-                data.seatbelt
+        seatbeltIcon
+            .classList
+            .toggle(
+                'active',
+                Boolean(
+                    data.seatbelt
+                )
             )
-        )
 
 
-        seatbeltIcon.classList.toggle(
-            'warning',
-            !Boolean(
-                data.seatbelt
+        seatbeltIcon
+            .classList
+            .toggle(
+                'warning',
+                !Boolean(
+                    data.seatbelt
+                )
             )
-        )
 
     }
 
 
-    //=====================================================
     // CRUISE
-    //=====================================================
 
     if (
         data.cruise !== undefined &&
         cruiseIcon
     ) {
 
-        cruiseIcon.classList.toggle(
-            'active',
-            Boolean(
-                data.cruise
+        cruiseIcon
+            .classList
+            .toggle(
+                'active',
+                Boolean(
+                    data.cruise
+                )
             )
-        )
 
     }
 
@@ -880,7 +926,7 @@ function updateVehicle(data) {
 
 
 //=========================================================
-// APPLY HUD POSITION
+// APPLY POSITION
 //=========================================================
 
 function applyHudPosition(
@@ -892,7 +938,9 @@ function applyHudPosition(
         !element ||
         !position
     ) {
+
         return
+
     }
 
 
@@ -912,7 +960,9 @@ function applyHudPosition(
         !Number.isFinite(x) ||
         !Number.isFinite(y)
     ) {
+
         return
+
     }
 
 
@@ -944,7 +994,9 @@ function anchorStatusToMinimap() {
         !statusBars ||
         !lastMinimapGeometry
     ) {
+
         return
+
     }
 
 
@@ -960,7 +1012,9 @@ function anchorStatusToMinimap() {
         statusWidth <= 0 ||
         statusHeight <= 0
     ) {
+
         return
+
     }
 
 
@@ -988,10 +1042,6 @@ function anchorStatusToMinimap() {
         STATUS_MINIMAP_GAP
 
 
-    //=====================================================
-    // SCREEN CLAMP
-    //=====================================================
-
     left =
         Math.max(
             0,
@@ -1009,10 +1059,6 @@ function anchorStatusToMinimap() {
             top
         )
 
-
-    //=====================================================
-    // APPLY
-    //=====================================================
 
     statusBars.style.left =
         `${Math.round(left)}px`
@@ -1066,15 +1112,6 @@ function applyHudLayout(layout) {
 
     }
 
-
-    /*
-        We still allow the editor/default layout to position
-        status initially.
-
-        As soon as the real minimap geometry is available,
-        anchorStatusToMinimap() becomes the final source of
-        truth.
-    */
 
     if (
         layout.status
@@ -1131,6 +1168,7 @@ function setMinimapBorder(data) {
 
 
         return
+
     }
 
 
@@ -1165,10 +1203,12 @@ function setMinimapBorder(data) {
 
 
     lastMinimapGeometry = {
+
         left,
         top,
         width,
         height
+
     }
 
 
@@ -1200,7 +1240,7 @@ function setMinimapBorder(data) {
 
 
 //=========================================================
-// BORDER VISIBILITY
+// MINIMAP BORDER VISIBILITY
 //=========================================================
 
 function setMinimapBorderVisible(
@@ -1257,7 +1297,7 @@ function setHudVisible(
 
 
 //=========================================================
-// WINDOW RESIZE
+// RESIZE
 //=========================================================
 
 window.addEventListener(
@@ -1273,7 +1313,7 @@ window.addEventListener(
 
 
 //=========================================================
-// MESSAGE HANDLER
+// NUI MESSAGE HANDLER
 //=========================================================
 
 window.addEventListener(
@@ -1288,7 +1328,9 @@ window.addEventListener(
             !data ||
             !data.action
         ) {
+
             return
+
         }
 
 
@@ -1297,15 +1339,11 @@ window.addEventListener(
         ) {
 
 
-            //=================================================
-            // PLAYER
-            //=================================================
-
             case 'updatePlayer':
 
                 updatePlayer(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
@@ -1314,22 +1352,18 @@ window.addEventListener(
             case 'player':
 
                 updatePlayer(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
 
 
-            //=================================================
-            // STATUS
-            //=================================================
-
             case 'updateStatus':
 
                 updateStatus(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
@@ -1338,22 +1372,18 @@ window.addEventListener(
             case 'status':
 
                 updateStatus(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
 
 
-            //=================================================
-            // COMPASS
-            //=================================================
-
             case 'updateCompass':
 
                 updateCompass(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
@@ -1362,22 +1392,18 @@ window.addEventListener(
             case 'compass':
 
                 updateCompass(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
 
 
-            //=================================================
-            // VEHICLE
-            //=================================================
-
             case 'updateVehicle':
 
                 updateVehicle(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
@@ -1386,8 +1412,8 @@ window.addEventListener(
             case 'vehicle':
 
                 updateVehicle(
-                    data.data ||
-                    data
+                    data.data
+                    || data
                 )
 
                 break
@@ -1421,10 +1447,6 @@ window.addEventListener(
                 break
 
 
-            //=================================================
-            // HUD
-            //=================================================
-
             case 'showHud':
 
                 setHudVisible(
@@ -1454,10 +1476,6 @@ window.addEventListener(
                 break
 
 
-            //=================================================
-            // LAYOUT
-            //=================================================
-
             case 'applyHudLayout':
 
                 applyHudLayout(
@@ -1466,10 +1484,6 @@ window.addEventListener(
 
                 break
 
-
-            //=================================================
-            // MINIMAP
-            //=================================================
 
             case 'setMinimapBorder':
 
@@ -1490,10 +1504,6 @@ window.addEventListener(
 
                 break
 
-
-            //=================================================
-            // COMPATIBILITY
-            //=================================================
 
             case 'setHarness':
 

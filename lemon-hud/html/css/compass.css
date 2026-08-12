@@ -1,19 +1,24 @@
 /*=========================================================
     808LEMON HUD
-    COMPASS / STREET - LARGE VERSION
+    COMPASS / STREET / CITY
+=========================================================*/
+
+
+/*=========================================================
+    MAIN WRAPPER
 =========================================================*/
 
 #compass-wrapper {
     position: absolute;
 
-    width: 18.75vw;
+    width: 15vw;
 
-    min-width: 330px;
-    max-width: 420px;
+    min-width: 285px;
+    max-width: 320px;
 
     overflow: hidden;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
     color: white;
 
@@ -21,15 +26,21 @@
         linear-gradient(
             135deg,
             rgba(5, 13, 21, 0.97),
-            rgba(7, 18, 28, 0.93)
+            rgba(7, 18, 28, 0.94)
         );
 
     border:
-        1px solid rgba(62, 142, 205, 0.27);
+        1px solid
+        rgba(62, 142, 205, 0.27);
 
     box-shadow:
-        0 7px 24px rgba(0, 0, 0, 0.38),
-        inset 0 0 26px rgba(39, 124, 190, 0.035);
+        0 7px 24px
+        rgba(0, 0, 0, 0.38),
+
+        inset 0 0 24px
+        rgba(39, 124, 190, 0.035);
+
+    user-select: none;
 }
 
 
@@ -42,17 +53,19 @@
 
     position: absolute;
 
-    left: 12px;
-    right: 12px;
+    left: 10px;
+    right: 10px;
     top: 0;
 
     height: 1px;
+
+    z-index: 5;
 
     background:
         linear-gradient(
             90deg,
             transparent,
-            rgba(223, 255, 69, 0.46),
+            rgba(223, 255, 69, 0.42),
             transparent
         );
 
@@ -68,48 +81,50 @@
     position: relative;
 
     width: 100%;
-    height: 43px;
+    height: 38px;
 
     display: grid;
 
     grid-template-columns:
-        52px
+        45px
         1fr;
 
     align-items: center;
 
     padding:
-        0 11px;
+        0 8px;
 
     border-bottom:
-        1px solid rgba(255, 255, 255, 0.055);
+        1px solid
+        rgba(255, 255, 255, 0.055);
 }
 
 
 /*=========================================================
-    DIRECTION PILL
+    CURRENT DIRECTION
 =========================================================*/
 
 .direction-pill {
-    width: 42px;
-    height: 25px;
+    width: 37px;
+    height: 22px;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    border-radius: 6px;
+    border-radius: 5px;
 
     background:
         rgba(223, 255, 69, 0.10);
 
     border:
-        1px solid rgba(223, 255, 69, 0.20);
+        1px solid
+        rgba(223, 255, 69, 0.20);
 
     box-shadow:
         inset 0 0 10px
-        rgba(223, 255, 69, 0.03);
+        rgba(223, 255, 69, 0.025);
 }
 
 
@@ -117,12 +132,16 @@
     color:
         #dfff45;
 
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 900;
 
     line-height: 1;
 
-    letter-spacing: 0.9px;
+    letter-spacing: 0.8px;
+
+    text-shadow:
+        0 0 7px
+        rgba(223, 255, 69, 0.18);
 }
 
 
@@ -133,13 +152,14 @@
 .compass-tape {
     position: relative;
 
+    width: 100%;
     height: 100%;
 
     display: grid;
 
     grid-template-columns:
         1fr
-        98px
+        80px
         1fr;
 
     align-items: center;
@@ -149,7 +169,7 @@
 
 
 /*=========================================================
-    SIDE FADE
+    EDGE FADE
 =========================================================*/
 
 .compass-tape::before {
@@ -166,16 +186,16 @@
     background:
         linear-gradient(
             90deg,
-            rgba(6, 15, 23, 0.90),
-            transparent 18%,
-            transparent 82%,
-            rgba(6, 15, 23, 0.90)
+            rgba(6, 15, 23, 0.88),
+            transparent 20%,
+            transparent 80%,
+            rgba(6, 15, 23, 0.88)
         );
 }
 
 
 /*=========================================================
-    NEIGHBOR DIRECTIONS
+    SIDE DIRECTIONS
 =========================================================*/
 
 #compass-label-left,
@@ -185,12 +205,14 @@
     z-index: 2;
 
     color:
-        rgba(162, 188, 208, 0.60);
+        rgba(155, 182, 202, 0.60);
 
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 850;
 
-    letter-spacing: 0.7px;
+    line-height: 1;
+
+    letter-spacing: 0.65px;
 }
 
 
@@ -220,7 +242,7 @@
     align-items: center;
     justify-content: center;
 
-    gap: 8px;
+    gap: 6px;
 }
 
 
@@ -233,18 +255,18 @@
     height: 0;
 
     border-left:
-        4px solid transparent;
+        3px solid transparent;
 
     border-right:
-        4px solid transparent;
+        3px solid transparent;
 
     border-bottom:
-        7px solid #dfff45;
+        6px solid #dfff45;
 
     filter:
         drop-shadow(
             0 0 5px
-            rgba(223, 255, 69, 0.50)
+            rgba(223, 255, 69, 0.48)
         );
 }
 
@@ -255,48 +277,53 @@
 
 #compass-heading {
     color:
-        rgba(232, 240, 246, 0.94);
+        rgba(235, 242, 247, 0.94);
 
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 850;
 
     line-height: 1;
 
-    letter-spacing: 0.8px;
+    letter-spacing: 0.7px;
+
+    text-shadow:
+        0 1px 3px
+        rgba(0, 0, 0, 0.35);
 }
 
 
 /*=========================================================
-    STREET AREA
+    STREET INFORMATION
 =========================================================*/
 
 #street-wrapper {
     position: relative;
 
-    min-height: 60px;
+    min-height: 61px;
 
     display: grid;
 
     grid-template-columns:
-        38px
-        1fr;
+        33px
+        minmax(0, 1fr);
 
     grid-template-rows:
         auto
+        auto
         auto;
 
-    column-gap: 10px;
+    column-gap: 8px;
 
     align-content: center;
 
     padding:
-        9px 11px;
+        7px 9px;
 
     background:
         linear-gradient(
             90deg,
-            rgba(27, 78, 111, 0.075),
-            rgba(27, 78, 111, 0.015),
+            rgba(27, 78, 111, 0.07),
+            rgba(27, 78, 111, 0.02),
             transparent
         );
 }
@@ -308,10 +335,12 @@
 
 .street-icon {
     grid-column: 1;
-    grid-row: 1 / 3;
 
-    width: 34px;
-    height: 34px;
+    grid-row:
+        1 / 4;
+
+    width: 30px;
+    height: 30px;
 
     align-self: center;
 
@@ -320,7 +349,7 @@
     align-items: center;
     justify-content: center;
 
-    border-radius: 7px;
+    border-radius: 6px;
 
     color:
         rgba(110, 205, 247, 0.96);
@@ -333,28 +362,32 @@
         rgba(55, 150, 215, 0.18);
 
     box-shadow:
-        inset 0 0 12px
+        inset 0 0 10px
         rgba(40, 150, 215, 0.035);
 }
 
 
 .street-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 15px;
+    height: 15px;
 
     fill: none;
 
-    stroke: currentColor;
+    stroke:
+        currentColor;
 
     stroke-width: 1.8;
 
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
 }
 
 
 /*=========================================================
-    PRIMARY STREET
+    STREET
 =========================================================*/
 
 #street-name {
@@ -362,6 +395,7 @@
     grid-row: 1;
 
     width: 100%;
+    min-width: 0;
 
     overflow: hidden;
 
@@ -372,17 +406,18 @@
     color:
         rgba(247, 250, 252, 0.98);
 
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 900;
 
-    line-height: 16px;
+    line-height: 14px;
 
-    letter-spacing: 0.75px;
+    letter-spacing: 0.65px;
 
     text-transform: uppercase;
 
     text-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.42);
+        0 1px 3px
+        rgba(0, 0, 0, 0.42);
 }
 
 
@@ -395,6 +430,7 @@
     grid-row: 2;
 
     width: 100%;
+    min-width: 0;
 
     display: none;
 
@@ -404,48 +440,61 @@
 
     text-overflow: ellipsis;
 
-    margin-top: 2px;
+    margin-top: 1px;
 
     color:
         rgba(148, 178, 200, 0.72);
 
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 700;
 
-    line-height: 12px;
+    line-height: 10px;
 
-    letter-spacing: 0.55px;
+    letter-spacing: 0.5px;
 
     text-transform: uppercase;
 }
 
 
 /*=========================================================
-    STREET DIVIDER
+    CITY / COUNTY
 =========================================================*/
 
-#street-wrapper::before {
-    content: '';
+#city-name {
+    grid-column: 2;
+    grid-row: 3;
 
-    position: absolute;
+    width: 100%;
+    min-width: 0;
 
-    left: 58px;
-    right: 12px;
-    top: 7px;
+    margin-top: 2px;
 
-    height: 1px;
+    overflow: hidden;
 
-    background:
-        linear-gradient(
-            90deg,
-            rgba(70, 155, 220, 0.16),
-            transparent
-        );
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    color:
+        rgba(223, 255, 69, 0.86);
+
+    font-size: 7px;
+    font-weight: 900;
+
+    line-height: 9px;
+
+    letter-spacing: 0.85px;
+
+    text-transform: uppercase;
+
+    text-shadow:
+        0 0 6px
+        rgba(223, 255, 69, 0.10);
 }
 
 
 /*=========================================================
-    OPTIONAL BOTTOM ACCENT
+    SUBTLE BOTTOM ACCENT
 =========================================================*/
 
 #street-wrapper::after {
@@ -453,16 +502,66 @@
 
     position: absolute;
 
-    left: 58px;
-    bottom: 6px;
+    left: 50px;
+    bottom: 5px;
 
-    width: 54px;
+    width: 44px;
     height: 1px;
 
     background:
         linear-gradient(
             90deg,
-            rgba(223, 255, 69, 0.28),
+            rgba(223, 255, 69, 0.25),
             transparent
         );
+
+    pointer-events: none;
+}
+
+
+/*=========================================================
+    1440P / ULTRAWIDE
+=========================================================*/
+
+@media screen and (min-width: 2200px) {
+
+    #compass-wrapper {
+        width: 14vw;
+
+        min-width: 300px;
+        max-width: 340px;
+    }
+
+}
+
+
+/*=========================================================
+    SMALLER RESOLUTIONS
+=========================================================*/
+
+@media screen and (max-width: 1400px) {
+
+    #compass-wrapper {
+        width: 18vw;
+
+        min-width: 260px;
+        max-width: 300px;
+    }
+
+}
+
+
+/*=========================================================
+    VERY SMALL RESOLUTIONS
+=========================================================*/
+
+@media screen and (max-width: 1100px) {
+
+    #compass-wrapper {
+        width: 23vw;
+
+        min-width: 245px;
+        max-width: 285px;
+    }
+
 }
