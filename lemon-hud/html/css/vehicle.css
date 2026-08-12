@@ -1,77 +1,59 @@
 /*=========================================================
     808LEMON HUD
-    VEHICLE SPEEDOMETER
+    1:1 REFERENCE VEHICLE SPEEDOMETER
 =========================================================*/
 
 
 /*=========================================================
-    VEHICLE HUD ROOT
+    ROOT
 =========================================================*/
 
 #vehicle-hud {
     position: absolute;
 
-    right: 1.5vw;
-    bottom: 2vh;
+    right: 1.35vw;
+    bottom: 1.8vh;
 
-    width: 310px;
-    height: 310px;
+    width: 360px;
+    height: 360px;
 
     display: none;
 
-    color: #ffffff;
-
     pointer-events: none;
+
+    z-index: 50;
+
+    transform-origin:
+        bottom right;
 
     filter:
         drop-shadow(
-            0 10px 26px
-            rgba(0, 0, 0, 0.48)
+            0 12px 25px
+            rgba(0, 0, 0, 0.46)
         );
 }
 
 
 /*=========================================================
-    MAIN SHELL
+    MAIN SPEEDOMETER BODY
 =========================================================*/
 
 .speedometer-shell {
     position: relative;
 
-    width: 310px;
-    height: 310px;
+    width: 360px;
+    height: 360px;
 
     border-radius: 50%;
 
     overflow: visible;
 
-    background:
-        radial-gradient(
-            circle at 50% 48%,
-            rgba(9, 34, 47, 0.985) 0%,
-            rgba(5, 25, 37, 0.985) 47%,
-            rgba(4, 17, 27, 0.975) 72%,
-            rgba(3, 11, 18, 0.95) 100%
-        );
-
-    border:
-        1px solid
-        rgba(66, 161, 213, 0.23);
-
-    box-shadow:
-        inset 0 0 42px
-        rgba(41, 161, 218, 0.055),
-
-        inset 0 -28px 35px
-        rgba(0, 0, 0, 0.22),
-
-        0 0 28px
-        rgba(0, 0, 0, 0.26);
+    color: white;
 }
 
 
 /*=========================================================
-    SUBTLE TOP ACCENT
+    MAIN DARK CIRCLE
 =========================================================*/
 
 .speedometer-shell::before {
@@ -79,64 +61,195 @@
 
     position: absolute;
 
-    left: 76px;
-    right: 76px;
-    top: 7px;
+    left: 47px;
+    top: 47px;
 
-    height: 1px;
+    width: 266px;
+    height: 266px;
 
-    z-index: 10;
+    border-radius: 50%;
 
     background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(223, 255, 69, 0.48),
-            transparent
+        radial-gradient(
+            circle at 50% 44%,
+            rgba(7, 66, 85, 0.985) 0%,
+            rgba(4, 54, 73, 0.99) 43%,
+            rgba(3, 40, 57, 0.995) 71%,
+            rgba(2, 27, 42, 1) 100%
+        );
+
+    border:
+        9px solid
+        rgba(2, 30, 44, 0.94);
+
+    box-shadow:
+        inset 0 0 28px
+        rgba(0, 0, 0, 0.23),
+
+        0 0 0 2px
+        rgba(34, 122, 161, 0.12),
+
+        0 10px 30px
+        rgba(0, 0, 0, 0.32);
+
+    z-index: 0;
+}
+
+
+/*=========================================================
+    SIDE GAUGES
+=========================================================*/
+
+.side-gauges-svg {
+    position: absolute;
+
+    inset: 0;
+
+    width: 360px;
+    height: 360px;
+
+    overflow: visible;
+
+    z-index: 1;
+}
+
+
+.side-gauge-track {
+    fill: none;
+
+    stroke:
+        rgba(223, 243, 251, 0.17);
+
+    stroke-width:
+        13;
+
+    stroke-linecap:
+        round;
+}
+
+
+.side-gauge-progress {
+    fill: none;
+
+    stroke-width:
+        13;
+
+    stroke-linecap:
+        round;
+
+    transition:
+        stroke-dashoffset 0.18s linear,
+        stroke 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+/*=========================================================
+    FUEL ARC
+=========================================================*/
+
+.fuel-arc {
+    stroke:
+        rgba(245, 251, 254, 0.98);
+
+    filter:
+        drop-shadow(
+            0 0 5px
+            rgba(255, 255, 255, 0.25)
+        );
+}
+
+
+#fuel-meter.low-fuel ~ .fuel-arc,
+.speedometer-shell.low-fuel .fuel-arc {
+    stroke:
+        #ffb84d;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255, 166, 55, 0.45)
         );
 }
 
 
 /*=========================================================
-    TACHOMETER SVG
+    ENGINE ARC
 =========================================================*/
 
-.tachometer-svg {
+.engine-arc {
+    stroke:
+        rgba(245, 251, 254, 0.98);
+
+    filter:
+        drop-shadow(
+            0 0 5px
+            rgba(255, 255, 255, 0.25)
+        );
+}
+
+
+.speedometer-shell.engine-warning
+.engine-arc {
+    stroke:
+        #ff5b5b;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255, 70, 70, 0.45)
+        );
+}
+
+
+/*=========================================================
+    TACH SVG
+=========================================================*/
+
+.tach-svg {
     position: absolute;
 
     inset: 0;
 
-    width: 100%;
-    height: 100%;
+    width: 360px;
+    height: 360px;
 
-    transform:
-        rotate(135deg);
+    z-index: 2;
 
     overflow: visible;
 }
 
 
-.tachometer-svg circle {
+/*=========================================================
+    OUTER RIM
+=========================================================*/
+
+.tach-outer-rim {
     fill: none;
+
+    stroke:
+        rgba(1, 24, 37, 0.96);
+
+    stroke-width:
+        17;
 }
 
 
 /*=========================================================
-    TACH TRACK
+    RPM TRACK
 =========================================================*/
 
-.tach-track {
+.rpm-track {
+    fill: none;
+
     stroke:
-        rgba(255, 255, 255, 0.085);
+        rgba(255, 255, 255, 0.10);
 
     stroke-width:
-        8;
+        14;
 
     stroke-linecap:
         round;
-
-    stroke-dasharray:
-        593.76 197.92;
 }
 
 
@@ -144,55 +257,60 @@
     RPM PROGRESS
 =========================================================*/
 
-.tach-progress {
+.rpm-progress {
+    fill: none;
+
     stroke:
-        #57c9ef;
+        rgba(248, 252, 254, 0.98);
 
     stroke-width:
-        9;
+        14;
 
     stroke-linecap:
         round;
 
-    stroke-dasharray:
-        0 791.68;
-
     transition:
-        stroke-dasharray 0.075s linear,
+        stroke-dashoffset 0.065s linear,
         stroke 0.15s ease,
         filter 0.15s ease;
 
     filter:
         drop-shadow(
-            0 0 6px
-            rgba(72, 194, 238, 0.42)
-        );
-}
-
-
-.speedometer-shell.redline
-.tach-progress {
-    stroke:
-        #ff6262;
-
-    filter:
-        drop-shadow(
-            0 0 8px
-            rgba(255, 75, 75, 0.48)
+            0 0 5px
+            rgba(255, 255, 255, 0.22)
         );
 }
 
 
 /*=========================================================
-    INNER RING
+    REDLINE
 =========================================================*/
 
-.tach-inner-ring {
+.speedometer-shell.redline
+.rpm-progress {
     stroke:
-        rgba(255, 255, 255, 0.055);
+        #ff5959;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255, 70, 70, 0.48)
+        );
+}
+
+
+/*=========================================================
+    INNER BORDER
+=========================================================*/
+
+.tach-inner-border {
+    fill: none;
+
+    stroke:
+        rgba(81, 174, 208, 0.095);
 
     stroke-width:
-        1;
+        1.5;
 }
 
 
@@ -205,105 +323,276 @@
 
     z-index: 5;
 
+    transform:
+        translate(-50%, -50%);
+
     color:
-        rgba(206, 224, 235, 0.76);
+        rgba(214, 231, 238, 0.77);
 
     font-size:
-        10px;
+        15px;
 
     font-weight:
-        800;
+        700;
 
-    line-height:
-        1;
+    font-variant-numeric:
+        tabular-nums;
 
-    transition:
-        color 0.12s ease,
-        text-shadow 0.12s ease;
+    text-shadow:
+        0 2px 3px
+        rgba(0, 0, 0, 0.40);
 }
 
 
-.n1 {
-    left: 49px;
-    top: 225px;
+/*
+    These placements intentionally follow the reference
+    rather than making a perfectly symmetrical circle.
+*/
+
+.rpm-1 {
+    left: 83px;
+    top: 250px;
 }
 
-
-.n2 {
-    left: 29px;
-    top: 185px;
+.rpm-2 {
+    left: 65px;
+    top: 203px;
 }
 
-
-.n3 {
-    left: 27px;
-    top: 139px;
+.rpm-3 {
+    left: 78px;
+    top: 147px;
 }
 
-
-.n4 {
-    left: 44px;
-    top: 94px;
+.rpm-4 {
+    left: 119px;
+    top: 103px;
 }
 
-
-.n5 {
-    left: 80px;
-    top: 59px;
+.rpm-5 {
+    left: 180px;
+    top: 87px;
 }
 
-
-.n6 {
-    left: 145px;
-    top: 44px;
+.rpm-6 {
+    left: 241px;
+    top: 103px;
 }
 
-
-.n7 {
-    right: 78px;
-    top: 59px;
+.rpm-7 {
+    left: 282px;
+    top: 147px;
 }
 
-
-.n8 {
-    right: 42px;
-    top: 95px;
+.rpm-8 {
+    left: 295px;
+    top: 203px;
 }
 
-
-.n9 {
-    right: 26px;
-    top: 140px;
+.rpm-9 {
+    left: 277px;
+    top: 250px;
 }
 
-
-.n10 {
-    right: 29px;
-    top: 186px;
+.rpm-10 {
+    left: 250px;
+    top: 286px;
 
     color:
-        rgba(255, 104, 104, 0.78);
+        rgba(228, 234, 237, 0.74);
 }
 
 
 /*=========================================================
-    RPM LABEL
+    TACH TICKS
 =========================================================*/
 
-.rpm-label {
+.tick {
     position: absolute;
 
-    left: 39px;
+    z-index: 6;
+
+    width: 5px;
+    height: 15px;
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(248, 251, 253, 0.92);
+
+    transform-origin:
+        center;
+}
+
+
+.tick-1 {
+    left: 178px;
+    top: 55px;
+}
+
+.tick-2 {
+    left: 242px;
+    top: 76px;
+
+    transform:
+        rotate(24deg);
+}
+
+.tick-3 {
+    right: 64px;
+    top: 116px;
+
+    transform:
+        rotate(48deg);
+}
+
+.tick-4 {
+    right: 49px;
+    top: 179px;
+
+    transform:
+        rotate(82deg);
+}
+
+.tick-5 {
+    right: 61px;
+    top: 240px;
+
+    transform:
+        rotate(110deg);
+}
+
+.tick-6 {
+    right: 96px;
     bottom: 65px;
 
     transform:
-        rotate(57deg);
+        rotate(137deg);
+}
+
+
+/*=========================================================
+    CENTER
+=========================================================*/
+
+.vehicle-center {
+    position: absolute;
+
+    left: 50%;
+    top: 52%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 10;
+
+    width: 170px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/*=========================================================
+    GEAR
+=========================================================*/
+
+.gear-circle {
+    width: 41px;
+    height: 41px;
+
+    margin-bottom:
+        13px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        rgba(248, 251, 252, 0.98);
 
     color:
-        rgba(137, 164, 181, 0.57);
+        #071f2c;
+
+    border:
+        2px solid
+        rgba(255, 255, 255, 0.65);
+
+    box-shadow:
+        0 4px 10px
+        rgba(0, 0, 0, 0.28);
 
     font-size:
-        7px;
+        20px;
+
+    font-weight:
+        950;
+
+    line-height:
+        1;
+}
+
+
+/*=========================================================
+    SPEED
+=========================================================*/
+
+#speed {
+    min-width:
+        160px;
+
+    text-align:
+        center;
+
+    color:
+        rgba(251, 253, 254, 1);
+
+    font-size:
+        82px;
+
+    font-weight:
+        850;
+
+    line-height:
+        74px;
+
+    letter-spacing:
+        -5px;
+
+    font-variant-numeric:
+        tabular-nums;
+
+    text-shadow:
+        0 4px 12px
+        rgba(0, 0, 0, 0.35);
+
+    transition:
+        transform 0.08s linear;
+}
+
+
+/*=========================================================
+    SPEED UNIT
+=========================================================*/
+
+#speed-unit {
+    margin-top:
+        11px;
+
+    color:
+        rgba(157, 185, 198, 0.72);
+
+    font-size:
+        17px;
 
     font-weight:
         800;
@@ -314,508 +603,31 @@
 
 
 /*=========================================================
-    VEHICLE ICONS
+    RPM LABEL
 =========================================================*/
 
-.vehicle-icons {
+.rpm-label {
     position: absolute;
 
-    left: 50%;
-    top: 25px;
+    z-index: 7;
+
+    left: 66px;
+    bottom: 80px;
 
     transform:
-        translateX(-50%);
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 18px;
-
-    z-index: 10;
-}
-
-
-.vehicle-icon {
-    width: 18px;
-    height: 18px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
+        rotate(63deg);
 
     color:
-        rgba(146, 170, 187, 0.34);
-
-    transition:
-        color 0.15s ease,
-        transform 0.15s ease,
-        filter 0.15s ease;
-}
-
-
-.vehicle-icon svg {
-    width: 15px;
-    height: 15px;
-
-    fill: none;
-
-    stroke:
-        currentColor;
-
-    stroke-width:
-        1.7;
-
-    stroke-linecap:
-        round;
-
-    stroke-linejoin:
-        round;
-}
-
-
-.vehicle-icon.active {
-    color:
-        #f4f9fc;
-
-    filter:
-        drop-shadow(
-            0 0 5px
-            rgba(255, 255, 255, 0.35)
-        );
-}
-
-
-#seatbelt-icon.warning {
-    color:
-        rgba(255, 83, 83, 0.90);
-
-    animation:
-        seatbelt-pulse
-        1.25s ease-in-out infinite;
-}
-
-
-#seatbelt-icon.active {
-    color:
-        #dfff45;
-
-    animation:
-        none;
-
-    filter:
-        drop-shadow(
-            0 0 6px
-            rgba(223, 255, 69, 0.40)
-        );
-}
-
-
-#cruise-icon.active {
-    color:
-        #5fd4ff;
-}
-
-
-@keyframes seatbelt-pulse {
-
-    0%,
-    100% {
-        opacity: 0.55;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-}
-
-
-/*=========================================================
-    CENTER DISPLAY
-=========================================================*/
-
-.vehicle-center {
-    position: absolute;
-
-    left: 50%;
-    top: 47%;
-
-    transform:
-        translate(-50%, -50%);
-
-    width: 175px;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    z-index: 8;
-}
-
-
-/*=========================================================
-    GEAR
-=========================================================*/
-
-.gear-block {
-    display: flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    margin-bottom: 2px;
-}
-
-
-.gear-label {
-    color:
-        rgba(137, 162, 178, 0.58);
-
-    font-size:
-        7px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        0.9px;
-}
-
-
-#gear {
-    min-width:
-        26px;
-
-    height:
-        26px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    border-radius:
-        50%;
-
-    background:
-        rgba(244, 249, 252, 0.96);
-
-    color:
-        rgba(6, 27, 39, 1);
-
-    font-size:
-        13px;
-
-    font-weight:
-        950;
-
-    box-shadow:
-        0 0 9px
-        rgba(255, 255, 255, 0.10);
-}
-
-
-/*=========================================================
-    SPEED
-=========================================================*/
-
-#speed {
-    min-width:
-        135px;
-
-    margin-top:
-        2px;
-
-    text-align:
-        center;
-
-    color:
-        rgba(249, 252, 254, 1);
-
-    font-size:
-        60px;
-
-    font-weight:
-        900;
-
-    line-height:
-        55px;
-
-    letter-spacing:
-        -3px;
-
-    font-variant-numeric:
-        tabular-nums;
-
-    text-shadow:
-        0 4px 13px
-        rgba(0, 0, 0, 0.48);
-}
-
-
-/*=========================================================
-    SPEED UNIT
-=========================================================*/
-
-#speed-unit {
-    margin-top:
-        5px;
-
-    color:
-        rgba(151, 180, 198, 0.70);
+        rgba(140, 167, 180, 0.55);
 
     font-size:
         10px;
 
     font-weight:
-        900;
+        700;
 
     letter-spacing:
-        1.2px;
-}
-
-
-/*=========================================================
-    CONDITION PANEL
-=========================================================*/
-
-.vehicle-condition-panel {
-    position: absolute;
-
-    left: 50%;
-    bottom: 47px;
-
-    transform:
-        translateX(-50%);
-
-    width:
-        150px;
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:
-        12px;
-
-    z-index:
-        10;
-}
-
-
-/*=========================================================
-    CONDITION ROW
-=========================================================*/
-
-.condition-row {
-    min-width:
-        0;
-}
-
-
-/*=========================================================
-    CONDITION HEADER
-=========================================================*/
-
-.condition-header {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    margin-bottom:
-        4px;
-}
-
-
-.condition-label {
-    color:
-        rgba(130, 157, 175, 0.60);
-
-    font-size:
-        6px;
-
-    font-weight:
-        900;
-
-    letter-spacing:
-        0.7px;
-}
-
-
-#fuel-value,
-#engine-value {
-    color:
-        rgba(223, 235, 242, 0.83);
-
-    font-size:
-        7px;
-
-    font-weight:
-        900;
-
-    font-variant-numeric:
-        tabular-nums;
-}
-
-
-/*=========================================================
-    CONDITION TRACK
-=========================================================*/
-
-.condition-track {
-    position: relative;
-
-    width:
-        100%;
-
-    height:
-        5px;
-
-    overflow:
-        hidden;
-
-    border-radius:
-        100px;
-
-    background:
-        rgba(255, 255, 255, 0.07);
-
-    box-shadow:
-        inset 0 1px 2px
-        rgba(0, 0, 0, 0.45);
-}
-
-
-/*=========================================================
-    CONDITION FILL
-=========================================================*/
-
-.condition-fill {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 100%;
-    height: 100%;
-
-    border-radius:
-        inherit;
-
-    transition:
-        width 0.18s ease,
-        background 0.18s ease,
-        box-shadow 0.18s ease;
-}
-
-
-.fuel-fill {
-    background:
-        linear-gradient(
-            90deg,
-            #2f9ddd,
-            #6bd0f7
-        );
-
-    box-shadow:
-        0 0 5px
-        rgba(55, 180, 235, 0.26);
-}
-
-
-.engine-fill {
-    background:
-        linear-gradient(
-            90deg,
-            #3acb72,
-            #74ec96
-        );
-
-    box-shadow:
-        0 0 5px
-        rgba(75, 220, 110, 0.23);
-}
-
-
-/*=========================================================
-    LOW FUEL
-=========================================================*/
-
-#fuel-meter.low-fuel
-#fuel-value {
-    color:
-        #ffbd54;
-}
-
-
-#fuel-meter.low-fuel
-.fuel-fill {
-    background:
-        linear-gradient(
-            90deg,
-            #d98826,
-            #ffbc4d
-        );
-
-    box-shadow:
-        0 0 7px
-        rgba(255, 170, 55, 0.37);
-
-    animation:
-        low-fuel-pulse
-        1.2s ease-in-out infinite;
-}
-
-
-@keyframes low-fuel-pulse {
-
-    0%,
-    100% {
-        opacity: 0.72;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-}
-
-
-/*=========================================================
-    BAD ENGINE
-=========================================================*/
-
-#engine-meter.engine-warning
-#engine-value {
-    color:
-        #ff6464;
-}
-
-
-#engine-meter.engine-warning
-.engine-fill {
-    background:
-        linear-gradient(
-            90deg,
-            #d74444,
-            #ff6969
-        );
-
-    box-shadow:
-        0 0 7px
-        rgba(255, 70, 70, 0.34);
+        0.3px;
 }
 
 
@@ -827,45 +639,59 @@
     position: absolute;
 
     left: 50%;
-    bottom: 20px;
+    bottom: 51px;
 
     transform:
         translateX(-50%);
 
+    z-index: 12;
+
     min-width:
-        92px;
+        105px;
+
+    height:
+        28px;
 
     padding:
-        3px 8px;
+        0 12px;
 
-    text-align:
-        center;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     border-radius:
-        4px;
+        14px;
 
     background:
-        rgba(2, 10, 16, 0.72);
+        rgba(1, 17, 26, 0.95);
 
     border:
         1px solid
-        rgba(255, 255, 255, 0.035);
+        rgba(63, 108, 128, 0.15);
+
+    box-shadow:
+        inset 0 2px 7px
+        rgba(0, 0, 0, 0.35);
 
     color:
-        rgba(215, 229, 237, 0.78);
+        rgba(229, 237, 241, 0.92);
 
     font-family:
         Consolas,
         monospace;
 
     font-size:
-        8px;
+        11px;
 
     font-weight:
-        800;
+        900;
 
     letter-spacing:
-        0.6px;
+        0.2px;
+
+    white-space:
+        nowrap;
 
     font-variant-numeric:
         tabular-nums;
@@ -873,32 +699,349 @@
 
 
 /*=========================================================
-    SMALLER RESOLUTIONS
+    FUEL / ENGINE ICONS
 =========================================================*/
 
-@media screen and (max-width: 1400px) {
+.gauge-icon {
+    position: absolute;
 
-    #vehicle-hud {
-        width:
-            280px;
+    z-index: 15;
 
-        height:
-            280px;
+    top: 21px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 3px;
+
+    color:
+        rgba(245, 250, 253, 0.92);
+}
+
+
+.gauge-icon svg {
+    width:
+        27px;
+
+    height:
+        27px;
+
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.75;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+}
+
+
+.gauge-icon span {
+    display:
+        none;
+}
+
+
+/* FUEL */
+
+.fuel-icon {
+    left:
+        72px;
+}
+
+
+/* ENGINE */
+
+.engine-icon {
+    right:
+        72px;
+}
+
+
+/*=========================================================
+    WARNING ICON COLORS
+=========================================================*/
+
+.speedometer-shell.low-fuel
+.fuel-icon {
+    color:
+        #ffb84d;
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(255, 175, 63, 0.40)
+        );
+}
+
+
+.speedometer-shell.engine-warning
+.engine-icon {
+    color:
+        #ff6767;
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(255, 70, 70, 0.40)
+        );
+}
+
+
+/*=========================================================
+    VEHICLE INDICATORS
+=========================================================*/
+
+.vehicle-indicators {
+    position: absolute;
+
+    left: 50%;
+    bottom: 18px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 15;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.vehicle-indicator {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color:
+        rgba(154, 178, 190, 0.25);
+
+    opacity:
+        0.75;
+
+    transition:
+        color 0.15s ease,
+        opacity 0.15s ease,
+        filter 0.15s ease;
+}
+
+
+.vehicle-indicator svg {
+    width:
+        14px;
+
+    height:
+        14px;
+
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.8;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+}
+
+
+.vehicle-indicator.active {
+    color:
+        rgba(248, 252, 254, 1);
+
+    opacity:
+        1;
+
+    filter:
+        drop-shadow(
+            0 0 5px
+            rgba(255, 255, 255, 0.30)
+        );
+}
+
+
+/*=========================================================
+    SEATBELT WARNING
+=========================================================*/
+
+#seatbelt-icon.warning {
+    color:
+        #ff6464;
+
+    opacity:
+        1;
+
+    animation:
+        lemon-seatbelt-pulse
+        1.2s
+        ease-in-out
+        infinite;
+}
+
+
+#seatbelt-icon.active {
+    color:
+        #dfff45;
+
+    opacity:
+        1;
+
+    animation:
+        none;
+}
+
+
+@keyframes lemon-seatbelt-pulse {
+
+    0%,
+    100% {
+        opacity:
+            0.45;
     }
 
+    50% {
+        opacity:
+            1;
+    }
 
-    .speedometer-shell {
-        width:
-            280px;
+}
 
-        height:
-            280px;
+
+/*=========================================================
+    CRUISE
+=========================================================*/
+
+#cruise-icon.active {
+    color:
+        #64d6ff;
+}
+
+
+/*=========================================================
+    LOW FUEL PULSE
+=========================================================*/
+
+.speedometer-shell.low-fuel
+.fuel-arc {
+    animation:
+        lemon-fuel-pulse
+        1.15s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes lemon-fuel-pulse {
+
+    0%,
+    100% {
+        opacity:
+            0.62;
+    }
+
+    50% {
+        opacity:
+            1;
+    }
+
+}
+
+
+/*=========================================================
+    SPEEDOMETER ENTRY
+=========================================================*/
+
+#vehicle-hud.vehicle-enter
+.speedometer-shell {
+    animation:
+        lemon-speedometer-enter
+        0.28s
+        cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+        );
+}
+
+
+@keyframes lemon-speedometer-enter {
+
+    from {
+        opacity:
+            0;
 
         transform:
+            translateY(14px)
             scale(0.92);
+    }
 
-        transform-origin:
-            bottom right;
+    to {
+        opacity:
+            1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+/*=========================================================
+    1440P / 1080P
+=========================================================*/
+
+@media screen and (max-width: 2000px) {
+
+    #vehicle-hud {
+        transform:
+            scale(0.88);
+    }
+
+}
+
+
+/*=========================================================
+    SMALL SCREEN
+=========================================================*/
+
+@media screen and (max-width: 1500px) {
+
+    #vehicle-hud {
+        right:
+            0.75vw;
+
+        bottom:
+            0.9vh;
+
+        transform:
+            scale(0.76);
     }
 
 }

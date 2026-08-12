@@ -11,7 +11,9 @@ console.log('[808LEMON HUD] app.js loaded')
 //=========================================================
 
 const minimapInfoPanel =
-    document.getElementById('minimap-info-panel')
+    document.getElementById(
+        'minimap-info-panel'
+    )
 
 
 //=========================================================
@@ -19,30 +21,45 @@ const minimapInfoPanel =
 //=========================================================
 
 const playerStats =
-    document.getElementById('player-stats')
+    document.getElementById(
+        'player-stats'
+    )
 
 const playerId =
-    document.getElementById('player-id')
+    document.getElementById(
+        'player-id'
+    )
 
 const playerCash =
-    document.getElementById('player-cash')
+    document.getElementById(
+        'player-cash'
+    )
 
 const playerBank =
-    document.getElementById('player-bank')
+    document.getElementById(
+        'player-bank'
+    )
 
 const playerJob =
-    document.getElementById('player-job')
+    document.getElementById(
+        'player-job'
+    )
 
 const playerGrade =
-    document.getElementById('player-grade')
+    document.getElementById(
+        'player-grade'
+    )
 
 
 //=========================================================
 // MONEY STATE
 //=========================================================
 
-let previousCash = null
-let previousBank = null
+let previousCash =
+    null
+
+let previousBank =
+    null
 
 
 //=========================================================
@@ -50,31 +67,49 @@ let previousBank = null
 //=========================================================
 
 const compassWrapper =
-    document.getElementById('compass-wrapper')
+    document.getElementById(
+        'compass-wrapper'
+    )
 
 const compassDirection =
-    document.getElementById('compass-direction')
+    document.getElementById(
+        'compass-direction'
+    )
 
 const compassHeading =
-    document.getElementById('compass-heading')
+    document.getElementById(
+        'compass-heading'
+    )
 
 const locationDirectionValue =
-    document.getElementById('location-direction-value')
+    document.getElementById(
+        'location-direction-value'
+    )
 
 const compassLabelLeft =
-    document.getElementById('compass-label-left')
+    document.getElementById(
+        'compass-label-left'
+    )
 
 const compassLabelRight =
-    document.getElementById('compass-label-right')
+    document.getElementById(
+        'compass-label-right'
+    )
 
 const streetName =
-    document.getElementById('street-name')
+    document.getElementById(
+        'street-name'
+    )
 
 const crossingName =
-    document.getElementById('crossing-name')
+    document.getElementById(
+        'crossing-name'
+    )
 
 const cityName =
-    document.getElementById('city-name')
+    document.getElementById(
+        'city-name'
+    )
 
 
 //=========================================================
@@ -82,31 +117,49 @@ const cityName =
 //=========================================================
 
 const statusBars =
-    document.getElementById('status-bars')
+    document.getElementById(
+        'status-bars'
+    )
 
 const healthRow =
-    document.getElementById('health-row')
+    document.getElementById(
+        'health-row'
+    )
 
 const healthFill =
-    document.getElementById('health-fill')
+    document.getElementById(
+        'health-fill'
+    )
 
 const armorRow =
-    document.getElementById('armor-row')
+    document.getElementById(
+        'armor-row'
+    )
 
 const armorFill =
-    document.getElementById('armor-fill')
+    document.getElementById(
+        'armor-fill'
+    )
 
 const hungerRow =
-    document.getElementById('hunger-row')
+    document.getElementById(
+        'hunger-row'
+    )
 
 const hungerFill =
-    document.getElementById('hunger-fill')
+    document.getElementById(
+        'hunger-fill'
+    )
 
 const thirstRow =
-    document.getElementById('thirst-row')
+    document.getElementById(
+        'thirst-row'
+    )
 
 const thirstFill =
-    document.getElementById('thirst-fill')
+    document.getElementById(
+        'thirst-fill'
+    )
 
 
 //=========================================================
@@ -114,52 +167,101 @@ const thirstFill =
 //=========================================================
 
 const vehicleHud =
-    document.getElementById('vehicle-hud')
+    document.getElementById(
+        'vehicle-hud'
+    )
 
 const speedometerShell =
-    document.getElementById('speedometer-shell')
+    document.getElementById(
+        'speedometer-shell'
+    )
 
 const speed =
-    document.getElementById('speed')
+    document.getElementById(
+        'speed'
+    )
 
 const speedUnit =
-    document.getElementById('speed-unit')
+    document.getElementById(
+        'speed-unit'
+    )
 
 const gear =
-    document.getElementById('gear')
+    document.getElementById(
+        'gear'
+    )
 
 const rpmRing =
-    document.getElementById('rpm-ring')
+    document.getElementById(
+        'rpm-ring'
+    )
+
+const fuelArc =
+    document.getElementById(
+        'fuel-arc'
+    )
+
+const engineArc =
+    document.getElementById(
+        'engine-arc'
+    )
 
 const fuelMeter =
-    document.getElementById('fuel-meter')
-
-const fuelFill =
-    document.getElementById('fuel-fill')
+    document.getElementById(
+        'fuel-meter'
+    )
 
 const fuelValue =
-    document.getElementById('fuel-value')
+    document.getElementById(
+        'fuel-value'
+    )
 
 const engineMeter =
-    document.getElementById('engine-meter')
-
-const engineFill =
-    document.getElementById('engine-fill')
+    document.getElementById(
+        'engine-meter'
+    )
 
 const engineValue =
-    document.getElementById('engine-value')
+    document.getElementById(
+        'engine-value'
+    )
 
 const mileage =
-    document.getElementById('mileage')
+    document.getElementById(
+        'mileage'
+    )
 
 const headlightIcon =
-    document.getElementById('headlight-icon')
+    document.getElementById(
+        'headlight-icon'
+    )
 
 const seatbeltIcon =
-    document.getElementById('seatbelt-icon')
+    document.getElementById(
+        'seatbelt-icon'
+    )
 
 const cruiseIcon =
-    document.getElementById('cruise-icon')
+    document.getElementById(
+        'cruise-icon'
+    )
+
+
+//=========================================================
+// VEHICLE SVG STATE
+//=========================================================
+
+let rpmPathLength =
+    0
+
+let fuelPathLength =
+    0
+
+let enginePathLength =
+    0
+
+let vehicleWasVisible =
+    false
 
 
 //=========================================================
@@ -167,11 +269,15 @@ const cruiseIcon =
 //=========================================================
 
 const minimapBorder =
-    document.getElementById('minimap-border')
+    document.getElementById(
+        'minimap-border'
+    )
 
-let lastMinimapGeometry = null
+let lastMinimapGeometry =
+    null
 
-const STATUS_MINIMAP_GAP = 4
+const STATUS_MINIMAP_GAP =
+    4
 
 
 //=========================================================
@@ -184,11 +290,22 @@ function clamp(
     maximum = 100
 ) {
 
-    const number = Number(value)
+    const number =
+        Number(
+            value
+        )
 
-    if (!Number.isFinite(number)) {
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+
         return minimum
+
     }
+
 
     return Math.min(
         maximum,
@@ -197,6 +314,7 @@ function clamp(
             number
         )
     )
+
 }
 
 
@@ -207,11 +325,18 @@ function clamp(
 function formatMoney(value) {
 
     const number =
-        Number(value) || 0
+        Number(
+            value
+        ) || 0
+
 
     return '$' +
-        Math.floor(number)
-            .toLocaleString('en-US')
+        Math.floor(
+            number
+        ).toLocaleString(
+            'en-US'
+        )
+
 }
 
 
@@ -228,18 +353,22 @@ function restartMoneyAnimation(
         return
     }
 
+
     element.classList.remove(
         'money-increase',
         'money-decrease',
         'money-bump'
     )
 
+
     void element.offsetWidth
+
 
     element.classList.add(
         className,
         'money-bump'
     )
+
 
     window.setTimeout(
         () => {
@@ -253,11 +382,12 @@ function restartMoneyAnimation(
         },
         650
     )
+
 }
 
 
 //=========================================================
-// UPDATE MONEY
+// UPDATE MONEY VALUE
 //=========================================================
 
 function updateMoneyValue(
@@ -270,27 +400,34 @@ function updateMoneyValue(
         return
     }
 
+
     const current =
-        Number(newValue) || 0
+        Number(
+            newValue
+        ) || 0
+
 
     element.textContent =
-        formatMoney(current)
+        formatMoney(
+            current
+        )
 
 
-    /*
-        First HUD load:
-        update value without animation.
-    */
+    // Initial load does not animate
 
     if (
         oldValue === null ||
         oldValue === undefined
     ) {
+
         return
+
     }
 
 
-    if (current > oldValue) {
+    if (
+        current > oldValue
+    ) {
 
         restartMoneyAnimation(
             element,
@@ -298,7 +435,9 @@ function updateMoneyValue(
         )
 
     }
-    else if (current < oldValue) {
+    else if (
+        current < oldValue
+    ) {
 
         restartMoneyAnimation(
             element,
@@ -306,11 +445,12 @@ function updateMoneyValue(
         )
 
     }
+
 }
 
 
 //=========================================================
-// STATUS PERCENTAGE
+// STANDARD BAR PERCENTAGE
 //=========================================================
 
 function setPercentage(
@@ -322,6 +462,7 @@ function setPercentage(
         return
     }
 
+
     const percentage =
         clamp(
             value,
@@ -329,8 +470,132 @@ function setPercentage(
             100
         )
 
+
     element.style.width =
         `${percentage}%`
+
+}
+
+
+//=========================================================
+// INITIALIZE VEHICLE SVG ARCS
+//=========================================================
+
+function initializeVehicleArcs() {
+
+    //=====================================================
+    // RPM
+    //=====================================================
+
+    if (
+        rpmRing &&
+        typeof rpmRing.getTotalLength ===
+            'function'
+    ) {
+
+        rpmPathLength =
+            rpmRing.getTotalLength()
+
+
+        rpmRing.style.strokeDasharray =
+            `${rpmPathLength}`
+
+
+        rpmRing.style.strokeDashoffset =
+            `${rpmPathLength}`
+
+    }
+
+
+    //=====================================================
+    // FUEL
+    //=====================================================
+
+    if (
+        fuelArc &&
+        typeof fuelArc.getTotalLength ===
+            'function'
+    ) {
+
+        fuelPathLength =
+            fuelArc.getTotalLength()
+
+
+        fuelArc.style.strokeDasharray =
+            `${fuelPathLength}`
+
+
+        fuelArc.style.strokeDashoffset =
+            '0'
+
+    }
+
+
+    //=====================================================
+    // ENGINE
+    //=====================================================
+
+    if (
+        engineArc &&
+        typeof engineArc.getTotalLength ===
+            'function'
+    ) {
+
+        enginePathLength =
+            engineArc.getTotalLength()
+
+
+        engineArc.style.strokeDasharray =
+            `${enginePathLength}`
+
+
+        engineArc.style.strokeDashoffset =
+            '0'
+
+    }
+
+}
+
+
+//=========================================================
+// SVG GAUGE
+//=========================================================
+
+function setSvgGauge(
+    path,
+    pathLength,
+    percentage
+) {
+
+    if (
+        !path ||
+        pathLength <= 0
+    ) {
+
+        return
+
+    }
+
+
+    const value =
+        clamp(
+            percentage,
+            0,
+            100
+        )
+
+
+    const offset =
+        pathLength *
+        (
+            1 -
+            value / 100
+        )
+
+
+    path.style.strokeDashoffset =
+        `${offset}`
+
 }
 
 
@@ -376,7 +641,10 @@ function updatePlayer(data) {
     ) {
 
         const currentCash =
-            Number(data.cash) || 0
+            Number(
+                data.cash
+            ) || 0
+
 
         updateMoneyValue(
             playerCash,
@@ -384,8 +652,10 @@ function updatePlayer(data) {
             previousCash
         )
 
+
         previousCash =
             currentCash
+
     }
 
 
@@ -399,7 +669,10 @@ function updatePlayer(data) {
     ) {
 
         const currentBank =
-            Number(data.bank) || 0
+            Number(
+                data.bank
+            ) || 0
+
 
         updateMoneyValue(
             playerBank,
@@ -407,8 +680,10 @@ function updatePlayer(data) {
             previousBank
         )
 
+
         previousBank =
             currentBank
+
     }
 
 
@@ -422,7 +697,8 @@ function updatePlayer(data) {
     ) {
 
         playerJob.textContent =
-            data.job || 'Unemployed'
+            data.job ||
+            'Unemployed'
 
     }
 
@@ -437,7 +713,8 @@ function updatePlayer(data) {
     ) {
 
         playerGrade.textContent =
-            data.grade || ''
+            data.grade ||
+            ''
 
     }
 
@@ -457,6 +734,7 @@ function updatePlayer(data) {
                 : 'none'
 
     }
+
 }
 
 
@@ -477,7 +755,10 @@ function moneyChanged(data) {
     ) {
 
         const currentCash =
-            Number(data.cash) || 0
+            Number(
+                data.cash
+            ) || 0
+
 
         updateMoneyValue(
             playerCash,
@@ -485,8 +766,10 @@ function moneyChanged(data) {
             previousCash
         )
 
+
         previousCash =
             currentCash
+
     }
 
 
@@ -496,7 +779,10 @@ function moneyChanged(data) {
     ) {
 
         const currentBank =
-            Number(data.bank) || 0
+            Number(
+                data.bank
+            ) || 0
+
 
         updateMoneyValue(
             playerBank,
@@ -504,9 +790,12 @@ function moneyChanged(data) {
             previousBank
         )
 
+
         previousBank =
             currentBank
+
     }
+
 }
 
 
@@ -525,7 +814,9 @@ function updateStatus(data) {
     // HEALTH
     //=====================================================
 
-    if (data.health !== undefined) {
+    if (
+        data.health !== undefined
+    ) {
 
         setPercentage(
             healthFill,
@@ -539,7 +830,9 @@ function updateStatus(data) {
     // ARMOR
     //=====================================================
 
-    if (data.armor !== undefined) {
+    if (
+        data.armor !== undefined
+    ) {
 
         setPercentage(
             armorFill,
@@ -553,7 +846,9 @@ function updateStatus(data) {
     // HUNGER
     //=====================================================
 
-    if (data.hunger !== undefined) {
+    if (
+        data.hunger !== undefined
+    ) {
 
         setPercentage(
             hungerFill,
@@ -567,7 +862,9 @@ function updateStatus(data) {
     // THIRST
     //=====================================================
 
-    if (data.thirst !== undefined) {
+    if (
+        data.thirst !== undefined
+    ) {
 
         setPercentage(
             thirstFill,
@@ -590,6 +887,7 @@ function updateStatus(data) {
             data.showHealth
                 ? 'grid'
                 : 'none'
+
     }
 
 
@@ -603,10 +901,15 @@ function updateStatus(data) {
     ) {
 
         const currentArmor =
-            Number(data.armor) || 0
+            Number(
+                data.armor
+            ) || 0
+
 
         const shouldShowArmor =
-            Boolean(data.showArmor) &&
+            Boolean(
+                data.showArmor
+            ) &&
             !(
                 Boolean(
                     data.hideArmorWhenEmpty
@@ -614,10 +917,12 @@ function updateStatus(data) {
                 currentArmor <= 0
             )
 
+
         armorRow.style.display =
             shouldShowArmor
                 ? 'grid'
                 : 'none'
+
     }
 
 
@@ -634,6 +939,7 @@ function updateStatus(data) {
             data.showHunger
                 ? 'grid'
                 : 'none'
+
     }
 
 
@@ -650,19 +956,14 @@ function updateStatus(data) {
             data.showThirst
                 ? 'grid'
                 : 'none'
+
     }
 
-
-    /*
-        Armor can disappear, which changes the overall
-        status panel height.
-
-        Re-anchor it above the minimap every update.
-    */
 
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
@@ -690,21 +991,27 @@ function updateCompass(data) {
             data.visible
                 ? 'block'
                 : 'none'
+
     }
 
 
     //=====================================================
-    // CARDINAL
+    // CARDINAL DIRECTION
     //=====================================================
 
-    if (data.direction !== undefined) {
+    if (
+        data.direction !== undefined
+    ) {
 
         const direction =
-            String(data.direction)
-                .toUpperCase()
+            String(
+                data.direction
+            ).toUpperCase()
 
 
-        if (compassDirection) {
+        if (
+            compassDirection
+        ) {
 
             compassDirection.textContent =
                 direction
@@ -712,17 +1019,20 @@ function updateCompass(data) {
         }
 
 
-        if (locationDirectionValue) {
+        if (
+            locationDirectionValue
+        ) {
 
             locationDirectionValue.textContent =
                 direction
 
         }
+
     }
 
 
     //=====================================================
-    // NUMERIC HEADING
+    // HEADING
     //=====================================================
 
     if (
@@ -732,8 +1042,11 @@ function updateCompass(data) {
 
         let heading =
             Math.round(
-                Number(data.heading) || 0
+                Number(
+                    data.heading
+                ) || 0
             )
+
 
         heading =
             (
@@ -741,13 +1054,20 @@ function updateCompass(data) {
                 360
             ) % 360
 
+
         compassHeading.textContent =
-            `${String(heading).padStart(3, '0')}°`
+            `${String(
+                heading
+            ).padStart(
+                3,
+                '0'
+            )}°`
+
     }
 
 
     //=====================================================
-    // NEIGHBOR DIRECTIONS
+    // LEFT
     //=====================================================
 
     if (
@@ -756,11 +1076,16 @@ function updateCompass(data) {
     ) {
 
         compassLabelLeft.textContent =
-            String(data.left)
-                .toUpperCase()
+            String(
+                data.left
+            ).toUpperCase()
 
     }
 
+
+    //=====================================================
+    // RIGHT
+    //=====================================================
 
     if (
         data.right !== undefined &&
@@ -768,8 +1093,9 @@ function updateCompass(data) {
     ) {
 
         compassLabelRight.textContent =
-            String(data.right)
-                .toUpperCase()
+            String(
+                data.right
+            ).toUpperCase()
 
     }
 
@@ -786,6 +1112,7 @@ function updateCompass(data) {
         streetName.textContent =
             data.street ||
             'UNKNOWN ROAD'
+
     }
 
 
@@ -799,15 +1126,19 @@ function updateCompass(data) {
     ) {
 
         const crossing =
-            data.crossing || ''
+            data.crossing ||
+            ''
+
 
         crossingName.textContent =
             crossing
+
 
         crossingName.style.display =
             crossing
                 ? 'block'
                 : 'none'
+
     }
 
 
@@ -823,7 +1154,9 @@ function updateCompass(data) {
         cityName.textContent =
             data.city ||
             'SAN ANDREAS'
+
     }
+
 }
 
 
@@ -847,24 +1180,82 @@ function updateVehicle(data) {
         vehicleHud
     ) {
 
+        const shouldShow =
+            Boolean(
+                data.visible
+            )
+
+
         vehicleHud.style.display =
-            data.visible
+            shouldShow
                 ? 'block'
                 : 'none'
-    }
 
 
-    if (data.visible === false) {
+        //=================================================
+        // ENTRY ANIMATION
+        //=================================================
 
-        if (speedometerShell) {
+        if (
+            shouldShow &&
+            !vehicleWasVisible
+        ) {
 
-            speedometerShell.classList.remove(
-                'redline'
+            vehicleWasVisible =
+                true
+
+
+            vehicleHud.classList.remove(
+                'vehicle-enter'
+            )
+
+
+            void vehicleHud.offsetWidth
+
+
+            vehicleHud.classList.add(
+                'vehicle-enter'
             )
 
         }
 
+
+        if (
+            !shouldShow
+        ) {
+
+            vehicleWasVisible =
+                false
+
+
+            vehicleHud.classList.remove(
+                'vehicle-enter'
+            )
+
+
+            if (
+                speedometerShell
+            ) {
+
+                speedometerShell.classList.remove(
+                    'redline',
+                    'low-fuel',
+                    'engine-warning'
+                )
+
+            }
+
+        }
+
+    }
+
+
+    if (
+        data.visible === false
+    ) {
+
         return
+
     }
 
 
@@ -877,21 +1268,42 @@ function updateVehicle(data) {
         speed
     ) {
 
-        const speedValue =
+        const currentSpeed =
             Math.max(
                 0,
                 Math.round(
-                    Number(data.speed) || 0
+                    Number(
+                        data.speed
+                    ) || 0
                 )
             )
 
+
         speed.textContent =
-            speedValue
+            currentSpeed
+
+
+        /*
+            Very small scaling effect at speed.
+            Keeps numbers feeling alive without bouncing.
+        */
+
+        const speedScale =
+            1 +
+            Math.min(
+                currentSpeed,
+                200
+            ) / 4000
+
+
+        speed.style.transform =
+            `scale(${speedScale})`
+
     }
 
 
     //=====================================================
-    // UNIT
+    // SPEED UNIT
     //=====================================================
 
     const unit =
@@ -906,8 +1318,10 @@ function updateVehicle(data) {
     ) {
 
         speedUnit.textContent =
-            String(unit)
-                .toUpperCase()
+            String(
+                unit
+            ).toUpperCase()
+
     }
 
 
@@ -921,7 +1335,10 @@ function updateVehicle(data) {
     ) {
 
         gear.textContent =
-            String(data.gear)
+            String(
+                data.gear
+            )
+
     }
 
 
@@ -930,42 +1347,39 @@ function updateVehicle(data) {
     //=====================================================
 
     if (
-        data.rpm !== undefined &&
-        rpmRing
+        data.rpm !== undefined
     ) {
 
         const rpm =
             clamp(
-                Number(data.rpm),
+                Number(
+                    data.rpm
+                ) * 100,
                 0,
-                1
+                100
             )
 
 
-        const circumference =
-            791.68
-
-        const visibleArc =
-            593.76
-
-        const fill =
-            visibleArc * rpm
+        setSvgGauge(
+            rpmRing,
+            rpmPathLength,
+            rpm
+        )
 
 
-        rpmRing.style.strokeDasharray =
-            `${fill} ${
-                circumference - fill
-            }`
+        if (
+            speedometerShell
+        ) {
 
-
-        if (speedometerShell) {
-
-            speedometerShell.classList.toggle(
-                'redline',
-                rpm >= 0.82
-            )
+            speedometerShell
+                .classList
+                .toggle(
+                    'redline',
+                    rpm >= 82
+                )
 
         }
+
     }
 
 
@@ -973,7 +1387,9 @@ function updateVehicle(data) {
     // FUEL
     //=====================================================
 
-    if (data.fuel !== undefined) {
+    if (
+        data.fuel !== undefined
+    ) {
 
         const currentFuel =
             Math.round(
@@ -985,33 +1401,55 @@ function updateVehicle(data) {
             )
 
 
-        if (fuelFill) {
+        setSvgGauge(
+            fuelArc,
+            fuelPathLength,
+            currentFuel
+        )
 
-            fuelFill.style.width =
-                `${currentFuel}%`
-        }
 
-
-        if (fuelValue) {
+        if (
+            fuelValue
+        ) {
 
             fuelValue.textContent =
                 `${currentFuel}%`
+
+        }
+
+
+        if (
+            fuelMeter
+        ) {
+
+            fuelMeter
+                .classList
+                .toggle(
+                    'low-fuel',
+                    currentFuel <= 15
+                )
+
         }
 
 
-        if (fuelMeter) {
+        if (
+            speedometerShell
+        ) {
 
-            fuelMeter.classList.toggle(
-                'low-fuel',
-                currentFuel <= 15
-            )
+            speedometerShell
+                .classList
+                .toggle(
+                    'low-fuel',
+                    currentFuel <= 15
+                )
 
         }
+
     }
 
 
     //=====================================================
-    // ENGINE
+    // ENGINE HEALTH
     //=====================================================
 
     const incomingEngine =
@@ -1020,19 +1458,25 @@ function updateVehicle(data) {
             : data.engine
 
 
-    if (incomingEngine !== undefined) {
+    if (
+        incomingEngine !== undefined
+    ) {
 
         let currentEngine =
-            Number(incomingEngine) || 0
+            Number(
+                incomingEngine
+            ) || 0
 
 
         /*
-            Support either:
-            0-100
-            or GTA's 0-1000 style.
+            Accept either:
+            0 - 100
+            or GTA 0 - 1000.
         */
 
-        if (currentEngine > 100) {
+        if (
+            currentEngine > 100
+        ) {
 
             currentEngine =
                 currentEngine / 10
@@ -1050,28 +1494,50 @@ function updateVehicle(data) {
             )
 
 
-        if (engineFill) {
+        setSvgGauge(
+            engineArc,
+            enginePathLength,
+            currentEngine
+        )
 
-            engineFill.style.width =
-                `${currentEngine}%`
-        }
 
-
-        if (engineValue) {
+        if (
+            engineValue
+        ) {
 
             engineValue.textContent =
                 `${currentEngine}%`
+
+        }
+
+
+        if (
+            engineMeter
+        ) {
+
+            engineMeter
+                .classList
+                .toggle(
+                    'engine-warning',
+                    currentEngine <= 35
+                )
+
         }
 
 
-        if (engineMeter) {
+        if (
+            speedometerShell
+        ) {
 
-            engineMeter.classList.toggle(
-                'engine-warning',
-                currentEngine <= 35
-            )
+            speedometerShell
+                .classList
+                .toggle(
+                    'engine-warning',
+                    currentEngine <= 35
+                )
 
         }
+
     }
 
 
@@ -1085,25 +1551,36 @@ function updateVehicle(data) {
     ) {
 
         const currentMileage =
-            Number(data.mileage) || 0
+            Number(
+                data.mileage
+            ) || 0
 
 
         const currentUnit =
             String(
-                unit || 'MPH'
+                unit ||
+                'MPH'
             ).toUpperCase()
 
 
         const distanceUnit =
-            currentUnit.includes('MPH')
+            currentUnit.includes(
+                'MPH'
+            )
                 ? 'MI'
                 : 'KM'
 
 
         mileage.textContent =
             `${currentMileage
-                .toFixed(1)
-                .padStart(6, '0')} ${distanceUnit}`
+                .toFixed(
+                    1
+                )
+                .padStart(
+                    6,
+                    '0'
+                )} ${distanceUnit}`
+
     }
 
 
@@ -1111,7 +1588,9 @@ function updateVehicle(data) {
     // HEADLIGHTS
     //=====================================================
 
-    if (headlightIcon) {
+    if (
+        headlightIcon
+    ) {
 
         const lights =
             data.headlights !== undefined
@@ -1119,14 +1598,21 @@ function updateVehicle(data) {
                 : data.lights
 
 
-        if (lights !== undefined) {
+        if (
+            lights !== undefined
+        ) {
 
-            headlightIcon.classList.toggle(
-                'active',
-                Boolean(lights)
-            )
+            headlightIcon
+                .classList
+                .toggle(
+                    'active',
+                    Boolean(
+                        lights
+                    )
+                )
 
         }
+
     }
 
 
@@ -1140,24 +1626,31 @@ function updateVehicle(data) {
     ) {
 
         const enabled =
-            Boolean(data.seatbelt)
+            Boolean(
+                data.seatbelt
+            )
 
 
-        seatbeltIcon.classList.toggle(
-            'active',
-            enabled
-        )
+        seatbeltIcon
+            .classList
+            .toggle(
+                'active',
+                enabled
+            )
 
 
-        seatbeltIcon.classList.toggle(
-            'warning',
-            !enabled
-        )
+        seatbeltIcon
+            .classList
+            .toggle(
+                'warning',
+                !enabled
+            )
+
     }
 
 
     //=====================================================
-    // CRUISE
+    // CRUISE CONTROL
     //=====================================================
 
     if (
@@ -1165,11 +1658,17 @@ function updateVehicle(data) {
         cruiseIcon
     ) {
 
-        cruiseIcon.classList.toggle(
-            'active',
-            Boolean(data.cruise)
-        )
+        cruiseIcon
+            .classList
+            .toggle(
+                'active',
+                Boolean(
+                    data.cruise
+                )
+            )
+
     }
+
 }
 
 
@@ -1186,36 +1685,53 @@ function applyHudPosition(
         !element ||
         !position
     ) {
+
         return
+
     }
 
 
     const x =
-        Number(position.x)
+        Number(
+            position.x
+        )
+
 
     const y =
-        Number(position.y)
+        Number(
+            position.y
+        )
 
 
     if (
-        !Number.isFinite(x) ||
-        !Number.isFinite(y)
+        !Number.isFinite(
+            x
+        ) ||
+        !Number.isFinite(
+            y
+        )
     ) {
+
         return
+
     }
 
 
     element.style.left =
         `${x}%`
 
+
     element.style.top =
         `${y}%`
+
 
     element.style.right =
         'auto'
 
+
     element.style.bottom =
         'auto'
+
 }
 
 
@@ -1229,12 +1745,15 @@ function anchorStatusToMinimap() {
         !statusBars ||
         !lastMinimapGeometry
     ) {
+
         return
+
     }
 
 
     const statusWidth =
         statusBars.offsetWidth
+
 
     const statusHeight =
         statusBars.offsetHeight
@@ -1244,13 +1763,23 @@ function anchorStatusToMinimap() {
         statusWidth <= 0 ||
         statusHeight <= 0
     ) {
+
         return
+
     }
 
+
+    //=====================================================
+    // SAME LEFT EDGE AS MINIMAP
+    //=====================================================
 
     let left =
         lastMinimapGeometry.left
 
+
+    //=====================================================
+    // DIRECTLY ABOVE MINIMAP
+    //=====================================================
 
     let top =
         lastMinimapGeometry.top -
@@ -1268,7 +1797,7 @@ function anchorStatusToMinimap() {
             Math.min(
                 left,
                 window.innerWidth -
-                statusWidth
+                    statusWidth
             )
         )
 
@@ -1285,16 +1814,24 @@ function anchorStatusToMinimap() {
     //=====================================================
 
     statusBars.style.left =
-        `${Math.round(left)}px`
+        `${Math.round(
+            left
+        )}px`
+
 
     statusBars.style.top =
-        `${Math.round(top)}px`
+        `${Math.round(
+            top
+        )}px`
+
 
     statusBars.style.right =
         'auto'
 
+
     statusBars.style.bottom =
         'auto'
+
 }
 
 
@@ -1304,45 +1841,60 @@ function anchorStatusToMinimap() {
 
 function applyHudLayout(layout) {
 
-    if (!layout) {
+    if (
+        !layout
+    ) {
+
         return
+
     }
 
 
     /*
-        Top-right player / compass panel is handled
-        separately by its CSS.
+        Player + compass panel is anchored
+        top-right through CSS.
 
-        Do NOT allow old saved player/compass coordinates
-        to override it.
+        Status is ultimately positioned by
+        real minimap geometry.
     */
 
 
-    if (layout.status) {
+    //=====================================================
+    // STATUS
+    //=====================================================
+
+    if (
+        layout.status
+    ) {
 
         applyHudPosition(
             statusBars,
             layout.status
         )
+
     }
 
 
-    if (layout.vehicle) {
+    //=====================================================
+    // VEHICLE
+    //=====================================================
+
+    if (
+        layout.vehicle
+    ) {
 
         applyHudPosition(
             vehicleHud,
             layout.vehicle
         )
+
     }
 
-
-    /*
-        Real minimap coordinates always win for status.
-    */
 
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
@@ -1352,69 +1904,112 @@ function applyHudLayout(layout) {
 
 function setMinimapBorder(data) {
 
-    if (!minimapBorder) {
+    if (
+        !minimapBorder
+    ) {
+
         return
+
     }
 
 
-    if (!data.visible) {
+    //=====================================================
+    // HIDE
+    //=====================================================
+
+    if (
+        !data.visible
+    ) {
 
         minimapBorder.style.display =
             'none'
 
+
         lastMinimapGeometry =
             null
 
+
         return
+
     }
 
 
+    //=====================================================
+    // GEOMETRY
+    //=====================================================
+
     const left =
-        Number(data.left) || 0
+        Number(
+            data.left
+        ) || 0
+
 
     const top =
-        Number(data.top) || 0
+        Number(
+            data.top
+        ) || 0
+
 
     const width =
         Math.max(
             0,
-            Number(data.width) || 0
+            Number(
+                data.width
+            ) || 0
         )
+
 
     const height =
         Math.max(
             0,
-            Number(data.height) || 0
+            Number(
+                data.height
+            ) || 0
         )
 
 
     lastMinimapGeometry = {
+
         left,
         top,
         width,
         height
+
     }
 
+
+    //=====================================================
+    // APPLY BORDER
+    //=====================================================
 
     minimapBorder.style.left =
         `${left}px`
 
+
     minimapBorder.style.top =
         `${top}px`
+
 
     minimapBorder.style.width =
         `${width}px`
 
+
     minimapBorder.style.height =
         `${height}px`
+
 
     minimapBorder.style.display =
         'block'
 
 
+    //=====================================================
+    // ANCHOR STATUS
+    //=====================================================
+
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
@@ -1426,8 +2021,12 @@ function setMinimapBorderVisible(
     visible
 ) {
 
-    if (!minimapBorder) {
+    if (
+        !minimapBorder
+    ) {
+
         return
+
     }
 
 
@@ -1437,12 +2036,16 @@ function setMinimapBorderVisible(
             : 'none'
 
 
-    if (visible) {
+    if (
+        visible
+    ) {
 
         requestAnimationFrame(
             anchorStatusToMinimap
         )
+
     }
+
 }
 
 
@@ -1450,24 +2053,35 @@ function setMinimapBorderVisible(
 // HUD VISIBILITY
 //=========================================================
 
-function setHudVisible(visible) {
+function setHudVisible(
+    visible
+) {
 
     const hud =
-        document.getElementById('hud')
+        document.getElementById(
+            'hud'
+        )
 
-    if (!hud) {
+
+    if (
+        !hud
+    ) {
+
         return
+
     }
+
 
     hud.style.display =
         visible
             ? 'block'
             : 'none'
+
 }
 
 
 //=========================================================
-// RESIZE
+// WINDOW RESIZE
 //=========================================================
 
 window.addEventListener(
@@ -1477,6 +2091,7 @@ window.addEventListener(
         requestAnimationFrame(
             anchorStatusToMinimap
         )
+
     }
 )
 
@@ -1497,11 +2112,15 @@ window.addEventListener(
             !data ||
             !data.action
         ) {
+
             return
+
         }
 
 
-        switch (data.action) {
+        switch (
+            data.action
+        ) {
 
 
             //=================================================
@@ -1626,10 +2245,17 @@ window.addEventListener(
 
             case 'showVehicle':
 
-                if (vehicleHud) {
+                if (
+                    vehicleHud
+                ) {
 
                     vehicleHud.style.display =
                         'block'
+
+
+                    vehicleWasVisible =
+                        true
+
                 }
 
                 break
@@ -1637,10 +2263,17 @@ window.addEventListener(
 
             case 'hideVehicle':
 
-                if (vehicleHud) {
+                if (
+                    vehicleHud
+                ) {
 
                     vehicleHud.style.display =
                         'none'
+
+
+                    vehicleWasVisible =
+                        false
+
                 }
 
                 break
@@ -1652,14 +2285,18 @@ window.addEventListener(
 
             case 'showHud':
 
-                setHudVisible(true)
+                setHudVisible(
+                    true
+                )
 
                 break
 
 
             case 'hideHud':
 
-                setHudVisible(false)
+                setHudVisible(
+                    false
+                )
 
                 break
 
@@ -1667,7 +2304,9 @@ window.addEventListener(
             case 'setVisible':
 
                 setHudVisible(
-                    Boolean(data.visible)
+                    Boolean(
+                        data.visible
+                    )
                 )
 
                 break
@@ -1692,7 +2331,9 @@ window.addEventListener(
 
             case 'setMinimapBorder':
 
-                setMinimapBorder(data)
+                setMinimapBorder(
+                    data
+                )
 
                 break
 
@@ -1700,7 +2341,9 @@ window.addEventListener(
             case 'setMinimapBorderVisible':
 
                 setMinimapBorderVisible(
-                    Boolean(data.visible)
+                    Boolean(
+                        data.visible
+                    )
                 )
 
                 break
@@ -1718,6 +2361,38 @@ window.addEventListener(
             default:
 
                 break
+
         }
+
     }
 )
+
+
+//=========================================================
+// INITIALIZE VEHICLE SVG PATHS
+//=========================================================
+
+if (
+    document.readyState ===
+    'loading'
+) {
+
+    window.addEventListener(
+        'DOMContentLoaded',
+        () => {
+
+            requestAnimationFrame(
+                initializeVehicleArcs
+            )
+
+        }
+    )
+
+}
+else {
+
+    requestAnimationFrame(
+        initializeVehicleArcs
+    )
+
+}

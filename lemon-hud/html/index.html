@@ -40,7 +40,6 @@
 
         <div id="player-stats">
 
-
             <div class="player-header">
 
                 <span>
@@ -169,7 +168,7 @@
 
 
         <!--================================================
-            COMPASS / STREET / CITY
+            COMPASS
         =================================================-->
 
         <div id="compass-wrapper">
@@ -217,12 +216,12 @@
             </div>
 
 
-            <!-- LOCATION INFORMATION -->
+            <!--============================================
+                LOCATION
+            =============================================-->
 
             <div id="street-wrapper">
 
-
-                <!-- LARGE CARDINAL -->
 
                 <div class="location-heading">
 
@@ -233,19 +232,13 @@
                 </div>
 
 
-                <!-- STREET -->
-
                 <div id="street-name">
                     UNKNOWN ROAD
                 </div>
 
 
-                <!-- CROSSING -->
-
                 <div id="crossing-name"></div>
 
-
-                <!-- CITY -->
 
                 <div id="city-name">
                     SAN ANDREAS
@@ -263,9 +256,6 @@
 
     <!--==================================================
         STATUS HUD
-
-        DO NOT CHANGE THESE IDS.
-        THIS IS THE WORKING STATUS STRUCTURE.
     ===================================================-->
 
     <div id="status-bars">
@@ -494,7 +484,8 @@
 
 
     <!--==================================================
-        NEW VEHICLE SPEEDOMETER
+        VEHICLE HUD
+        REFERENCE-STYLE SPEEDOMETER
     ===================================================-->
 
     <div id="vehicle-hud">
@@ -507,41 +498,233 @@
 
 
             <!--================================================
-                TACHOMETER
+                OUTER FUEL / ENGINE ARCS
             =================================================-->
 
             <svg
-                class="tachometer-svg"
-                viewBox="0 0 300 300"
+                class="side-gauges-svg"
+                viewBox="0 0 360 360"
+                aria-hidden="true"
             >
 
 
+                <!-- FUEL TRACK -->
+
+                <path
+                    class="side-gauge-track"
+                    d="
+                        M 56 281
+                        C 26 235,
+                          25 126,
+                          69 77
+                    "
+                ></path>
+
+
+                <!-- FUEL -->
+
+                <path
+                    id="fuel-arc"
+                    class="side-gauge-progress fuel-arc"
+                    d="
+                        M 56 281
+                        C 26 235,
+                          25 126,
+                          69 77
+                    "
+                ></path>
+
+
+                <!-- ENGINE TRACK -->
+
+                <path
+                    class="side-gauge-track"
+                    d="
+                        M 291 77
+                        C 335 126,
+                          334 235,
+                          304 281
+                    "
+                ></path>
+
+
+                <!-- ENGINE -->
+
+                <path
+                    id="engine-arc"
+                    class="side-gauge-progress engine-arc"
+                    d="
+                        M 291 77
+                        C 335 126,
+                          334 235,
+                          304 281
+                    "
+                ></path>
+
+
+            </svg>
+
+
+            <!--================================================
+                CENTRAL TACHOMETER
+            =================================================-->
+
+            <svg
+                class="tach-svg"
+                viewBox="0 0 360 360"
+                aria-hidden="true"
+            >
+
+
+                <!-- OUTER DARK RING -->
+
                 <circle
-                    class="tach-track"
-                    cx="150"
-                    cy="150"
-                    r="126"
+                    class="tach-outer-rim"
+                    cx="180"
+                    cy="180"
+                    r="142"
                 ></circle>
 
 
-                <circle
+                <!-- RPM TRACK -->
+
+                <path
+                    id="rpm-track"
+                    class="rpm-track"
+                    d="
+                        M 88 291
+                        A 144 144
+                        0 1 1
+                        272 291
+                    "
+                ></path>
+
+
+                <!-- ACTIVE RPM -->
+
+                <path
                     id="rpm-ring"
-                    class="tach-progress"
-                    cx="150"
-                    cy="150"
-                    r="126"
-                ></circle>
+                    class="rpm-progress"
+                    d="
+                        M 88 291
+                        A 144 144
+                        0 1 1
+                        272 291
+                    "
+                ></path>
 
+
+                <!-- INNER RING -->
 
                 <circle
-                    class="tach-inner-ring"
-                    cx="150"
-                    cy="150"
-                    r="108"
+                    class="tach-inner-border"
+                    cx="180"
+                    cy="180"
+                    r="118"
                 ></circle>
 
 
             </svg>
+
+
+            <!--================================================
+                FUEL ICON
+            =================================================-->
+
+            <div
+                id="fuel-meter"
+                class="gauge-icon fuel-icon"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="
+                            M5 3
+                            h9
+                            v18
+                            H5
+                            Z
+                        "
+                    ></path>
+
+                    <path
+                        d="
+                            M7 6
+                            h5
+                            v5
+                            H7
+                            Z
+                        "
+                    ></path>
+
+                    <path
+                        d="
+                            M14 8
+                            h2
+                            l2 2
+                            v7
+                            c0 1.2
+                            1.8 1.2
+                            1.8 0
+                            v-5
+                        "
+                    ></path>
+
+                </svg>
+
+
+                <span id="fuel-value">
+                    100%
+                </span>
+
+
+            </div>
+
+
+            <!--================================================
+                ENGINE ICON
+            =================================================-->
+
+            <div
+                id="engine-meter"
+                class="gauge-icon engine-icon"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="
+                            M7 7
+                            h9
+                            l2 3
+                            v7
+                            H6
+                            v-7
+                            Z
+                        "
+                    ></path>
+
+                    <path d="M9 7V4"></path>
+                    <path d="M14 7V4"></path>
+                    <path d="M4 11H2"></path>
+                    <path d="M20 11h2"></path>
+
+                </svg>
+
+
+                <span id="engine-value">
+                    100%
+                </span>
+
+
+            </div>
 
 
             <!--================================================
@@ -550,138 +733,90 @@
 
             <div class="rpm-scale">
 
-                <span class="rpm-number n1">1</span>
-                <span class="rpm-number n2">2</span>
-                <span class="rpm-number n3">3</span>
-                <span class="rpm-number n4">4</span>
-                <span class="rpm-number n5">5</span>
-                <span class="rpm-number n6">6</span>
-                <span class="rpm-number n7">7</span>
-                <span class="rpm-number n8">8</span>
-                <span class="rpm-number n9">9</span>
-                <span class="rpm-number n10">10</span>
+                <span class="rpm-number rpm-1">
+                    1
+                </span>
 
-            </div>
+                <span class="rpm-number rpm-2">
+                    2
+                </span>
 
+                <span class="rpm-number rpm-3">
+                    3
+                </span>
 
-            <div class="rpm-label">
-                RPM ×1000
+                <span class="rpm-number rpm-4">
+                    4
+                </span>
+
+                <span class="rpm-number rpm-5">
+                    5
+                </span>
+
+                <span class="rpm-number rpm-6">
+                    6
+                </span>
+
+                <span class="rpm-number rpm-7">
+                    7
+                </span>
+
+                <span class="rpm-number rpm-8">
+                    8
+                </span>
+
+                <span class="rpm-number rpm-9">
+                    9
+                </span>
+
+                <span class="rpm-number rpm-10">
+                    10
+                </span>
+
             </div>
 
 
             <!--================================================
-                INDICATOR ICONS
+                TACH MARKERS
             =================================================-->
 
-            <div class="vehicle-icons">
+            <div class="tach-ticks">
 
-
-                <!-- HEADLIGHTS -->
-
-                <div
-                    id="headlight-icon"
-                    class="vehicle-icon"
-                    title="Headlights"
-                >
-
-                    <svg viewBox="0 0 24 24">
-
-                        <path
-                            d="
-                                M11 7
-                                H8
-                                a5 5 0 0 0 0 10
-                                h3
-                                V7
-                                Z
-                            "
-                        ></path>
-
-                        <path d="M15 8l5-2"></path>
-                        <path d="M15 12h6"></path>
-                        <path d="M15 16l5 2"></path>
-
-                    </svg>
-
-                </div>
-
-
-                <!-- SEATBELT -->
-
-                <div
-                    id="seatbelt-icon"
-                    class="vehicle-icon warning"
-                    title="Seatbelt"
-                >
-
-                    <svg viewBox="0 0 24 24">
-
-                        <circle
-                            cx="8"
-                            cy="5"
-                            r="2"
-                        ></circle>
-
-                        <path d="M8 8v6"></path>
-                        <path d="M8 11l7 8"></path>
-                        <path d="M14 8l-6 11"></path>
-
-                    </svg>
-
-                </div>
-
-
-                <!-- CRUISE -->
-
-                <div
-                    id="cruise-icon"
-                    class="vehicle-icon"
-                    title="Cruise Control"
-                >
-
-                    <svg viewBox="0 0 24 24">
-
-                        <path
-                            d="
-                                M5 17
-                                a8 8 0 1 1 14 0
-                            "
-                        ></path>
-
-                        <path d="M12 12l4-3"></path>
-
-                    </svg>
-
-                </div>
-
+                <span class="tick tick-1"></span>
+                <span class="tick tick-2"></span>
+                <span class="tick tick-3"></span>
+                <span class="tick tick-4"></span>
+                <span class="tick tick-5"></span>
+                <span class="tick tick-6"></span>
 
             </div>
 
 
             <!--================================================
-                CENTER DISPLAY
+                CENTER
             =================================================-->
 
             <div class="vehicle-center">
 
 
-                <div class="gear-block">
+                <!-- GEAR -->
 
-                    <span class="gear-label">
-                        GEAR
-                    </span>
-
-                    <span id="gear">
-                        N
-                    </span>
-
+                <div
+                    id="gear"
+                    class="gear-circle"
+                >
+                    N
                 </div>
 
+
+                <!-- SPEED -->
 
                 <div id="speed">
                     0
                 </div>
 
+
+                <!-- UNIT -->
 
                 <div id="speed-unit">
                     MPH
@@ -692,78 +827,11 @@
 
 
             <!--================================================
-                FUEL + ENGINE
+                RPM LABEL
             =================================================-->
 
-            <div class="vehicle-condition-panel">
-
-
-                <!-- FUEL -->
-
-                <div
-                    id="fuel-meter"
-                    class="condition-row"
-                >
-
-                    <div class="condition-header">
-
-                        <span class="condition-label">
-                            FUEL
-                        </span>
-
-                        <span id="fuel-value">
-                            100%
-                        </span>
-
-                    </div>
-
-
-                    <div class="condition-track">
-
-                        <div
-                            id="fuel-fill"
-                            class="condition-fill fuel-fill"
-                        ></div>
-
-                    </div>
-
-
-                </div>
-
-
-                <!-- ENGINE -->
-
-                <div
-                    id="engine-meter"
-                    class="condition-row"
-                >
-
-                    <div class="condition-header">
-
-                        <span class="condition-label">
-                            ENGINE
-                        </span>
-
-                        <span id="engine-value">
-                            100%
-                        </span>
-
-                    </div>
-
-
-                    <div class="condition-track">
-
-                        <div
-                            id="engine-fill"
-                            class="condition-fill engine-fill"
-                        ></div>
-
-                    </div>
-
-
-                </div>
-
-
+            <div class="rpm-label">
+                ×1000 RPM
             </div>
 
 
@@ -776,6 +844,105 @@
                 class="mileage"
             >
                 0000.0 MI
+            </div>
+
+
+            <!--================================================
+                VEHICLE INDICATORS
+            =================================================-->
+
+            <div class="vehicle-indicators">
+
+
+                <!-- HEADLIGHT -->
+
+                <div
+                    id="headlight-icon"
+                    class="vehicle-indicator"
+                    title="Headlights"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+
+                        <path
+                            d="
+                                M10 7
+                                H7
+                                a5 5 0 0 0
+                                0 10
+                                h3
+                                Z
+                            "
+                        ></path>
+
+                        <path d="M14 8l6-2"></path>
+                        <path d="M14 12h7"></path>
+                        <path d="M14 16l6 2"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <!-- SEATBELT -->
+
+                <div
+                    id="seatbelt-icon"
+                    class="vehicle-indicator warning"
+                    title="Seatbelt"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+
+                        <circle
+                            cx="8"
+                            cy="5"
+                            r="2"
+                        ></circle>
+
+                        <path d="M8 8v7"></path>
+                        <path d="M8 11l7 8"></path>
+                        <path d="M15 8L8 19"></path>
+
+                    </svg>
+
+                </div>
+
+
+                <!-- CRUISE -->
+
+                <div
+                    id="cruise-icon"
+                    class="vehicle-indicator"
+                    title="Cruise Control"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+
+                        <path
+                            d="
+                                M5 17
+                                a8 8 0 1 1
+                                14 0
+                            "
+                        ></path>
+
+                        <path d="M12 12l4-3"></path>
+
+                    </svg>
+
+                </div>
+
+
             </div>
 
 
