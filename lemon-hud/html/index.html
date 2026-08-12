@@ -12,334 +12,252 @@
 
     <title>808Lemon HUD</title>
 
-
-    <!--==================================================
-        MAIN HUD
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/main.css"
-    >
-
-
-    <!--==================================================
-        PLAYER STATS
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/player.css"
-    >
-
-
-    <!--==================================================
-        COMPASS / STREET
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/compass.css"
-    >
-
-
-    <!--==================================================
-        PLAYER STATUS
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/status.css"
-    >
-
-
-    <!--==================================================
-        VEHICLE HUD
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/vehicle.css"
-    >
-
-
-    <!--==================================================
-        HUD EDITOR
-    ===================================================-->
-
-    <link
-        rel="stylesheet"
-        href="css/editor.css"
-    >
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="css/compass.css">
+    <link rel="stylesheet" href="css/status.css">
+    <link rel="stylesheet" href="css/vehicle.css">
+    <link rel="stylesheet" href="css/editor.css">
 
 </head>
 
-
 <body>
-
-
-<!--======================================================
-    808LEMON HUD ROOT
-=======================================================-->
 
 <div id="hud">
 
 
     <!--==================================================
-        PLAYER STATS
+        MINIMAP SIDE INFORMATION PANEL
     ===================================================-->
 
-    <div id="player-stats">
+    <div id="minimap-info-panel">
 
 
-        <!--==============================================
-            HEADER
-        ===============================================-->
+        <!--================================================
+            PLAYER STATS
+        =================================================-->
 
-        <div class="player-header">
-
-            <span>
-                PLAYER STATS
-            </span>
-
-            <div class="online-dot"></div>
-
-        </div>
+        <div id="player-stats">
 
 
-        <!--==============================================
-            PLAYER ID
-        ===============================================-->
+            <div class="player-header">
 
-        <div class="player-row">
+                <span>
+                    PLAYER STATS
+                </span>
 
-            <div class="player-icon">
-                ID
+                <div class="online-dot"></div>
+
             </div>
 
-            <div class="player-content">
 
-                <span class="player-label">
+            <!-- ID -->
+
+            <div class="player-row">
+
+                <div class="player-icon">
                     ID
-                </span>
-
-                <span id="player-id">
-                    0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!--==============================================
-            CASH
-        ===============================================-->
-
-        <div class="player-row">
-
-            <div class="player-icon">
-                $
-            </div>
-
-            <div class="player-content">
-
-                <span class="player-label">
-                    CASH
-                </span>
-
-                <span id="player-cash">
-                    $0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!--==============================================
-            BANK
-        ===============================================-->
-
-        <div class="player-row">
-
-            <div class="player-icon">
-                B
-            </div>
-
-            <div class="player-content">
-
-                <span class="player-label">
-                    BANK
-                </span>
-
-                <span id="player-bank">
-                    $0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!--==============================================
-            JOB
-        ===============================================-->
-
-        <div class="player-row">
-
-            <div class="player-icon">
-                J
-            </div>
-
-            <div class="player-content">
-
-                <span class="player-label">
-                    JOB
-                </span>
-
-                <span id="player-job">
-                    Unemployed
-                </span>
-
-                <span id="player-grade"></span>
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-    <!--==================================================
-        COMPASS / STREET / CITY INFORMATION
-    ===================================================-->
-
-    <div id="compass-wrapper">
-
-
-        <!--==============================================
-            COMPASS HEADER
-        ===============================================-->
-
-        <div class="compass-top">
-
-
-            <!--==========================================
-                CURRENT DIRECTION
-            ===========================================-->
-
-            <div class="direction-pill">
-
-                <span id="compass-direction">
-                    N
-                </span>
-
-            </div>
-
-
-            <!--==========================================
-                COMPASS TAPE
-            ===========================================-->
-
-            <div class="compass-tape">
-
-
-                <!-- LEFT DIRECTION -->
-
-                <div id="compass-label-left">
-                    NW
                 </div>
 
+                <div class="player-content">
 
-                <!-- CURRENT HEADING -->
+                    <span class="player-label">
+                        ID
+                    </span>
 
-                <div class="compass-center">
+                    <span
+                        id="player-id"
+                        class="player-value"
+                    >
+                        0
+                    </span>
 
-                    <div class="compass-arrow"></div>
+                </div>
 
-                    <span id="compass-heading">
-                        000°
+            </div>
+
+
+            <!-- CASH -->
+
+            <div class="player-row">
+
+                <div class="player-icon">
+                    $
+                </div>
+
+                <div class="player-content">
+
+                    <span class="player-label">
+                        CASH
+                    </span>
+
+                    <span
+                        id="player-cash"
+                        class="player-value"
+                    >
+                        $0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- BANK -->
+
+            <div class="player-row">
+
+                <div class="player-icon">
+                    B
+                </div>
+
+                <div class="player-content">
+
+                    <span class="player-label">
+                        BANK
+                    </span>
+
+                    <span
+                        id="player-bank"
+                        class="player-value"
+                    >
+                        $0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- JOB -->
+
+            <div class="player-row player-job-row">
+
+                <div class="player-icon">
+                    J
+                </div>
+
+                <div class="player-content">
+
+                    <span class="player-label">
+                        JOB
+                    </span>
+
+                    <span
+                        id="player-job"
+                        class="player-value"
+                    >
+                        Unemployed
+                    </span>
+
+                    <span id="player-grade"></span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!--================================================
+            PANEL DIVIDER
+        =================================================-->
+
+        <div class="info-panel-divider"></div>
+
+
+        <!--================================================
+            COMPASS / STREET / CITY
+        =================================================-->
+
+        <div id="compass-wrapper">
+
+
+            <!-- COMPASS -->
+
+            <div class="compass-top">
+
+
+                <div class="direction-pill">
+
+                    <span id="compass-direction">
+                        N
                     </span>
 
                 </div>
 
 
-                <!-- RIGHT DIRECTION -->
+                <div class="compass-tape">
 
-                <div id="compass-label-right">
-                    NE
+
+                    <div id="compass-label-left">
+                        NW
+                    </div>
+
+
+                    <div class="compass-center">
+
+                        <div class="compass-arrow"></div>
+
+                        <span id="compass-heading">
+                            000°
+                        </span>
+
+                    </div>
+
+
+                    <div id="compass-label-right">
+                        NE
+                    </div>
+
+
                 </div>
 
 
             </div>
 
 
-        </div>
+            <!-- LOCATION -->
+
+            <div id="street-wrapper">
 
 
-        <!--==============================================
-            STREET / CITY INFORMATION
-        ===============================================-->
+                <div class="street-icon">
 
-        <div id="street-wrapper">
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
 
+                        <path
+                            d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
+                        ></path>
 
-            <!--==========================================
-                LOCATION ICON
-            ===========================================-->
+                        <circle
+                            cx="12"
+                            cy="10"
+                            r="2.5"
+                        ></circle>
 
-            <div class="street-icon">
+                    </svg>
 
-                <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-
-                    <path
-                        d="
-                            M20 10
-                            c0 5-8 11-8 11
-                            S4 15 4 10
-                            a8 8 0 1 1 16 0
-                            Z
-                        "
-                    ></path>
-
-                    <circle
-                        cx="12"
-                        cy="10"
-                        r="2.5"
-                    ></circle>
-
-                </svg>
-
-            </div>
+                </div>
 
 
-            <!--==========================================
-                PRIMARY STREET
-            ===========================================-->
-
-            <div id="street-name">
-                UNKNOWN ROAD
-            </div>
+                <div id="street-name">
+                    UNKNOWN ROAD
+                </div>
 
 
-            <!--==========================================
-                CROSS STREET
-            ===========================================-->
-
-            <div id="crossing-name"></div>
+                <div id="crossing-name"></div>
 
 
-            <!--==========================================
-                CITY / COUNTY
-            ===========================================-->
+                <div id="city-name">
+                    SAN ANDREAS
+                </div>
 
-            <div id="city-name">
-                SAN ANDREAS
+
             </div>
 
 
@@ -351,30 +269,19 @@
 
     <!--==================================================
         PLAYER STATUS
-
-        IMPORTANT:
-        app.js automatically anchors this directly above
-        the real minimap geometry.
     ===================================================-->
 
     <div id="status-bars">
 
 
-        <!--==============================================
-            HEALTH
-        ===============================================-->
+        <!-- HEALTH -->
 
         <div
             id="health-row"
             class="status-row"
         >
 
-
-            <!-- ICON -->
-
-            <div
-                class="status-icon health-icon"
-            >
+            <div class="status-icon health-icon">
 
                 <svg
                     viewBox="0 0 24 24"
@@ -400,14 +307,10 @@
             </div>
 
 
-            <!-- LABEL -->
-
             <div class="status-name">
                 HEALTH
             </div>
 
-
-            <!-- BAR -->
 
             <div class="status-track">
 
@@ -418,25 +321,17 @@
 
             </div>
 
-
         </div>
 
 
-        <!--==============================================
-            ARMOR
-        ===============================================-->
+        <!-- ARMOR -->
 
         <div
             id="armor-row"
             class="status-row"
         >
 
-
-            <!-- ICON -->
-
-            <div
-                class="status-icon armor-icon"
-            >
+            <div class="status-icon armor-icon">
 
                 <svg
                     viewBox="0 0 24 24"
@@ -461,14 +356,10 @@
             </div>
 
 
-            <!-- LABEL -->
-
             <div class="status-name">
                 ARMOR
             </div>
 
-
-            <!-- BAR -->
 
             <div class="status-track">
 
@@ -479,36 +370,24 @@
 
             </div>
 
-
         </div>
 
 
-        <!--==============================================
-            HUNGER
-        ===============================================-->
+        <!-- HUNGER -->
 
         <div
             id="hunger-row"
             class="status-row"
         >
 
-
-            <!-- ICON -->
-
-            <div
-                class="status-icon hunger-icon"
-            >
+            <div class="status-icon hunger-icon">
 
                 <svg
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                 >
 
-                    <!-- FORK -->
-
-                    <path
-                        d="M7 3v8"
-                    ></path>
+                    <path d="M7 3v8"></path>
 
                     <path
                         d="
@@ -520,12 +399,7 @@
                         "
                     ></path>
 
-                    <path
-                        d="M7 11v10"
-                    ></path>
-
-
-                    <!-- KNIFE -->
+                    <path d="M7 11v10"></path>
 
                     <path
                         d="
@@ -540,14 +414,10 @@
             </div>
 
 
-            <!-- LABEL -->
-
             <div class="status-name">
                 HUNGER
             </div>
 
-
-            <!-- BAR -->
 
             <div class="status-track">
 
@@ -558,25 +428,17 @@
 
             </div>
 
-
         </div>
 
 
-        <!--==============================================
-            THIRST
-        ===============================================-->
+        <!-- THIRST -->
 
         <div
             id="thirst-row"
             class="status-row"
         >
 
-
-            <!-- ICON -->
-
-            <div
-                class="status-icon thirst-icon"
-            >
+            <div class="status-icon thirst-icon">
 
                 <svg
                     viewBox="0 0 24 24"
@@ -598,14 +460,10 @@
             </div>
 
 
-            <!-- LABEL -->
-
             <div class="status-name">
                 THIRST
             </div>
 
-
-            <!-- BAR -->
 
             <div class="status-track">
 
@@ -615,7 +473,6 @@
                 ></div>
 
             </div>
-
 
         </div>
 
@@ -629,21 +486,13 @@
 
     <div id="vehicle-hud">
 
-
         <div class="gauge-shell">
 
-
-            <!--==========================================
-                RPM GAUGE
-            ===========================================-->
 
             <svg
                 class="gauge-svg"
                 viewBox="0 0 300 300"
             >
-
-
-                <!-- BACKGROUND RING -->
 
                 <circle
                     class="gauge-bg-ring"
@@ -651,9 +500,6 @@
                     cy="150"
                     r="126"
                 ></circle>
-
-
-                <!-- RPM PROGRESS -->
 
                 <circle
                     id="rpm-ring"
@@ -663,9 +509,6 @@
                     r="126"
                 ></circle>
 
-
-                <!-- INNER RING -->
-
                 <circle
                     class="gauge-inner-ring"
                     cx="150"
@@ -673,67 +516,26 @@
                     r="105"
                 ></circle>
 
-
             </svg>
 
 
-            <!--==========================================
-                RPM SCALE
-            ===========================================-->
-
             <div class="rpm-scale">
 
-                <span class="rpm-number n1">
-                    1
-                </span>
-
-                <span class="rpm-number n2">
-                    2
-                </span>
-
-                <span class="rpm-number n3">
-                    3
-                </span>
-
-                <span class="rpm-number n4">
-                    4
-                </span>
-
-                <span class="rpm-number n5">
-                    5
-                </span>
-
-                <span class="rpm-number n6">
-                    6
-                </span>
-
-                <span class="rpm-number n7">
-                    7
-                </span>
-
-                <span class="rpm-number n8">
-                    8
-                </span>
-
-                <span class="rpm-number n9">
-                    9
-                </span>
-
-                <span class="rpm-number n10">
-                    10
-                </span>
+                <span class="rpm-number n1">1</span>
+                <span class="rpm-number n2">2</span>
+                <span class="rpm-number n3">3</span>
+                <span class="rpm-number n4">4</span>
+                <span class="rpm-number n5">5</span>
+                <span class="rpm-number n6">6</span>
+                <span class="rpm-number n7">7</span>
+                <span class="rpm-number n8">8</span>
+                <span class="rpm-number n9">9</span>
+                <span class="rpm-number n10">10</span>
 
             </div>
 
 
-            <!--==========================================
-                CENTER SPEED DISPLAY
-            ===========================================-->
-
             <div class="vehicle-center">
-
-
-                <!-- GEAR -->
 
                 <div
                     id="gear"
@@ -742,41 +544,23 @@
                     N
                 </div>
 
-
-                <!-- SPEED -->
-
                 <div id="speed">
                     0
                 </div>
-
-
-                <!-- UNIT -->
 
                 <div id="speed-unit">
                     MPH
                 </div>
 
-
             </div>
 
-
-            <!--==========================================
-                RPM LABEL
-            ===========================================-->
 
             <div class="rpm-label">
                 x1000 RPM
             </div>
 
 
-            <!--==========================================
-                VEHICLE INDICATORS
-            ===========================================-->
-
             <div class="vehicle-icons">
-
-
-                <!-- HEADLIGHTS -->
 
                 <div
                     id="headlight-icon"
@@ -786,9 +570,6 @@
                     ◉
                 </div>
 
-
-                <!-- SEATBELT -->
-
                 <div
                     id="seatbelt-icon"
                     class="vehicle-icon warning"
@@ -796,9 +577,6 @@
                 >
                     ▰
                 </div>
-
-
-                <!-- CRUISE CONTROL -->
 
                 <div
                     id="cruise-icon"
@@ -808,21 +586,14 @@
                     C
                 </div>
 
-
             </div>
 
 
-            <!--==========================================
-                FUEL
-            ===========================================-->
-
             <div class="side-meter fuel-meter">
-
 
                 <div class="side-meter-label">
                     F
                 </div>
-
 
                 <div class="side-meter-track">
 
@@ -833,21 +604,14 @@
 
                 </div>
 
-
             </div>
 
 
-            <!--==========================================
-                ENGINE HEALTH
-            ===========================================-->
-
             <div class="side-meter engine-meter">
-
 
                 <div class="side-meter-label">
                     E
                 </div>
-
 
                 <div class="side-meter-track">
 
@@ -858,13 +622,8 @@
 
                 </div>
 
-
             </div>
 
-
-            <!--==========================================
-                ODOMETER
-            ===========================================-->
 
             <div
                 id="mileage"
@@ -876,86 +635,50 @@
 
         </div>
 
-
     </div>
 
 
     <!--==================================================
-        NATIVE GTA MINIMAP BORDER
-
-        IMPORTANT:
-        This element DOES NOT contain GTA's minimap.
-
-        client/minimap.lua controls the native radar.
-
-        Lua calculates the actual screen coordinates of the
-        radar and app.js places this border over it.
-
-        app.js also uses this geometry to automatically
-        position the status HUD directly above the minimap.
+        NATIVE MINIMAP BORDER
     ===================================================-->
 
     <div id="minimap-border"></div>
 
 
     <!--==================================================
-        HUD EDITOR OVERLAY
+        HUD EDITOR
     ===================================================-->
 
     <div id="hud-editor-overlay"></div>
 
 
-    <!--==================================================
-        HUD EDITOR PANEL
-    ===================================================-->
-
     <div id="hud-editor-panel">
 
-
-        <!--==============================================
-            HEADER
-        ===============================================-->
-
         <div class="editor-title-row">
-
 
             <div class="editor-title">
                 808LEMON HUD EDITOR
             </div>
 
-
             <div class="editor-version">
                 EDIT MODE
             </div>
 
-
         </div>
 
-
-        <!--==============================================
-            DESCRIPTION
-        ===============================================-->
 
         <div class="editor-description">
 
-            Drag each highlighted HUD component anywhere
+            Drag the available HUD components anywhere
             on your screen.
 
-            The player status panel is automatically
-            anchored above the minimap during normal
-            gameplay.
+            The status and information panel are anchored
+            to the minimap during normal gameplay.
 
         </div>
 
 
-        <!--==============================================
-            BUTTONS
-        ===============================================-->
-
         <div class="editor-buttons">
-
-
-            <!-- SAVE -->
 
             <button
                 id="editor-save"
@@ -965,9 +688,6 @@
                 SAVE
             </button>
 
-
-            <!-- RESET -->
-
             <button
                 id="editor-reset"
                 class="editor-button editor-reset"
@@ -975,9 +695,6 @@
             >
                 RESET
             </button>
-
-
-            <!-- CANCEL -->
 
             <button
                 id="editor-cancel"
@@ -987,18 +704,12 @@
                 CANCEL
             </button>
 
-
         </div>
 
-
-        <!--==============================================
-            POSITION READOUT
-        ===============================================-->
 
         <div id="editor-position-readout">
             DRAG A HUD COMPONENT
         </div>
-
 
     </div>
 
@@ -1006,16 +717,7 @@
 </div>
 
 
-<!--======================================================
-    JAVASCRIPT
-
-    IMPORTANT:
-    app.js loads FIRST.
-    editor.js loads SECOND.
-=======================================================-->
-
 <script src="js/app.js"></script>
-
 <script src="js/editor.js"></script>
 
 

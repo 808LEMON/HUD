@@ -3,31 +3,7 @@
 -- COMPASS / STREET / CITY
 --=========================================================
 
-
---=========================================================
--- NORMALIZE HEADING
---=========================================================
-
-local function NormalizeHeading(heading)
-
-    heading =
-        heading % 360.0
-
-    if heading < 0 then
-        heading =
-            heading + 360.0
-    end
-
-    return heading
-
-end
-
-
---=========================================================
--- DIRECTION TABLE
---=========================================================
-
-local directions = {
+local Directions = {
     'N',
     'NE',
     'E',
@@ -38,6 +14,20 @@ local directions = {
     'NW'
 }
 
+--=========================================================
+-- NORMALIZE HEADING
+--=========================================================
+
+local function NormalizeHeading(heading)
+
+    heading = heading % 360.0
+
+    if heading < 0.0 then
+        heading = heading + 360.0
+    end
+
+    return heading
+end
 
 --=========================================================
 -- GET DIRECTION INDEX
@@ -45,70 +35,44 @@ local directions = {
 
 local function GetDirectionIndex(heading)
 
-    return
+    return (
         math.floor(
-            (
-                heading + 22.5
-            ) / 45.0
-        ) % 8 + 1
-
+            (heading + 22.5) / 45.0
+        ) % 8
+    ) + 1
 end
 
-
 --=========================================================
--- GET CURRENT DIRECTION
---=========================================================
-
-local function GetDirection(heading)
-
-    return directions[
-        GetDirectionIndex(
-            heading
-        )
-    ]
-
-end
-
-
---=========================================================
--- GET NEIGHBOR DIRECTIONS
+-- GET DIRECTIONS
 --=========================================================
 
-local function GetNeighborDirections(heading)
+local function GetDirections(heading)
 
     local index =
-        GetDirectionIndex(
-            heading
-        )
-
+        GetDirectionIndex(heading)
 
     local leftIndex =
         index - 1
-
 
     if leftIndex < 1 then
         leftIndex = 8
     end
 
-
     local rightIndex =
         index + 1
-
 
     if rightIndex > 8 then
         rightIndex = 1
     end
 
-
     return
-        directions[leftIndex],
-        directions[rightIndex]
-
+        Directions[index],
+        Directions[leftIndex],
+        Directions[rightIndex]
 end
 
-
 --=========================================================
--- LOS SANTOS ZONES
+-- CITY / COUNTY DETECTION
 --=========================================================
 
 local LosSantosZones = {
@@ -161,11 +125,6 @@ local LosSantosZones = {
 
 }
 
-
---=========================================================
--- BLAINE COUNTY ZONES
---=========================================================
-
 local BlaineCountyZones = {
 
     ALAMO = true,
@@ -199,11 +158,6 @@ local BlaineCountyZones = {
 
 }
 
-
---=========================================================
--- CITY / COUNTY
---=========================================================
-
 local function GetCityName(coords)
 
     local zone =
@@ -213,115 +167,54 @@ local function GetCityName(coords)
             coords.z
         )
 
-
-    if not zone
-    or zone == ''
-    then
-
-        return 'SAN ANDREAS'
-
-    end
-
-
     if LosSantosZones[zone] then
-
         return 'LOS SANTOS'
-
     end
-
 
     if BlaineCountyZones[zone] then
-
         return 'BLAINE COUNTY'
-
     end
 
-
     return 'SAN ANDREAS'
-
 end
 
-
 --=========================================================
--- COMPASS THREAD
+-- MAIN COMPASS THREAD
 --=========================================================
 
 CreateThread(function()
 
     while true do
 
-
-        --=================================================
-        -- COMPASS DISABLED
-        --=================================================
-
         if not Config.ShowCompass then
 
             SendNUIMessage({
-
-                action =
-                    'updateCompass',
-
-                visible =
-                    false
-
+                action = 'updateCompass',
+                visible = false
             })
-
 
             Wait(1000)
 
-
         else
-
-
-            --=================================================
-            -- PED / POSITION
-            --=================================================
 
             local ped =
                 PlayerPedId()
 
-
             local coords =
-                GetEntityCoords(
-                    ped
-                )
+                GetEntityCoords(ped)
 
-
-            --=================================================
-            -- CAMERA HEADING
-            --=================================================
-
-            local camRot =
+            local rotation =
                 GetGameplayCamRot(2)
-
 
             local heading =
                 NormalizeHeading(
-                    camRot.z
+                    rotation.z
                 )
 
-
-            --=================================================
-            -- DIRECTIONS
-            --=================================================
-
-            local direction =
-                GetDirection(
-                    heading
-                )
-
-
-            local leftDirection,
+            local direction,
+                  leftDirection,
                   rightDirection =
-                GetNeighborDirections(
-                    heading
-                )
-
-
-            --=================================================
-            -- STREET HASHES
-            --=================================================
+                GetDirections(heading)
 
             local streetHash,
                   crossingHash =
@@ -331,42 +224,27 @@ CreateThread(function()
                     coords.z
                 )
 
-
-            --=================================================
-            -- STREET
-            --=================================================
-
-            local street = ''
-
+            local street =
+                'UNKNOWN ROAD'
 
             if streetHash
             and streetHash ~= 0
             then
 
-                street =
+                local result =
                     GetStreetNameFromHashKey(
                         streetHash
                     )
 
-            end
-
-
-            if not street
-            or street == ''
-            then
-
-                street =
-                    'UNKNOWN ROAD'
+                if result
+                and result ~= ''
+                then
+                    street = result
+                end
 
             end
-
-
-            --=================================================
-            -- CROSS STREET
-            --=================================================
 
             local crossing = ''
-
 
             if crossingHash
             and crossingHash ~= 0
@@ -375,61 +253,37 @@ CreateThread(function()
                 crossing =
                     GetStreetNameFromHashKey(
                         crossingHash
-                    )
+                    ) or ''
 
             end
 
-
-            --=================================================
-            -- CITY
-            --=================================================
-
             local city =
-                GetCityName(
-                    coords
-                )
-
-
-            --=================================================
-            -- NUI
-            --=================================================
+                GetCityName(coords)
 
             SendNUIMessage({
 
-                action =
-                    'updateCompass',
+                action = 'updateCompass',
 
-                visible =
-                    true,
+                visible = true,
+
+                direction = direction,
+
+                left = leftDirection,
+
+                right = rightDirection,
 
                 heading =
                     math.floor(
                         heading + 0.5
                     ),
 
-                direction =
-                    direction,
+                street = street,
 
-                left =
-                    leftDirection,
+                crossing = crossing,
 
-                right =
-                    rightDirection,
-
-                street =
-                    street,
-
-                crossing =
-                    crossing,
-
-                city =
-                    city,
-
-                showStreetNames =
-                    Config.ShowStreetNames
+                city = city
 
             })
-
 
             Wait(
                 Config.CompassUpdateInterval
