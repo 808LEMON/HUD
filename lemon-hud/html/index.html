@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -11,10 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        808Lemon HUD
-    </title>
-
+    <title>808Lemon HUD</title>
 
     <!--==================================================
         MAIN HUD STYLES
@@ -24,7 +20,6 @@
         rel="stylesheet"
         href="css/main.css"
     >
-
 
     <!--==================================================
         COMPONENT STYLES
@@ -49,7 +44,6 @@
         rel="stylesheet"
         href="css/vehicle.css"
     >
-
 
     <!--==================================================
         HUD EDITOR
@@ -199,13 +193,15 @@
 
 
     <!--==================================================
-        COMPASS / STREET INFORMATION
+        COMPASS + STREET INFORMATION
     ===================================================-->
 
     <div id="compass-wrapper">
 
 
-        <!-- COMPASS -->
+        <!--================================================
+            COMPASS HEADER
+        =================================================-->
 
         <div class="compass-top">
 
@@ -221,19 +217,21 @@
             </div>
 
 
-            <!-- COMPASS TAPE -->
+            <!--================================================
+                COMPASS STRIP
+            =================================================-->
 
             <div class="compass-tape">
 
 
-                <!-- LEFT -->
+                <!-- LEFT DIRECTION -->
 
                 <div id="compass-label-left">
                     NW
                 </div>
 
 
-                <!-- CENTER -->
+                <!-- CURRENT HEADING -->
 
                 <div class="compass-center">
 
@@ -246,7 +244,7 @@
                 </div>
 
 
-                <!-- RIGHT -->
+                <!-- RIGHT DIRECTION -->
 
                 <div id="compass-label-right">
                     NE
@@ -260,16 +258,47 @@
 
 
         <!--================================================
-            STREET
+            STREET INFORMATION
         =================================================-->
 
         <div id="street-wrapper">
+
+
+            <!-- LOCATION ICON -->
+
+            <div class="street-icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
+                    ></path>
+
+                    <circle
+                        cx="12"
+                        cy="10"
+                        r="2.5"
+                    ></circle>
+
+                </svg>
+
+            </div>
+
+
+            <!-- CURRENT STREET -->
 
             <div id="street-name">
                 UNKNOWN ROAD
             </div>
 
+
+            <!-- CROSS STREET -->
+
             <div id="crossing-name"></div>
+
 
         </div>
 
@@ -278,7 +307,7 @@
 
 
     <!--==================================================
-        STATUS HUD
+        PLAYER STATUS
     ===================================================-->
 
     <div id="status-bars">
@@ -293,11 +322,45 @@
             class="status-row"
         >
 
+
+            <!-- ICON -->
+
             <div
                 class="status-icon health-icon"
             >
-                ♥
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="
+                            M20.8 4.6
+                            a5.5 5.5 0 0 0-7.8 0
+                            L12 5.6
+                            l-1-1
+                            a5.5 5.5 0 0 0-7.8 7.8
+                            L12 21
+                            l8.8-8.6
+                            a5.5 5.5 0 0 0 0-7.8
+                            Z
+                        "
+                    ></path>
+
+                </svg>
+
             </div>
+
+
+            <!-- LABEL -->
+
+            <div class="status-name">
+                HEALTH
+            </div>
+
+
+            <!-- BAR -->
 
             <div class="status-track">
 
@@ -307,6 +370,7 @@
                 ></div>
 
             </div>
+
 
         </div>
 
@@ -320,11 +384,44 @@
             class="status-row"
         >
 
+
+            <!-- ICON -->
+
             <div
                 class="status-icon armor-icon"
             >
-                ◆
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="
+                            M12 3
+                            L19 6
+                            v5
+                            c0 4.6-2.9 8-7 10
+                            c-4.1-2-7-5.4-7-10
+                            V6
+                            l7-3
+                            Z
+                        "
+                    ></path>
+
+                </svg>
+
             </div>
+
+
+            <!-- LABEL -->
+
+            <div class="status-name">
+                ARMOR
+            </div>
+
+
+            <!-- BAR -->
 
             <div class="status-track">
 
@@ -334,6 +431,7 @@
                 ></div>
 
             </div>
+
 
         </div>
 
@@ -347,11 +445,62 @@
             class="status-row"
         >
 
+
+            <!-- ICON -->
+
             <div
                 class="status-icon hunger-icon"
             >
-                ●
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <!-- FORK -->
+
+                    <path
+                        d="M7 3v8"
+                    ></path>
+
+                    <path
+                        d="
+                            M4 3
+                            v5
+                            c0 2 1.3 3 3 3
+                            s3-1 3-3
+                            V3
+                        "
+                    ></path>
+
+                    <path
+                        d="M7 11v10"
+                    ></path>
+
+
+                    <!-- KNIFE -->
+
+                    <path
+                        d="
+                            M16 3
+                            c2 3 2 6 0 8
+                            v10
+                        "
+                    ></path>
+
+                </svg>
+
             </div>
+
+
+            <!-- LABEL -->
+
+            <div class="status-name">
+                HUNGER
+            </div>
+
+
+            <!-- BAR -->
 
             <div class="status-track">
 
@@ -361,6 +510,7 @@
                 ></div>
 
             </div>
+
 
         </div>
 
@@ -374,11 +524,41 @@
             class="status-row"
         >
 
+
+            <!-- ICON -->
+
             <div
                 class="status-icon thirst-icon"
             >
-                ▼
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+
+                    <path
+                        d="
+                            M12 3
+                            s-6 7-6 11
+                            a6 6 0 0 0 12 0
+                            c0-4-6-11-6-11
+                            Z
+                        "
+                    ></path>
+
+                </svg>
+
             </div>
+
+
+            <!-- LABEL -->
+
+            <div class="status-name">
+                THIRST
+            </div>
+
+
+            <!-- BAR -->
 
             <div class="status-track">
 
@@ -388,6 +568,7 @@
                 ></div>
 
             </div>
+
 
         </div>
 
@@ -414,6 +595,7 @@
                 viewBox="0 0 300 300"
             >
 
+
                 <!-- BACKGROUND -->
 
                 <circle
@@ -421,7 +603,7 @@
                     cx="150"
                     cy="150"
                     r="126"
-                />
+                ></circle>
 
 
                 <!-- RPM -->
@@ -432,7 +614,7 @@
                     cx="150"
                     cy="150"
                     r="126"
-                />
+                ></circle>
 
 
                 <!-- INNER -->
@@ -442,16 +624,18 @@
                     cx="150"
                     cy="150"
                     r="105"
-                />
+                ></circle>
+
 
             </svg>
 
 
             <!--============================================
-                RPM SCALE
+                RPM NUMBERS
             =============================================-->
 
             <div class="rpm-scale">
+
 
                 <span class="rpm-number n1">
                     1
@@ -493,11 +677,12 @@
                     10
                 </span>
 
+
             </div>
 
 
             <!--============================================
-                VEHICLE CENTER
+                CENTER
             =============================================-->
 
             <div class="vehicle-center">
@@ -520,7 +705,7 @@
                 </div>
 
 
-                <!-- UNIT -->
+                <!-- SPEED UNIT -->
 
                 <div id="speed-unit">
                     MPH
@@ -651,20 +836,18 @@
 
 
     <!--==================================================
-        NATIVE MINIMAP BORDER
+        NATIVE GTA MINIMAP BORDER
 
         IMPORTANT:
+        This is ONLY the visual border.
 
-        This is NOT the minimap.
+        The actual GTA minimap is controlled by:
+        client/minimap.lua
 
-        GTA renders the actual minimap.
+        Lua calculates the real minimap screen geometry
+        and sends the coordinates to app.js.
 
-        client/minimap.lua calculates the actual native
-        minimap screen position and sends its dimensions
-        to this element.
-
-        This prevents the HTML border from becoming
-        detached from the real GTA radar.
+        DO NOT make this draggable independently.
     ===================================================-->
 
     <div id="minimap-border"></div>
@@ -678,7 +861,7 @@
 
 
     <!--==================================================
-        HUD EDITOR
+        HUD EDITOR PANEL
     ===================================================-->
 
     <div id="hud-editor-panel">
@@ -780,7 +963,7 @@
 <!--======================================================
     JAVASCRIPT
 
-    app.js MUST load before editor.js.
+    app.js MUST load before editor.js
 =======================================================-->
 
 <script src="js/app.js"></script>

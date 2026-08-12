@@ -1,64 +1,71 @@
 /*=========================================================
     808LEMON HUD
-    STATUS BARS
-
-    Designed to line up with the VISIBLE native GTA radar,
-    not the full internal minimap component width.
+    PLAYER STATUS - FINAL LARGE DEFAULT
 =========================================================*/
 
-
 #status-bars {
+    
     position: absolute;
 
-    /*
-        Same left edge as the visible radar.
-    */
-    left: 1.55vw;
+    left: 0.80vw;
+    top: 55.4vh;
 
-    /*
-        Sits directly beneath radar.
-    */
-    bottom: 1.35vh;
+    width: 16.25vw;
 
-    /*
-        IMPORTANT:
-        The GTA minimap component may be 15vw internally,
-        but its visible map area is smaller because of the
-        native mask / padding.
-
-        12.25vw = ~235px @ 1920x1080.
-    */
-    width: 12.25vw;
-
-    /*
-        Keeps it sensible on different resolutions.
-    */
-    min-width: 210px;
-    max-width: 245px;
+    min-width: 300px;
+    max-width: 355px;
 
     display: flex;
     flex-direction: column;
 
-    gap: 5px;
+    gap: 6px;
 
-    padding: 7px 8px;
+    padding: 9px;
+
+    border-radius: 9px;
 
     overflow: hidden;
-
-    border-radius: 7px;
 
     background:
         linear-gradient(
             135deg,
-            rgba(5, 13, 22, 0.95),
-            rgba(8, 20, 32, 0.89)
+            rgba(5, 13, 21, 0.97),
+            rgba(7, 18, 28, 0.93)
         );
 
     border:
-        1px solid rgba(50, 135, 215, 0.20);
+        1px solid rgba(62, 142, 205, 0.27);
 
     box-shadow:
-        0 5px 18px rgba(0, 0, 0, 0.30);
+        0 7px 22px rgba(0, 0, 0, 0.36),
+        inset 0 0 24px rgba(39, 124, 190, 0.035);
+}
+
+
+/*=========================================================
+    TOP ACCENT
+=========================================================*/
+
+#status-bars::before {
+    content: '';
+
+    position: absolute;
+
+    left: 10px;
+    right: 10px;
+    top: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(223, 255, 69, 0.42),
+            transparent
+        );
+
+    pointer-events: none;
 }
 
 
@@ -67,50 +74,108 @@
 =========================================================*/
 
 .status-row {
-    width: 100%;
-    height: 12px;
+    position: relative;
 
-    display: flex;
+    width: 100%;
+    height: 35px;
+
+    display: grid;
+
+    grid-template-columns:
+        31px
+        65px
+        minmax(0, 1fr);
+
     align-items: center;
+
+    gap: 8px;
+
+    padding: 3px 7px;
+
+    border-radius: 6px;
+
+    background:
+        rgba(255, 255, 255, 0.018);
+}
+
+
+.status-row + .status-row {
+    border-top:
+        1px solid rgba(255, 255, 255, 0.025);
 }
 
 
 /*=========================================================
-    STATUS ICON
+    ICON
 =========================================================*/
 
 .status-icon {
-    width: 16px;
-    height: 12px;
-
-    flex: 0 0 16px;
+    width: 30px;
+    height: 30px;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    margin-right: 6px;
+    border-radius: 6px;
+
+    background:
+        rgba(25, 80, 120, 0.12);
+
+    border:
+        1px solid rgba(70, 145, 200, 0.14);
 
     color:
-        rgba(225, 235, 245, 0.90);
+        rgba(220, 235, 245, 0.94);
+}
 
-    font-size: 8px;
 
-    line-height: 1;
+.status-icon svg {
+    width: 16px;
+    height: 16px;
+
+    display: block;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.9;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 
 /*=========================================================
-    BAR BACKGROUND
+    LABEL
+=========================================================*/
+
+.status-name {
+    overflow: hidden;
+
+    color:
+        rgba(185, 203, 216, 0.78);
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: 0.8px;
+
+    white-space: nowrap;
+}
+
+
+/*=========================================================
+    TRACK
 =========================================================*/
 
 .status-track {
     position: relative;
 
-    flex: 1;
-
-    height: 6px;
+    width: 100%;
+    height: 8px;
 
     overflow: hidden;
 
@@ -120,22 +185,29 @@
         rgba(255, 255, 255, 0.075);
 
     box-shadow:
-        inset 0 1px 3px rgba(0, 0, 0, 0.45);
+        inset 0 1px 3px rgba(0, 0, 0, 0.58);
 }
 
 
 /*=========================================================
-    BAR FILL
+    FILL
 =========================================================*/
 
 .status-fill {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
     width: 100%;
     height: 100%;
 
     border-radius: inherit;
 
     transition:
-        width 0.18s ease;
+        width 0.22s ease;
+
+    will-change: width;
 }
 
 
@@ -143,17 +215,27 @@
     HEALTH
 =========================================================*/
 
+.health-icon {
+    color: #73ef8b;
+
+    background:
+        rgba(56, 198, 92, 0.08);
+
+    border-color:
+        rgba(72, 220, 110, 0.16);
+}
+
+
 #health-fill {
     background:
         linear-gradient(
             90deg,
-            #36c95d,
-            #72f08c
+            #34bf58,
+            #76ed8b
         );
 
     box-shadow:
-        0 0 6px
-        rgba(65, 225, 100, 0.28);
+        0 0 9px rgba(59, 220, 95, 0.36);
 }
 
 
@@ -161,17 +243,27 @@
     ARMOR
 =========================================================*/
 
+.armor-icon {
+    color: #70a8ff;
+
+    background:
+        rgba(46, 105, 225, 0.08);
+
+    border-color:
+        rgba(70, 125, 235, 0.16);
+}
+
+
 #armor-fill {
     background:
         linear-gradient(
             90deg,
-            #296aff,
-            #589cff
+            #346cf0,
+            #70a8ff
         );
 
     box-shadow:
-        0 0 6px
-        rgba(45, 115, 255, 0.28);
+        0 0 9px rgba(65, 115, 245, 0.33);
 }
 
 
@@ -179,17 +271,27 @@
     HUNGER
 =========================================================*/
 
+.hunger-icon {
+    color: #f3c665;
+
+    background:
+        rgba(215, 155, 48, 0.08);
+
+    border-color:
+        rgba(225, 170, 60, 0.16);
+}
+
+
 #hunger-fill {
     background:
         linear-gradient(
             90deg,
-            #d99531,
-            #f0c65b
+            #d69231,
+            #f1c35e
         );
 
     box-shadow:
-        0 0 6px
-        rgba(235, 180, 65, 0.25);
+        0 0 9px rgba(235, 180, 65, 0.30);
 }
 
 
@@ -197,15 +299,25 @@
     THIRST
 =========================================================*/
 
+.thirst-icon {
+    color: #62ccfa;
+
+    background:
+        rgba(38, 155, 225, 0.08);
+
+    border-color:
+        rgba(50, 175, 235, 0.16);
+}
+
+
 #thirst-fill {
     background:
         linear-gradient(
             90deg,
-            #249ce2,
-            #62cafa
+            #269ade,
+            #64cdf9
         );
 
     box-shadow:
-        0 0 6px
-        rgba(40, 175, 235, 0.25);
+        0 0 9px rgba(45, 175, 235, 0.32);
 }

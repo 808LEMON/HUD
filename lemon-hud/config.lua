@@ -112,13 +112,13 @@ Config.HudEditor.DefaultLayout = {
     },
 
     compass = {
-        x = 1.5,
-        y = 64.0
+        x = 43.5,
+        y = 0.0
     },
 
     status = {
-        x = 1.5,
-        y = 88.0
+        x = 0.8,
+        y = 53.8
     },
 
     vehicle = {

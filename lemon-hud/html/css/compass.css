@@ -1,47 +1,87 @@
+/*=========================================================
+    808LEMON HUD
+    COMPASS / LOCATION
+=========================================================*/
+
 #compass-wrapper {
     position: absolute;
 
     left: 1.50vw;
     bottom: 23.15vh;
 
-    width: 15.25vw;
+    width: 12.35vw;
 
-    min-width: 235px;
-    max-width: 305px;
+    min-width: 222px;
+    max-width: 255px;
 
     overflow: hidden;
 
-    color: white;
+    border-radius: 8px;
 
-    border-radius: 7px;
+    color: white;
 
     background:
         linear-gradient(
             135deg,
-            rgba(5, 13, 22, 0.95),
-            rgba(8, 20, 32, 0.89)
+            rgba(5, 13, 21, 0.96),
+            rgba(7, 18, 28, 0.91)
         );
 
     border:
-        1px solid rgba(50, 135, 215, 0.20);
+        1px solid rgba(62, 142, 205, 0.22);
 
     box-shadow:
-        0 5px 18px rgba(0, 0, 0, 0.30);
+        0 6px 20px rgba(0, 0, 0, 0.34),
+        inset 0 0 22px rgba(39, 124, 190, 0.025);
 }
 
 
 /*=========================================================
-    TOP ROW
+    TOP ACCENT
+=========================================================*/
+
+#compass-wrapper::before {
+    content: '';
+
+    position: absolute;
+
+    left: 8px;
+    right: 8px;
+    top: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(223, 255, 69, 0.38),
+            transparent
+        );
+
+    pointer-events: none;
+}
+
+
+/*=========================================================
+    COMPASS HEADER
 =========================================================*/
 
 .compass-top {
+    position: relative;
+
     width: 100%;
     height: 31px;
 
-    display: flex;
+    display: grid;
+
+    grid-template-columns:
+        38px
+        1fr;
+
     align-items: center;
 
-    padding: 0 8px;
+    padding: 0 7px;
 
     border-bottom:
         1px solid rgba(255, 255, 255, 0.045);
@@ -53,29 +93,29 @@
 =========================================================*/
 
 .direction-pill {
-    width: 32px;
+    width: 31px;
     height: 18px;
 
-    flex: 0 0 32px;
-
     display: flex;
+
     align-items: center;
     justify-content: center;
-
-    margin-right: 8px;
 
     border-radius: 4px;
 
     background:
-        rgba(223, 255, 69, 0.11);
+        rgba(223, 255, 69, 0.09);
 
     border:
-        1px solid rgba(223, 255, 69, 0.15);
+        1px solid rgba(223, 255, 69, 0.17);
+
+    box-shadow:
+        inset 0 0 8px
+        rgba(223, 255, 69, 0.025);
 }
 
-#compass-direction {
-    display: block;
 
+#compass-direction {
     color: #dfff45;
 
     font-size: 8px;
@@ -83,19 +123,16 @@
 
     line-height: 1;
 
-    letter-spacing: 0.45px;
+    letter-spacing: 0.7px;
 }
 
 
 /*=========================================================
-    COMPASS TAPE
+    COMPASS STRIP
 =========================================================*/
 
 .compass-tape {
     position: relative;
-
-    min-width: 0;
-    flex: 1;
 
     height: 100%;
 
@@ -103,7 +140,7 @@
 
     grid-template-columns:
         1fr
-        60px
+        74px
         1fr;
 
     align-items: center;
@@ -112,40 +149,69 @@
 }
 
 
-/* LEFT + RIGHT DIRECTION */
+/* Fade both sides */
+
+.compass-tape::before {
+    content: '';
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(6, 15, 23, 0.88),
+            transparent 22%,
+            transparent 78%,
+            rgba(6, 15, 23, 0.88)
+        );
+}
+
+
+/*=========================================================
+    NEIGHBOR DIRECTIONS
+=========================================================*/
 
 #compass-label-left,
 #compass-label-right {
-    display: flex;
+    position: relative;
 
-    align-items: center;
+    z-index: 2;
 
     color:
-        rgba(165, 188, 210, 0.52);
+        rgba(152, 176, 195, 0.52);
 
     font-size: 7px;
     font-weight: 800;
 
-    line-height: 1;
-
-    letter-spacing: 0.4px;
+    letter-spacing: 0.55px;
 }
+
 
 #compass-label-left {
-    justify-content: flex-start;
+    text-align: left;
 }
+
 
 #compass-label-right {
-    justify-content: flex-end;
+    text-align: right;
 }
 
 
-/* CENTER HEADING */
+/*=========================================================
+    CENTER HEADING
+=========================================================*/
 
 .compass-center {
     position: relative;
 
-    width: 60px;
+    z-index: 2;
+
     height: 100%;
 
     display: flex;
@@ -155,6 +221,9 @@
 
     gap: 5px;
 }
+
+
+/* Navigation marker */
 
 .compass-arrow {
     width: 0;
@@ -171,65 +240,144 @@
 
     filter:
         drop-shadow(
-            0 0 3px rgba(223, 255, 69, 0.45)
+            0 0 4px
+            rgba(223, 255, 69, 0.45)
         );
 }
 
-#compass-heading {
-    display: block;
 
+#compass-heading {
     color:
-        rgba(225, 235, 245, 0.82);
+        rgba(226, 237, 245, 0.87);
 
     font-size: 8px;
     font-weight: 800;
 
     line-height: 1;
 
-    letter-spacing: 0.4px;
+    letter-spacing: 0.65px;
 }
 
 
 /*=========================================================
-    STREET AREA
+    STREET CONTAINER
 =========================================================*/
 
 #street-wrapper {
-    width: 100%;
+    position: relative;
 
-    min-height: 29px;
+    min-height: 41px;
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
 
-    justify-content: center;
+    grid-template-columns:
+        27px
+        1fr;
+
+    grid-template-rows:
+        auto
+        auto;
+
+    column-gap: 7px;
+
+    align-content: center;
 
     padding:
-        5px 9px 6px 9px;
+        6px 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(27, 78, 111, 0.055),
+            transparent
+        );
 }
 
-#street-name {
-    width: 100%;
 
-    display: block;
+/*=========================================================
+    LOCATION ICON
+=========================================================*/
+
+.street-icon {
+    grid-column: 1;
+    grid-row: 1 / 3;
+
+    width: 25px;
+    height: 25px;
+
+    align-self: center;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 5px;
+
+    color:
+        rgba(110, 200, 245, 0.92);
+
+    background:
+        rgba(35, 125, 185, 0.085);
+
+    border:
+        1px solid rgba(55, 150, 215, 0.14);
+}
+
+
+.street-icon svg {
+    width: 12px;
+    height: 12px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/*=========================================================
+    PRIMARY STREET
+=========================================================*/
+
+#street-name {
+    grid-column: 2;
+    grid-row: 1;
+
+    width: 100%;
 
     overflow: hidden;
 
     white-space: nowrap;
+
     text-overflow: ellipsis;
 
     color:
-        rgba(245, 248, 252, 0.96);
+        rgba(244, 248, 251, 0.97);
 
     font-size: 9px;
-    font-weight: 800;
+    font-weight: 850;
 
-    line-height: 11px;
+    line-height: 12px;
 
-    letter-spacing: 0.4px;
+    letter-spacing: 0.55px;
+
+    text-transform: uppercase;
 }
 
+
+/*=========================================================
+    CROSS STREET
+=========================================================*/
+
 #crossing-name {
+    grid-column: 2;
+    grid-row: 2;
+
     width: 100%;
 
     display: none;
@@ -237,17 +385,20 @@
     overflow: hidden;
 
     white-space: nowrap;
+
     text-overflow: ellipsis;
 
-    margin-top: 2px;
+    margin-top: 1px;
 
     color:
-        rgba(145, 170, 195, 0.65);
+        rgba(140, 165, 185, 0.65);
 
     font-size: 7px;
-    font-weight: 600;
+    font-weight: 650;
 
     line-height: 9px;
 
-    letter-spacing: 0.3px;
+    letter-spacing: 0.4px;
+
+    text-transform: uppercase;
 }
