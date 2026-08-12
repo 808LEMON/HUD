@@ -1,29 +1,47 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore =
+    exports['qb-core']:GetCoreObject()
+
 
 local PlayerData = {}
 
-local hudVisible = true
+local hudVisible =
+    true
 
-local hunger = 100
-local thirst = 100
-local stress = 0
+
+local hunger =
+    100
+
+local thirst =
+    100
+
+local stress =
+    0
 
 
 --=========================================================
 -- HELPERS
 --=========================================================
 
-local function Clamp(value, minimum, maximum)
+local function Clamp(
+    value,
+    minimum,
+    maximum
+)
 
-    value = tonumber(value) or minimum
+    value =
+        tonumber(value)
+        or minimum
+
 
     if value < minimum then
         return minimum
     end
 
+
     if value > maximum then
         return maximum
     end
+
 
     return value
 
@@ -38,21 +56,34 @@ end
 
 
 --=========================================================
--- PLAYER DATA
+-- REFRESH PLAYER DATA
 --=========================================================
 
-local function UpdatePlayerData()
+local function RefreshPlayerData()
 
-    PlayerData =
+    local latestData =
         QBCore.Functions.GetPlayerData()
 
+
+    if latestData then
+
+        PlayerData =
+            latestData
+
+    end
+
+
     if not PlayerData then
+
         PlayerData = {}
+
         return
+
     end
 
 
     if PlayerData.metadata then
+
 
         if PlayerData.metadata['hunger'] ~= nil then
 
@@ -92,15 +123,18 @@ end
 
 
 --=========================================================
--- JOB DATA
+-- JOB
 --=========================================================
 
 local function GetPlayerJob()
 
     if not PlayerData
-    or not PlayerData.job then
+    or not PlayerData.job
+    then
 
-        return 'Unemployed', ''
+        return
+            'Unemployed',
+            ''
 
     end
 
@@ -111,7 +145,8 @@ local function GetPlayerJob()
         or 'Unemployed'
 
 
-    local gradeLabel = ''
+    local gradeLabel =
+        ''
 
 
     if PlayerData.job.grade then
@@ -124,14 +159,15 @@ local function GetPlayerJob()
     end
 
 
-    return jobLabel,
-           gradeLabel
+    return
+        jobLabel,
+        gradeLabel
 
 end
 
 
 --=========================================================
--- HEALTH / STATUS VALUES
+-- GET STATUS VALUES
 --=========================================================
 
 local function GetStatusValues()
@@ -142,28 +178,22 @@ local function GetStatusValues()
 
     if not DoesEntityExist(ped) then
 
-        return 100,
-               0,
-               hunger,
-               thirst
+        return
+            100,
+            0,
+            hunger,
+            thirst
 
     end
 
 
     --=====================================================
     -- HEALTH
-    --
-    -- GTA player health normally uses:
-    --
-    -- 100 = zero usable health
-    -- 200 = full usable health
-    --
-    -- We calculate against GetEntityMaxHealth so it will
-    -- still work if another resource changes max health.
     --=====================================================
 
     local rawHealth =
         GetEntityHealth(ped)
+
 
     local rawMaxHealth =
         GetEntityMaxHealth(ped)
@@ -172,20 +202,25 @@ local function GetStatusValues()
     local usableHealth =
         rawHealth - 100
 
+
     local usableMaxHealth =
         rawMaxHealth - 100
 
 
     if usableMaxHealth <= 0 then
-        usableMaxHealth = 100
+
+        usableMaxHealth =
+            100
+
     end
 
 
     local health =
         (
-            usableHealth /
-            usableMaxHealth
-        ) * 100
+            usableHealth
+            / usableMaxHealth
+        )
+        * 100
 
 
     health =
@@ -240,10 +275,11 @@ local function GetStatusValues()
         )
 
 
-    return health,
-           armor,
-           currentHunger,
-           currentThirst
+    return
+        health,
+        armor,
+        currentHunger,
+        currentThirst
 
 end
 
@@ -259,17 +295,23 @@ local function SendPlayerInformation()
     end
 
 
+    RefreshPlayerData()
+
+
     local jobLabel,
           gradeLabel =
         GetPlayerJob()
 
 
-    local cash = 0
-    local bank = 0
+    local cash =
+        0
 
 
-    if PlayerData
-    and PlayerData.money then
+    local bank =
+        0
+
+
+    if PlayerData.money then
 
         cash =
             tonumber(
@@ -382,6 +424,7 @@ local function UpdateHud()
         return
     end
 
+
     SendPlayerInformation()
 
     SendStatusInformation()
@@ -397,9 +440,11 @@ RegisterNetEvent(
     'QBCore:Client:OnPlayerLoaded',
     function()
 
-        UpdatePlayerData()
+        RefreshPlayerData()
 
-        hudVisible = true
+
+        hudVisible =
+            true
 
 
         SendHudMessage({
@@ -414,6 +459,7 @@ RegisterNetEvent(
 
 
         Wait(250)
+
 
         UpdateHud()
 
@@ -431,7 +477,9 @@ RegisterNetEvent(
 
         PlayerData = {}
 
-        hudVisible = false
+
+        hudVisible =
+            false
 
 
         SendHudMessage({
@@ -449,7 +497,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- PLAYER DATA UPDATED
+-- QBCORE PLAYER DATA UPDATE
 --=========================================================
 
 RegisterNetEvent(
@@ -457,7 +505,8 @@ RegisterNetEvent(
     function(data)
 
         PlayerData =
-            data or {}
+            data
+            or {}
 
 
         if PlayerData.metadata then
@@ -498,14 +547,16 @@ RegisterNetEvent(
         end
 
 
-        UpdateHud()
+        SendPlayerInformation()
+
+        SendStatusInformation()
 
     end
 )
 
 
 --=========================================================
--- JOB UPDATED
+-- JOB UPDATE
 --=========================================================
 
 RegisterNetEvent(
@@ -515,6 +566,7 @@ RegisterNetEvent(
         PlayerData.job =
             job
 
+
         SendPlayerInformation()
 
     end
@@ -522,7 +574,109 @@ RegisterNetEvent(
 
 
 --=========================================================
--- QB-HUD COMPATIBILITY
+-- QB-HUD MONEY CHANGE COMPATIBILITY
+--=========================================================
+
+RegisterNetEvent(
+    'hud:client:OnMoneyChange',
+    function(
+        moneyType,
+        amount,
+        isMinus
+    )
+
+        /*
+            Give QBCore a moment to update the local
+            PlayerData table before reading it again.
+        */
+
+        Wait(50)
+
+
+        RefreshPlayerData()
+
+
+        local cash =
+            0
+
+
+        local bank =
+            0
+
+
+        if PlayerData.money then
+
+            cash =
+                tonumber(
+                    PlayerData.money['cash']
+                )
+                or 0
+
+
+            bank =
+                tonumber(
+                    PlayerData.money['bank']
+                )
+                or 0
+
+        end
+
+
+        SendHudMessage({
+
+            action =
+                'moneyChanged',
+
+            moneyType =
+                moneyType,
+
+            amount =
+                tonumber(amount)
+                or 0,
+
+            isMinus =
+                isMinus == true,
+
+            cash =
+                cash,
+
+            bank =
+                bank
+
+        })
+
+
+        /*
+            Also send the normal player update so our UI
+            can never get stuck on an old value.
+        */
+
+        SendPlayerInformation()
+
+    end
+)
+
+
+--=========================================================
+-- OPTIONAL QB-HUD ACCOUNT DISPLAY COMPATIBILITY
+--=========================================================
+
+RegisterNetEvent(
+    'hud:client:ShowAccounts',
+    function(
+        moneyType,
+        amount
+    )
+
+        RefreshPlayerData()
+
+        SendPlayerInformation()
+
+    end
+)
+
+
+--=========================================================
 -- NEEDS
 --=========================================================
 
@@ -564,7 +718,6 @@ RegisterNetEvent(
 
 
 --=========================================================
--- QB-HUD COMPATIBILITY
 -- STRESS
 --=========================================================
 
@@ -685,19 +838,21 @@ RegisterNetEvent(
 
 
 --=========================================================
--- INITIAL THREAD
+-- MAIN LOOP
 --=========================================================
 
 CreateThread(function()
 
     Wait(1000)
 
-    UpdatePlayerData()
+
+    RefreshPlayerData()
 
 
     while true do
 
         UpdateHud()
+
 
         Wait(
             Config.UpdateInterval

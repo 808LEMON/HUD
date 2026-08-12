@@ -11,7 +11,9 @@ console.log('[808LEMON HUD] app.js loaded')
 //=========================================================
 
 
-// COMBINED INFO PANEL
+//=========================================================
+// TOP RIGHT INFO PANEL
+//=========================================================
 
 const minimapInfoPanel =
     document.getElementById(
@@ -55,6 +57,17 @@ const playerGrade =
 
 
 //=========================================================
+// MONEY STATE
+//=========================================================
+
+let previousCash =
+    null
+
+let previousBank =
+    null
+
+
+//=========================================================
 // COMPASS
 //=========================================================
 
@@ -71,6 +84,11 @@ const compassDirection =
 const compassHeading =
     document.getElementById(
         'compass-heading'
+    )
+
+const locationDirectionValue =
+    document.getElementById(
+        'location-direction-value'
     )
 
 const compassLabelLeft =
@@ -227,10 +245,6 @@ let lastMinimapGeometry =
     null
 
 
-//=========================================================
-// STATUS → MINIMAP
-//=========================================================
-
 const STATUS_MINIMAP_GAP =
     4
 
@@ -290,6 +304,145 @@ function formatMoney(value) {
 
 
 //=========================================================
+// MONEY ANIMATION
+//=========================================================
+
+function restartMoneyAnimation(
+    element,
+    className
+) {
+
+    if (!element) {
+        return
+    }
+
+
+    // Remove previous animation states
+
+    element.classList.remove(
+        'money-increase',
+        'money-decrease',
+        'money-bump'
+    )
+
+
+    // Force browser reflow so animation can restart
+
+    void element.offsetWidth
+
+
+    // Apply new state
+
+    element.classList.add(
+        className
+    )
+
+
+    element.classList.add(
+        'money-bump'
+    )
+
+
+    // Remove animation classes after animation finishes
+
+    window.setTimeout(
+        () => {
+
+            element.classList.remove(
+                'money-increase',
+                'money-decrease',
+                'money-bump'
+            )
+
+        },
+        650
+    )
+
+}
+
+
+//=========================================================
+// UPDATE MONEY VALUE
+//=========================================================
+
+function updateMoneyValue(
+    element,
+    newValue,
+    previousValue
+) {
+
+    if (!element) {
+        return
+    }
+
+
+    const current =
+        Number(newValue)
+        || 0
+
+
+    // Always update the actual number
+
+    element.textContent =
+        formatMoney(
+            current
+        )
+
+
+    /*
+        Do not animate the initial HUD load.
+
+        We only want animation when the player's
+        balance actually changes.
+    */
+
+    if (
+        previousValue === null ||
+        previousValue === undefined
+    ) {
+
+        return
+
+    }
+
+
+    //=====================================================
+    // MONEY ADDED
+    //=====================================================
+
+    if (
+        current > previousValue
+    ) {
+
+        restartMoneyAnimation(
+            element,
+            'money-increase'
+        )
+
+        return
+
+    }
+
+
+    //=====================================================
+    // MONEY REMOVED
+    //=====================================================
+
+    if (
+        current < previousValue
+    ) {
+
+        restartMoneyAnimation(
+            element,
+            'money-decrease'
+        )
+
+    }
+
+}
+
+
+//=========================================================
 // PERCENTAGE BAR
 //=========================================================
 
@@ -329,16 +482,32 @@ function updatePlayer(data) {
 
 
     //=====================================================
-    // ID
+    // PLAYER ID
     //=====================================================
 
+    /*
+        Supports both:
+
+        id
+        playerId
+
+        This gives us some compatibility with older
+        lemon-hud messages.
+    */
+
+    const incomingPlayerId =
+        data.id !== undefined
+            ? data.id
+            : data.playerId
+
+
     if (
-        data.id !== undefined &&
+        incomingPlayerId !== undefined &&
         playerId
     ) {
 
         playerId.textContent =
-            data.id
+            incomingPlayerId
 
     }
 
@@ -352,10 +521,21 @@ function updatePlayer(data) {
         playerCash
     ) {
 
-        playerCash.textContent =
-            formatMoney(
+        const newCash =
+            Number(
                 data.cash
-            )
+            ) || 0
+
+
+        updateMoneyValue(
+            playerCash,
+            newCash,
+            previousCash
+        )
+
+
+        previousCash =
+            newCash
 
     }
 
@@ -369,10 +549,21 @@ function updatePlayer(data) {
         playerBank
     ) {
 
-        playerBank.textContent =
-            formatMoney(
+        const newBank =
+            Number(
                 data.bank
-            )
+            ) || 0
+
+
+        updateMoneyValue(
+            playerBank,
+            newBank,
+            previousBank
+        )
+
+
+        previousBank =
+            newBank
 
     }
 
@@ -387,8 +578,8 @@ function updatePlayer(data) {
     ) {
 
         playerJob.textContent =
-            data.job
-            || 'Unemployed'
+            data.job ||
+            'Unemployed'
 
     }
 
@@ -403,8 +594,7 @@ function updatePlayer(data) {
     ) {
 
         playerGrade.textContent =
-            data.grade
-            || ''
+            data.grade || ''
 
     }
 
@@ -422,6 +612,75 @@ function updatePlayer(data) {
             data.visible
                 ? 'block'
                 : 'none'
+
+    }
+
+}
+
+
+//=========================================================
+// DIRECT MONEY CHANGE
+//=========================================================
+
+function moneyChanged(data) {
+
+    if (!data) {
+        return
+    }
+
+
+    //=====================================================
+    // CASH
+    //=====================================================
+
+    if (
+        data.cash !== undefined &&
+        playerCash
+    ) {
+
+        const newCash =
+            Number(
+                data.cash
+            ) || 0
+
+
+        updateMoneyValue(
+            playerCash,
+            newCash,
+            previousCash
+        )
+
+
+        previousCash =
+            newCash
+
+    }
+
+
+    //=====================================================
+    // BANK
+    //=====================================================
+
+    if (
+        data.bank !== undefined &&
+        playerBank
+    ) {
+
+        const newBank =
+            Number(
+                data.bank
+            ) || 0
+
+
+        updateMoneyValue(
+            playerBank,
+            newBank,
+            previousBank
+        )
+
+
+        previousBank =
+            newBank
 
     }
 
@@ -594,10 +853,10 @@ function updateStatus(data) {
 
 
     /*
-        If armor disappears, the status panel changes
-        height.
+        Armor can dynamically disappear.
 
-        Re-anchor it immediately above the minimap.
+        That changes the status container height, so
+        re-anchor the status box above the minimap.
     */
 
     requestAnimationFrame(
@@ -619,7 +878,7 @@ function updateCompass(data) {
 
 
     //=====================================================
-    // COMPASS VISIBILITY
+    // VISIBILITY
     //=====================================================
 
     if (
@@ -636,22 +895,47 @@ function updateCompass(data) {
 
 
     //=====================================================
-    // CURRENT DIRECTION
+    // CARDINAL DIRECTION
     //=====================================================
 
     if (
-        data.direction !== undefined &&
-        compassDirection
+        data.direction !== undefined
     ) {
 
-        compassDirection.textContent =
-            data.direction
+        const direction =
+            String(
+                data.direction
+            ).toUpperCase()
+
+
+        // Small direction pill
+
+        if (
+            compassDirection
+        ) {
+
+            compassDirection.textContent =
+                direction
+
+        }
+
+
+        // Large direction beside street name
+
+        if (
+            locationDirectionValue
+        ) {
+
+            locationDirectionValue.textContent =
+                direction
+
+        }
 
     }
 
 
     //=====================================================
-    // HEADING
+    // NUMERIC HEADING
     //=====================================================
 
     if (
@@ -695,7 +979,9 @@ function updateCompass(data) {
     ) {
 
         compassLabelLeft.textContent =
-            data.left
+            String(
+                data.left
+            ).toUpperCase()
 
     }
 
@@ -710,7 +996,9 @@ function updateCompass(data) {
     ) {
 
         compassLabelRight.textContent =
-            data.right
+            String(
+                data.right
+            ).toUpperCase()
 
     }
 
@@ -725,8 +1013,8 @@ function updateCompass(data) {
     ) {
 
         streetName.textContent =
-            data.street
-            || 'UNKNOWN ROAD'
+            data.street ||
+            'UNKNOWN ROAD'
 
     }
 
@@ -740,13 +1028,16 @@ function updateCompass(data) {
         crossingName
     ) {
 
+        const crossing =
+            data.crossing || ''
+
+
         crossingName.textContent =
-            data.crossing
-            || ''
+            crossing
 
 
         crossingName.style.display =
-            data.crossing
+            crossing
                 ? 'block'
                 : 'none'
 
@@ -763,8 +1054,8 @@ function updateCompass(data) {
     ) {
 
         cityName.textContent =
-            data.city
-            || 'SAN ANDREAS'
+            data.city ||
+            'SAN ANDREAS'
 
     }
 
@@ -843,8 +1134,9 @@ function updateVehicle(data) {
     ) {
 
         speedUnit.textContent =
-            String(unit)
-                .toUpperCase()
+            String(
+                unit
+            ).toUpperCase()
 
     }
 
@@ -951,6 +1243,11 @@ function updateVehicle(data) {
             ) || 0
 
 
+        /*
+            GTA normally reports engine health on
+            approximately a 0-1000 scale.
+        */
+
         if (
             currentEngine > 100
         ) {
@@ -1048,13 +1345,17 @@ function updateVehicle(data) {
         seatbeltIcon
     ) {
 
+        const seatbeltEnabled =
+            Boolean(
+                data.seatbelt
+            )
+
+
         seatbeltIcon
             .classList
             .toggle(
                 'active',
-                Boolean(
-                    data.seatbelt
-                )
+                seatbeltEnabled
             )
 
 
@@ -1062,9 +1363,7 @@ function updateVehicle(data) {
             .classList
             .toggle(
                 'warning',
-                !Boolean(
-                    data.seatbelt
-                )
+                !seatbeltEnabled
             )
 
     }
@@ -1187,7 +1486,7 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // LEFT EDGE MATCHES MINIMAP
+    // MATCH LEFT EDGE OF MINIMAP
     //=====================================================
 
     let left =
@@ -1195,7 +1494,7 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // DIRECTLY ABOVE MINIMAP
+    // POSITION DIRECTLY ABOVE MINIMAP
     //=====================================================
 
     let top =
@@ -1205,7 +1504,7 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // SCREEN SAFETY
+    // SCREEN BOUNDS
     //=====================================================
 
     left =
@@ -1227,7 +1526,7 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // APPLY
+    // APPLY POSITION
     //=====================================================
 
     statusBars.style.left =
@@ -1264,11 +1563,12 @@ function applyHudLayout(layout) {
 
 
     /*
-        Player stats and compass now belong to the
-        top-right #minimap-info-panel.
+        The player/compass information panel is now
+        permanently anchored to the top-right through CSS.
 
-        We intentionally DO NOT apply their old editor
-        coordinates anymore.
+        We intentionally ignore any old player/compass
+        coordinates saved by previous versions of the
+        editor.
     */
 
 
@@ -1305,8 +1605,8 @@ function applyHudLayout(layout) {
 
 
     /*
-        Real minimap geometry is the final authority for
-        status position.
+        Minimap geometry takes priority over any old
+        status coordinates.
     */
 
     requestAnimationFrame(
@@ -1332,7 +1632,7 @@ function setMinimapBorder(data) {
 
 
     //=====================================================
-    // HIDDEN
+    // HIDE MINIMAP BORDER
     //=====================================================
 
     if (
@@ -1353,7 +1653,7 @@ function setMinimapBorder(data) {
 
 
     //=====================================================
-    // REAL MINIMAP GEOMETRY
+    // GET ACTUAL MINIMAP GEOMETRY
     //=====================================================
 
     const left =
@@ -1397,7 +1697,7 @@ function setMinimapBorder(data) {
 
 
     //=====================================================
-    // VISUAL BORDER
+    // POSITION BORDER
     //=====================================================
 
     minimapBorder.style.left =
@@ -1421,7 +1721,7 @@ function setMinimapBorder(data) {
 
 
     //=====================================================
-    // STATUS
+    // REPOSITION STATUS
     //=====================================================
 
     requestAnimationFrame(
@@ -1566,6 +1866,30 @@ window.addEventListener(
 
 
             //=================================================
+            // MONEY
+            //=================================================
+
+            case 'moneyChanged':
+
+                moneyChanged(
+                    data.data ||
+                    data
+                )
+
+                break
+
+
+            case 'updateMoney':
+
+                moneyChanged(
+                    data.data ||
+                    data
+                )
+
+                break
+
+
+            //=================================================
             // STATUS
             //=================================================
 
@@ -1699,7 +2023,7 @@ window.addEventListener(
 
 
             //=================================================
-            // HUD LAYOUT
+            // LAYOUT
             //=================================================
 
             case 'applyHudLayout':

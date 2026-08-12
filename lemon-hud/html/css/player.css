@@ -477,3 +477,106 @@
     }
 
 }
+
+
+/*=========================================================
+    MONEY CHANGE ANIMATIONS
+=========================================================*/
+
+#player-cash,
+#player-bank {
+    display: inline-block;
+
+    transform-origin:
+        left center;
+
+    transition:
+        color 0.15s ease,
+        text-shadow 0.15s ease;
+}
+
+
+/*=========================================================
+    MONEY INCREASE
+=========================================================*/
+
+#player-cash.money-increase,
+#player-bank.money-increase {
+    color:
+        #73ef8b;
+
+    text-shadow:
+        0 0 8px
+        rgba(70, 230, 110, 0.38);
+}
+
+
+/*=========================================================
+    MONEY DECREASE
+=========================================================*/
+
+#player-cash.money-decrease,
+#player-bank.money-decrease {
+    color:
+        #ff6868;
+
+    text-shadow:
+        0 0 8px
+        rgba(255, 75, 75, 0.34);
+}
+
+
+/*=========================================================
+    VALUE BUMP
+=========================================================*/
+
+#player-cash.money-bump,
+#player-bank.money-bump {
+    animation:
+        lemon-money-bump
+        0.52s
+        cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+        );
+}
+
+
+@keyframes lemon-money-bump {
+
+    0% {
+        transform:
+            translateX(0)
+            scale(1);
+
+        opacity:
+            1;
+    }
+
+
+    25% {
+        transform:
+            translateX(3px)
+            scale(1.12);
+
+        opacity:
+            1;
+    }
+
+
+    55% {
+        transform:
+            translateX(-1px)
+            scale(1.04);
+    }
+
+
+    100% {
+        transform:
+            translateX(0)
+            scale(1);
+    }
+
+}

@@ -27,7 +27,7 @@
 
 
     <!--==================================================
-        MINIMAP SIDE INFORMATION PANEL
+        TOP RIGHT INFORMATION PANEL
     ===================================================-->
 
     <div id="minimap-info-panel">
@@ -161,7 +161,7 @@
 
 
         <!--================================================
-            PANEL DIVIDER
+            DIVIDER
         =================================================-->
 
         <div class="info-panel-divider"></div>
@@ -174,7 +174,7 @@
         <div id="compass-wrapper">
 
 
-            <!-- COMPASS -->
+            <!-- COMPASS STRIP -->
 
             <div class="compass-top">
 
@@ -218,40 +218,35 @@
             </div>
 
 
-            <!-- LOCATION -->
+            <!-- LOCATION INFORMATION -->
 
             <div id="street-wrapper">
 
 
-                <div class="street-icon">
+                <!-- LARGE CARDINAL DIRECTION -->
 
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
+                <div class="location-heading">
 
-                        <path
-                            d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
-                        ></path>
-
-                        <circle
-                            cx="12"
-                            cy="10"
-                            r="2.5"
-                        ></circle>
-
-                    </svg>
+                    <span id="location-direction-value">
+                        N
+                    </span>
 
                 </div>
 
+
+                <!-- PRIMARY STREET -->
 
                 <div id="street-name">
                     UNKNOWN ROAD
                 </div>
 
 
+                <!-- CROSS STREET -->
+
                 <div id="crossing-name"></div>
 
+
+                <!-- CITY / COUNTY -->
 
                 <div id="city-name">
                     SAN ANDREAS
@@ -268,7 +263,7 @@
 
 
     <!--==================================================
-        PLAYER STATUS
+        STATUS HUD
     ===================================================-->
 
     <div id="status-bars">
@@ -639,7 +634,7 @@
 
 
     <!--==================================================
-        NATIVE MINIMAP BORDER
+        MINIMAP BORDER
     ===================================================-->
 
     <div id="minimap-border"></div>
@@ -672,8 +667,8 @@
             Drag the available HUD components anywhere
             on your screen.
 
-            The status and information panel are anchored
-            to the minimap during normal gameplay.
+            The player status panel is automatically
+            anchored above the minimap.
 
         </div>
 
@@ -719,7 +714,6 @@
 
 <script src="js/app.js"></script>
 <script src="js/editor.js"></script>
-
 
 </body>
 
