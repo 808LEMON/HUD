@@ -1,79 +1,61 @@
-local radarVisible = false
+--=========================================================
+-- 808LEMON HUD
+-- NATIVE GTA MINIMAP CONTROLLER
+--=========================================================
 
+local radarVisible = false
 local minimapScaleform = nil
 
 --=========================================================
--- APPLY BASE MINIMAP
+-- LOAD MINIMAP SCALEFORM
 --=========================================================
 
-local function ApplyBaseMinimapPosition()
+local function LoadMinimapScaleform()
 
-    local map = Config.Minimap.Map
-    local mask = Config.Minimap.Mask
-    local blur = Config.Minimap.Blur
+    if minimapScaleform
+    and HasScaleformMovieLoaded(
+        minimapScaleform
+    ) then
+        return true
+    end
 
-    SetMinimapClipType(0)
+    minimapScaleform =
+        RequestScaleformMovie(
+            'minimap'
+        )
 
-    SetMinimapComponentPosition(
-        'minimap',
-        'L',
-        'B',
-        map.x,
-        map.y,
-        map.width,
-        map.height
-    )
+    local timeout =
+        GetGameTimer() + 5000
 
-    SetMinimapComponentPosition(
-        'minimap_mask',
-        'L',
-        'B',
-        mask.x,
-        mask.y,
-        mask.width,
-        mask.height
-    )
+    while not HasScaleformMovieLoaded(
+        minimapScaleform
+    ) do
 
-    SetMinimapComponentPosition(
-        'minimap_blur',
-        'L',
-        'B',
-        blur.x,
-        blur.y,
-        blur.width,
-        blur.height
-    )
+        if GetGameTimer() >
+            timeout
+        then
+
+            print(
+                '[LEMON-HUD] Failed to load minimap scaleform.'
+            )
+
+            return false
+        end
+
+        Wait(25)
+
+    end
+
+    return true
 end
 
 --=========================================================
--- REFRESH RADAR
---=========================================================
-
-local function RefreshRadar()
-
-    SetRadarBigmapEnabled(true, false)
-
-    Wait(50)
-
-    SetRadarBigmapEnabled(false, false)
-end
-
---=========================================================
--- REMOVE GTA HEALTH / ARMOR BARS
+-- HIDE STOCK HEALTH / ARMOR
 --=========================================================
 
 local function HideDefaultHealthArmor()
 
-    if not minimapScaleform then
-
-        minimapScaleform =
-            RequestScaleformMovie('minimap')
-
-    end
-
-    if not HasScaleformMovieLoaded(
-        minimapScaleform
-    ) then
+    if not LoadMinimapScaleform() then
         return
     end
 
@@ -82,33 +64,140 @@ local function HideDefaultHealthArmor()
         'SETUP_HEALTH_ARMOUR'
     )
 
-    -- 3 removes GTA's stock health/armor bars
-    -- while leaving the radar itself active.
-    ScaleformMovieMethodAddParamInt(3)
+    ScaleformMovieMethodAddParamInt(
+        3
+    )
 
     EndScaleformMovieMethod()
 end
 
 --=========================================================
--- INITIALIZE
+-- HIDE STOCK NORTH INDICATOR
+--=========================================================
+
+local function HideNorthRadarBlip()
+
+    local northBlip =
+        GetNorthRadarBlip()
+
+    if northBlip
+    and northBlip ~= 0 then
+
+        SetBlipAlpha(
+            northBlip,
+            0
+        )
+
+    end
+end
+
+--=========================================================
+-- APPLY MINIMAP COMPONENT POSITIONS
+--=========================================================
+
+local function ApplyMinimapPosition()
+
+    local map =
+        Config.Minimap.Map
+
+    local mask =
+        Config.Minimap.Mask
+
+    local blur =
+        Config.Minimap.Blur
+
+    --=====================================================
+    -- SQUARE CLIP
+    --=====================================================
+
+    SetMinimapClipType(
+        0
+    )
+
+    --=====================================================
+    -- ACTUAL MAP FEED
+    --=====================================================
+
+    SetMinimapComponentPosition(
+        'minimap',
+        'L',
+        'B',
+
+        map.x,
+        map.y,
+
+        map.width,
+        map.height
+    )
+
+    --=====================================================
+    -- ICON / BLIP MASK
+    --
+    -- THIS IS CRITICAL.
+    -- Do NOT give this the same dimensions as the map.
+    --=====================================================
+
+    SetMinimapComponentPosition(
+        'minimap_mask',
+        'L',
+        'B',
+
+        mask.x,
+        mask.y,
+
+        mask.width,
+        mask.height
+    )
+
+    --=====================================================
+    -- BLUR / BACKING LAYER
+    --=====================================================
+
+    SetMinimapComponentPosition(
+        'minimap_blur',
+        'L',
+        'B',
+
+        blur.x,
+        blur.y,
+
+        blur.width,
+        blur.height
+    )
+
+end
+
+--=========================================================
+-- REFRESH MAP
+--=========================================================
+
+local function RefreshRadar()
+
+    SetRadarBigmapEnabled(
+        true,
+        false
+    )
+
+    Wait(50)
+
+    SetRadarBigmapEnabled(
+        false,
+        false
+    )
+
+end
+
+--=========================================================
+-- INITIAL SETUP
 --=========================================================
 
 CreateThread(function()
 
-    minimapScaleform =
-        RequestScaleformMovie('minimap')
+    Wait(750)
 
-    while not HasScaleformMovieLoaded(
-        minimapScaleform
-    ) do
+    LoadMinimapScaleform()
 
-        Wait(50)
-
-    end
-
-    Wait(500)
-
-    ApplyBaseMinimapPosition()
+    ApplyMinimapPosition()
 
     RefreshRadar()
 
@@ -116,10 +205,15 @@ CreateThread(function()
 
     HideDefaultHealthArmor()
 
+    HideNorthRadarBlip()
+
 end)
 
 --=========================================================
--- KEEP STOCK HEALTH/ARMOR DISABLED
+-- KEEP STOCK MINIMAP UI DISABLED
+--
+-- GTA or other resources can reinitialize this stuff,
+-- so lightly reassert it.
 --=========================================================
 
 CreateThread(function()
@@ -127,6 +221,8 @@ CreateThread(function()
     while true do
 
         HideDefaultHealthArmor()
+
+        HideNorthRadarBlip()
 
         Wait(1000)
 
@@ -158,7 +254,9 @@ CreateThread(function()
 
         end
 
-        if shouldShow ~= radarVisible then
+        if shouldShow ~=
+            radarVisible
+        then
 
             radarVisible =
                 shouldShow
@@ -176,18 +274,45 @@ CreateThread(function()
 end)
 
 --=========================================================
--- BASE RESET
+-- PLAYER LOAD
 --=========================================================
 
 RegisterNetEvent(
-    'lemon-hud:client:resetNativeMinimap',
+    'QBCore:Client:OnPlayerLoaded',
     function()
 
-        ApplyBaseMinimapPosition()
+        Wait(750)
+
+        ApplyMinimapPosition()
 
         RefreshRadar()
 
+        Wait(100)
+
         HideDefaultHealthArmor()
+
+        HideNorthRadarBlip()
+
+    end
+)
+
+--=========================================================
+-- MANUAL REFRESH
+--=========================================================
+
+RegisterNetEvent(
+    'lemon-hud:client:refreshMinimap',
+    function()
+
+        ApplyMinimapPosition()
+
+        RefreshRadar()
+
+        Wait(50)
+
+        HideDefaultHealthArmor()
+
+        HideNorthRadarBlip()
 
     end
 )
@@ -195,6 +320,21 @@ RegisterNetEvent(
 --=========================================================
 -- EXPORT
 --=========================================================
+
+exports(
+    'RefreshMinimap',
+    function()
+
+        ApplyMinimapPosition()
+
+        RefreshRadar()
+
+        HideDefaultHealthArmor()
+
+        HideNorthRadarBlip()
+
+    end
+)
 
 exports(
     'HideDefaultHealthArmor',

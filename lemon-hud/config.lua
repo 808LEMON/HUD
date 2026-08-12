@@ -27,56 +27,60 @@ Config.HideArmorWhenEmpty = true
 Config.ShowMinimap = true
 Config.MinimapOnlyInVehicle = false
 
+--=========================================================
+-- MINIMAP STYLE
+--=========================================================
+
+Config.MinimapStyle = 'square'
+
+--=========================================================
+-- SQUARE MINIMAP
+--
+-- Based on the current qb-hud style of positioning:
+-- map, mask and blur deliberately use DIFFERENT values.
+--=========================================================
+
 Config.Minimap = {
 
     Map = {
-        x = -0.0040,
-        y = -0.0215,
-        width = 0.1515,
-        height = 0.1880
+        x = 0.0000,
+        y = -0.0470,
+        width = 0.1638,
+        height = 0.1830
     },
 
     Mask = {
-        x = 0.0200,
-        y = 0.0320,
-        width = 0.1110,
-        height = 0.1590
+        x = 0.0000,
+        y = 0.0000,
+        width = 0.1280,
+        height = 0.2000
     },
 
     Blur = {
-        x = -0.0300,
-        y = 0.0220,
-        width = 0.2660,
-        height = 0.2370
+        x = -0.0100,
+        y = 0.0250,
+        width = 0.2620,
+        height = 0.3000
     }
 
 }
 
 --=========================================================
--- MINIMAP FRAME
---=========================================================
+-- CUSTOM MINIMAP BORDER
 --
--- This is the HTML border drawn around the VISIBLE map.
---
--- Values are percentages:
---
--- x      = left
--- y      = top
--- width  = screen width %
--- height = screen height %
---
--- Once you get this frame sitting PERFECTLY around the
--- actual map, we can bake your final values in here.
+-- NUI border only.
+-- Does NOT control the native minimap.
+-- We'll calibrate this after the native map is fixed.
 --=========================================================
 
-Config.MinimapFrame = {
+Config.MinimapBorder = {
+    enabled = true,
 
-    x = 1.50,
-    y = 73.15,
+    x = 1.55,
+    y = 72.6,
 
-    width = 12.30,
-    height = 10.85
-
+    width = 14.3,
+    height = 17.1
 }
 
 --=========================================================
@@ -104,6 +108,8 @@ Config.CompassUpdateInterval = 75
 
 --=========================================================
 -- HUD EDITOR
+--
+-- Leave this configured, but don't use minimap editing yet.
 --=========================================================
 
 Config.HudEditor = {}
@@ -133,11 +139,6 @@ Config.HudEditor.DefaultLayout = {
     vehicle = {
         x = 82.0,
         y = 68.0
-    },
-
-    minimap = {
-        x = Config.MinimapFrame.x,
-        y = Config.MinimapFrame.y
     }
 
 }
