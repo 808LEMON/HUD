@@ -5,6 +5,7 @@
 
 console.log('[808LEMON HUD] app.js loaded')
 
+
 //=========================================================
 // DOM REFERENCES
 //=========================================================
@@ -122,10 +123,34 @@ const minimapBorder =
 
 
 //=========================================================
+// MINIMAP GEOMETRY CACHE
+//=========================================================
+
+let lastMinimapGeometry = null
+
+
+//=========================================================
+// STATUS → MINIMAP ANCHOR SETTINGS
+//=========================================================
+
+const STATUS_MINIMAP_GAP = 4
+
+/*
+    Set this to true if you want the status HUD centered
+    over the minimap instead of matching its left edge.
+*/
+const CENTER_STATUS_OVER_MINIMAP = false
+
+
+//=========================================================
 // HELPERS
 //=========================================================
 
-function clamp(value, minimum = 0, maximum = 100) {
+function clamp(
+    value,
+    minimum = 0,
+    maximum = 100
+) {
 
     const number =
         Number(value)
@@ -160,10 +185,13 @@ function formatMoney(value) {
 
 
 //=========================================================
-// PERCENTAGE
+// PERCENTAGE BAR
 //=========================================================
 
-function setPercentage(element, value) {
+function setPercentage(
+    element,
+    value
+) {
 
     if (!element) {
         return
@@ -191,32 +219,40 @@ function updatePlayer(data) {
         data.id !== undefined &&
         playerId
     ) {
+
         playerId.textContent =
             data.id
+
     }
 
     if (
         data.cash !== undefined &&
         playerCash
     ) {
+
         playerCash.textContent =
             formatMoney(data.cash)
+
     }
 
     if (
         data.bank !== undefined &&
         playerBank
     ) {
+
         playerBank.textContent =
             formatMoney(data.bank)
+
     }
 
     if (
         data.job !== undefined &&
         playerJob
     ) {
+
         playerJob.textContent =
             data.job || 'Unemployed'
+
     }
 
     if (
@@ -228,7 +264,6 @@ function updatePlayer(data) {
             data.grade || ''
 
     }
-
 }
 
 
@@ -242,7 +277,9 @@ function updateStatus(data) {
         return
     }
 
-    if (data.health !== undefined) {
+    if (
+        data.health !== undefined
+    ) {
 
         setPercentage(
             healthFill,
@@ -251,7 +288,9 @@ function updateStatus(data) {
 
     }
 
-    if (data.armor !== undefined) {
+    if (
+        data.armor !== undefined
+    ) {
 
         setPercentage(
             armorFill,
@@ -260,7 +299,9 @@ function updateStatus(data) {
 
     }
 
-    if (data.hunger !== undefined) {
+    if (
+        data.hunger !== undefined
+    ) {
 
         setPercentage(
             hungerFill,
@@ -269,12 +310,31 @@ function updateStatus(data) {
 
     }
 
-    if (data.thirst !== undefined) {
+    if (
+        data.thirst !== undefined
+    ) {
 
         setPercentage(
             thirstFill,
             data.thirst
         )
+
+    }
+
+
+    //=====================================================
+    // ROW VISIBILITY
+    //=====================================================
+
+    if (
+        healthRow &&
+        data.showHealth !== undefined
+    ) {
+
+        healthRow.style.display =
+            data.showHealth
+                ? 'grid'
+                : 'none'
 
     }
 
@@ -285,11 +345,60 @@ function updateStatus(data) {
 
         armorRow.style.display =
             data.showArmor
-                ? 'flex'
+                ? 'grid'
                 : 'none'
 
     }
 
+    if (
+        hungerRow &&
+        data.showHunger !== undefined
+    ) {
+
+        hungerRow.style.display =
+            data.showHunger
+                ? 'grid'
+                : 'none'
+
+    }
+
+    if (
+        thirstRow &&
+        data.showThirst !== undefined
+    ) {
+
+        thirstRow.style.display =
+            data.showThirst
+                ? 'grid'
+                : 'none'
+
+    }
+
+
+    //=====================================================
+    // HIDE ARMOR WHEN EMPTY
+    //=====================================================
+
+    if (
+        armorRow &&
+        data.hideArmorWhenEmpty &&
+        Number(data.armor) <= 0
+    ) {
+
+        armorRow.style.display =
+            'none'
+
+    }
+
+
+    /*
+        Status height can change when armor is hidden,
+        so immediately recalculate its minimap anchor.
+    */
+
+    requestAnimationFrame(
+        anchorStatusToMinimap
+    )
 }
 
 
@@ -324,7 +433,8 @@ function updateCompass(data) {
             )
 
         compassHeading.textContent =
-            `${String(heading).padStart(3, '0')}°`
+            `${String(heading)
+                .padStart(3, '0')}°`
 
     }
 
@@ -354,7 +464,8 @@ function updateCompass(data) {
     ) {
 
         streetName.textContent =
-            data.street || 'UNKNOWN ROAD'
+            data.street ||
+            'UNKNOWN ROAD'
 
     }
 
@@ -372,7 +483,6 @@ function updateCompass(data) {
                 : 'none'
 
     }
-
 }
 
 
@@ -402,6 +512,11 @@ function updateVehicle(data) {
         return
     }
 
+
+    //=====================================================
+    // SPEED
+    //=====================================================
+
     if (
         data.speed !== undefined &&
         speed
@@ -414,15 +529,37 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // UNIT
+    //=====================================================
+
     if (
         data.unit !== undefined &&
         speedUnit
     ) {
 
         speedUnit.textContent =
-            String(data.unit).toUpperCase()
+            String(data.unit)
+                .toUpperCase()
 
     }
+
+    if (
+        data.speedUnit !== undefined &&
+        speedUnit
+    ) {
+
+        speedUnit.textContent =
+            String(data.speedUnit)
+                .toUpperCase()
+
+    }
+
+
+    //=====================================================
+    // GEAR
+    //=====================================================
 
     if (
         data.gear !== undefined &&
@@ -439,6 +576,11 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // RPM
+    //=====================================================
+
     if (
         data.rpm !== undefined &&
         rpmRing
@@ -448,11 +590,6 @@ function updateVehicle(data) {
             clamp(
                 Number(data.rpm) * 100
             )
-
-        /*
-            Circle radius = 126
-            Circumference ≈ 791.68
-        */
 
         const circumference =
             791.68
@@ -472,6 +609,11 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // FUEL
+    //=====================================================
+
     if (
         data.fuel !== undefined &&
         fuelFill
@@ -482,13 +624,23 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // ENGINE
+    //=====================================================
+
+    const engineValue =
+        data.engine !== undefined
+            ? data.engine
+            : data.engineHealth
+
     if (
-        data.engine !== undefined &&
+        engineValue !== undefined &&
         engineFill
     ) {
 
         let engine =
-            Number(data.engine) || 0
+            Number(engineValue) || 0
 
         if (engine > 100) {
             engine /= 10
@@ -499,30 +651,65 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // MILEAGE
+    //=====================================================
+
     if (
         data.mileage !== undefined &&
         mileage
     ) {
 
-        const miles =
+        const mileageValue =
             Number(data.mileage) || 0
 
+        const currentUnit =
+            (
+                data.speedUnit ||
+                data.unit ||
+                'MPH'
+            ).toUpperCase()
+
+        const distanceUnit =
+            currentUnit === 'MPH'
+                ? 'MI'
+                : 'KM'
+
         mileage.textContent =
-            `${miles.toFixed(1)} MI`
+            `${mileageValue
+                .toFixed(1)
+                .padStart(6, '0')} ${distanceUnit}`
 
     }
 
-    if (
-        data.headlights !== undefined &&
-        headlightIcon
-    ) {
 
-        headlightIcon.classList.toggle(
-            'active',
-            Boolean(data.headlights)
-        )
+    //=====================================================
+    // HEADLIGHTS
+    //=====================================================
+
+    if (headlightIcon) {
+
+        const lights =
+            data.headlights !== undefined
+                ? data.headlights
+                : data.lights
+
+        if (lights !== undefined) {
+
+            headlightIcon.classList.toggle(
+                'active',
+                Boolean(lights)
+            )
+
+        }
 
     }
+
+
+    //=====================================================
+    // SEATBELT
+    //=====================================================
 
     if (
         data.seatbelt !== undefined &&
@@ -541,6 +728,11 @@ function updateVehicle(data) {
 
     }
 
+
+    //=====================================================
+    // CRUISE
+    //=====================================================
+
     if (
         data.cruise !== undefined &&
         cruiseIcon
@@ -552,7 +744,6 @@ function updateVehicle(data) {
         )
 
     }
-
 }
 
 
@@ -560,7 +751,10 @@ function updateVehicle(data) {
 // APPLY SAVED HUD POSITION
 //=========================================================
 
-function applyHudPosition(element, position) {
+function applyHudPosition(
+    element,
+    position
+) {
 
     if (
         !element ||
@@ -593,7 +787,108 @@ function applyHudPosition(element, position) {
 
     element.style.bottom =
         'auto'
+}
 
+
+//=========================================================
+// ANCHOR STATUS DIRECTLY ABOVE REAL MINIMAP
+//=========================================================
+
+function anchorStatusToMinimap() {
+
+    if (
+        !statusBars ||
+        !lastMinimapGeometry
+    ) {
+        return
+    }
+
+    /*
+        Use actual rendered status dimensions.
+
+        This matters because hiding the armor row changes
+        the panel height.
+    */
+
+    const statusWidth =
+        statusBars.offsetWidth
+
+    const statusHeight =
+        statusBars.offsetHeight
+
+    if (
+        statusWidth <= 0 ||
+        statusHeight <= 0
+    ) {
+        return
+    }
+
+
+    //=====================================================
+    // LEFT POSITION
+    //=====================================================
+
+    let left =
+        lastMinimapGeometry.left
+
+    if (CENTER_STATUS_OVER_MINIMAP) {
+
+        left =
+            lastMinimapGeometry.left +
+            (
+                lastMinimapGeometry.width -
+                statusWidth
+            ) / 2
+
+    }
+
+
+    //=====================================================
+    // TOP POSITION
+    //=====================================================
+
+    let top =
+        lastMinimapGeometry.top -
+        statusHeight -
+        STATUS_MINIMAP_GAP
+
+
+    //=====================================================
+    // SCREEN SAFETY
+    //=====================================================
+
+    left =
+        Math.max(
+            0,
+            Math.min(
+                left,
+                window.innerWidth -
+                statusWidth
+            )
+        )
+
+    top =
+        Math.max(
+            0,
+            top
+        )
+
+
+    //=====================================================
+    // FORCE THE FINAL POSITION
+    //=====================================================
+
+    statusBars.style.left =
+        `${Math.round(left)}px`
+
+    statusBars.style.top =
+        `${Math.round(top)}px`
+
+    statusBars.style.right =
+        'auto'
+
+    statusBars.style.bottom =
+        'auto'
 }
 
 
@@ -607,6 +902,11 @@ function applyHudLayout(layout) {
         return
     }
 
+
+    //=====================================================
+    // PLAYER
+    //=====================================================
+
     if (layout.player) {
 
         applyHudPosition(
@@ -615,6 +915,11 @@ function applyHudLayout(layout) {
         )
 
     }
+
+
+    //=====================================================
+    // COMPASS
+    //=====================================================
 
     if (layout.compass) {
 
@@ -625,6 +930,15 @@ function applyHudLayout(layout) {
 
     }
 
+
+    //=====================================================
+    // STATUS
+    //
+    // We allow the editor layout to apply first, then
+    // immediately override it with the real minimap
+    // geometry if that geometry is available.
+    //=====================================================
+
     if (layout.status) {
 
         applyHudPosition(
@@ -633,6 +947,11 @@ function applyHudLayout(layout) {
         )
 
     }
+
+
+    //=====================================================
+    // VEHICLE
+    //=====================================================
 
     if (layout.vehicle) {
 
@@ -643,6 +962,14 @@ function applyHudLayout(layout) {
 
     }
 
+
+    //=====================================================
+    // FINAL STATUS ANCHOR
+    //=====================================================
+
+    requestAnimationFrame(
+        anchorStatusToMinimap
+    )
 }
 
 
@@ -656,14 +983,26 @@ function setMinimapBorder(data) {
         return
     }
 
+
+    //=====================================================
+    // HIDDEN
+    //=====================================================
+
     if (!data.visible) {
 
         minimapBorder.style.display =
             'none'
 
-        return
+        lastMinimapGeometry =
+            null
 
+        return
     }
+
+
+    //=====================================================
+    // GEOMETRY
+    //=====================================================
 
     const left =
         Number(data.left) || 0
@@ -683,6 +1022,23 @@ function setMinimapBorder(data) {
             Number(data.height) || 0
         )
 
+
+    //=====================================================
+    // SAVE REAL MINIMAP POSITION
+    //=====================================================
+
+    lastMinimapGeometry = {
+        left,
+        top,
+        width,
+        height
+    }
+
+
+    //=====================================================
+    // BORDER
+    //=====================================================
+
     minimapBorder.style.left =
         `${left}px`
 
@@ -698,6 +1054,16 @@ function setMinimapBorder(data) {
     minimapBorder.style.display =
         'block'
 
+
+    //=====================================================
+    // STATUS
+    //
+    // This is now the source of truth.
+    //=====================================================
+
+    requestAnimationFrame(
+        anchorStatusToMinimap
+    )
 }
 
 
@@ -705,7 +1071,9 @@ function setMinimapBorder(data) {
 // MINIMAP BORDER VISIBILITY
 //=========================================================
 
-function setMinimapBorderVisible(visible) {
+function setMinimapBorderVisible(
+    visible
+) {
 
     if (!minimapBorder) {
         return
@@ -716,6 +1084,13 @@ function setMinimapBorderVisible(visible) {
             ? 'block'
             : 'none'
 
+    if (visible) {
+
+        requestAnimationFrame(
+            anchorStatusToMinimap
+        )
+
+    }
 }
 
 
@@ -723,7 +1098,9 @@ function setMinimapBorderVisible(visible) {
 // GLOBAL HUD VISIBILITY
 //=========================================================
 
-function setHudVisible(visible) {
+function setHudVisible(
+    visible
+) {
 
     const hud =
         document.getElementById('hud')
@@ -736,8 +1113,26 @@ function setHudVisible(visible) {
         visible
             ? 'block'
             : 'none'
-
 }
+
+
+//=========================================================
+// WINDOW RESIZE
+//
+// Border geometry will normally be resent by Lua, but
+// this keeps the status anchored during the transition.
+//=========================================================
+
+window.addEventListener(
+    'resize',
+    () => {
+
+        requestAnimationFrame(
+            anchorStatusToMinimap
+        )
+
+    }
+)
 
 
 //=========================================================
@@ -758,7 +1153,9 @@ window.addEventListener(
             return
         }
 
+
         switch (data.action) {
+
 
             //=================================================
             // PLAYER
@@ -878,14 +1275,27 @@ window.addEventListener(
 
             case 'showHud':
 
-                setHudVisible(true)
+                setHudVisible(
+                    true
+                )
 
                 break
 
 
             case 'hideHud':
 
-                setHudVisible(false)
+                setHudVisible(
+                    false
+                )
+
+                break
+
+
+            case 'setVisible':
+
+                setHudVisible(
+                    Boolean(data.visible)
+                )
 
                 break
 
@@ -909,7 +1319,9 @@ window.addEventListener(
 
             case 'setMinimapBorder':
 
-                setMinimapBorder(data)
+                setMinimapBorder(
+                    data
+                )
 
                 break
 
@@ -919,6 +1331,15 @@ window.addEventListener(
                 setMinimapBorderVisible(
                     Boolean(data.visible)
                 )
+
+                break
+
+
+            //=================================================
+            // QB-HUD COMPATIBILITY
+            //=================================================
+
+            case 'setHarness':
 
                 break
 
