@@ -1,21 +1,47 @@
+/*=========================================================
+    808LEMON HUD
+    STATUS BARS
+
+    Designed to line up with the VISIBLE native GTA radar,
+    not the full internal minimap component width.
+=========================================================*/
+
+
 #status-bars {
     position: absolute;
 
-    left: 1.50vw;
+    /*
+        Same left edge as the visible radar.
+    */
+    left: 1.55vw;
+
+    /*
+        Sits directly beneath radar.
+    */
     bottom: 1.35vh;
 
-    width: 15.25vw;
+    /*
+        IMPORTANT:
+        The GTA minimap component may be 15vw internally,
+        but its visible map area is smaller because of the
+        native mask / padding.
 
-    min-width: 235px;
-    max-width: 305px;
+        12.25vw = ~235px @ 1920x1080.
+    */
+    width: 12.25vw;
+
+    /*
+        Keeps it sensible on different resolutions.
+    */
+    min-width: 210px;
+    max-width: 245px;
 
     display: flex;
     flex-direction: column;
 
     gap: 5px;
 
-    padding:
-        7px 8px;
+    padding: 7px 8px;
 
     overflow: hidden;
 
@@ -37,7 +63,7 @@
 
 
 /*=========================================================
-    ROW
+    STATUS ROW
 =========================================================*/
 
 .status-row {
@@ -50,14 +76,14 @@
 
 
 /*=========================================================
-    ICON
+    STATUS ICON
 =========================================================*/
 
 .status-icon {
-    width: 17px;
+    width: 16px;
     height: 12px;
 
-    flex: 0 0 17px;
+    flex: 0 0 16px;
 
     display: flex;
 
@@ -76,7 +102,7 @@
 
 
 /*=========================================================
-    TRACK
+    BAR BACKGROUND
 =========================================================*/
 
 .status-track {
@@ -99,7 +125,7 @@
 
 
 /*=========================================================
-    FILL
+    BAR FILL
 =========================================================*/
 
 .status-fill {
@@ -113,7 +139,9 @@
 }
 
 
-/* HEALTH */
+/*=========================================================
+    HEALTH
+=========================================================*/
 
 #health-fill {
     background:
@@ -124,11 +152,14 @@
         );
 
     box-shadow:
-        0 0 5px rgba(65, 225, 100, 0.28);
+        0 0 6px
+        rgba(65, 225, 100, 0.28);
 }
 
 
-/* ARMOR */
+/*=========================================================
+    ARMOR
+=========================================================*/
 
 #armor-fill {
     background:
@@ -139,11 +170,14 @@
         );
 
     box-shadow:
-        0 0 5px rgba(45, 115, 255, 0.28);
+        0 0 6px
+        rgba(45, 115, 255, 0.28);
 }
 
 
-/* HUNGER */
+/*=========================================================
+    HUNGER
+=========================================================*/
 
 #hunger-fill {
     background:
@@ -154,11 +188,14 @@
         );
 
     box-shadow:
-        0 0 5px rgba(235, 180, 65, 0.25);
+        0 0 6px
+        rgba(235, 180, 65, 0.25);
 }
 
 
-/* THIRST */
+/*=========================================================
+    THIRST
+=========================================================*/
 
 #thirst-fill {
     background:
@@ -169,5 +206,6 @@
         );
 
     box-shadow:
-        0 0 5px rgba(40, 175, 235, 0.25);
+        0 0 6px
+        rgba(40, 175, 235, 0.25);
 }
