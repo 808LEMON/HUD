@@ -123,22 +123,18 @@ const minimapBorder =
 
 
 //=========================================================
-// MINIMAP GEOMETRY CACHE
+// MINIMAP GEOMETRY
 //=========================================================
 
 let lastMinimapGeometry = null
 
 
 //=========================================================
-// STATUS → MINIMAP ANCHOR SETTINGS
+// STATUS POSITION
 //=========================================================
 
 const STATUS_MINIMAP_GAP = 4
 
-/*
-    Set this to true if you want the status HUD centered
-    over the minimap instead of matching its left edge.
-*/
 const CENTER_STATUS_OVER_MINIMAP = false
 
 
@@ -170,7 +166,7 @@ function clamp(
 
 
 //=========================================================
-// MONEY FORMAT
+// MONEY
 //=========================================================
 
 function formatMoney(value) {
@@ -181,11 +177,12 @@ function formatMoney(value) {
     return '$' +
         Math.floor(number)
             .toLocaleString('en-US')
+
 }
 
 
 //=========================================================
-// PERCENTAGE BAR
+// STATUS BAR WIDTH
 //=========================================================
 
 function setPercentage(
@@ -198,15 +195,20 @@ function setPercentage(
     }
 
     const percentage =
-        clamp(value)
+        clamp(
+            value,
+            0,
+            100
+        )
 
     element.style.width =
         `${percentage}%`
+
 }
 
 
 //=========================================================
-// PLAYER DATA
+// PLAYER
 //=========================================================
 
 function updatePlayer(data) {
@@ -215,15 +217,23 @@ function updatePlayer(data) {
         return
     }
 
+
+    const incomingId =
+        data.id !== undefined
+            ? data.id
+            : data.playerId
+
+
     if (
-        data.id !== undefined &&
+        incomingId !== undefined &&
         playerId
     ) {
 
         playerId.textContent =
-            data.id
+            incomingId
 
     }
+
 
     if (
         data.cash !== undefined &&
@@ -231,9 +241,12 @@ function updatePlayer(data) {
     ) {
 
         playerCash.textContent =
-            formatMoney(data.cash)
+            formatMoney(
+                data.cash
+            )
 
     }
+
 
     if (
         data.bank !== undefined &&
@@ -241,9 +254,12 @@ function updatePlayer(data) {
     ) {
 
         playerBank.textContent =
-            formatMoney(data.bank)
+            formatMoney(
+                data.bank
+            )
 
     }
+
 
     if (
         data.job !== undefined &&
@@ -251,9 +267,11 @@ function updatePlayer(data) {
     ) {
 
         playerJob.textContent =
-            data.job || 'Unemployed'
+            data.job ||
+            'Unemployed'
 
     }
+
 
     if (
         data.grade !== undefined &&
@@ -264,6 +282,20 @@ function updatePlayer(data) {
             data.grade || ''
 
     }
+
+
+    if (
+        data.visible !== undefined &&
+        playerStats
+    ) {
+
+        playerStats.style.display =
+            data.visible
+                ? 'block'
+                : 'none'
+
+    }
+
 }
 
 
@@ -277,6 +309,11 @@ function updateStatus(data) {
         return
     }
 
+
+    //=====================================================
+    // HEALTH
+    //=====================================================
+
     if (
         data.health !== undefined
     ) {
@@ -287,6 +324,11 @@ function updateStatus(data) {
         )
 
     }
+
+
+    //=====================================================
+    // ARMOR
+    //=====================================================
 
     if (
         data.armor !== undefined
@@ -299,6 +341,11 @@ function updateStatus(data) {
 
     }
 
+
+    //=====================================================
+    // HUNGER
+    //=====================================================
+
     if (
         data.hunger !== undefined
     ) {
@@ -309,6 +356,11 @@ function updateStatus(data) {
         )
 
     }
+
+
+    //=====================================================
+    // THIRST
+    //=====================================================
 
     if (
         data.thirst !== undefined
@@ -323,7 +375,7 @@ function updateStatus(data) {
 
 
     //=====================================================
-    // ROW VISIBILITY
+    // HEALTH ROW
     //=====================================================
 
     if (
@@ -338,17 +390,47 @@ function updateStatus(data) {
 
     }
 
+
+    //=====================================================
+    // ARMOR ROW
+    //=====================================================
+
     if (
         armorRow &&
         data.showArmor !== undefined
     ) {
 
+        const armor =
+            Number(
+                data.armor
+            ) || 0
+
+
+        const hideWhenEmpty =
+            Boolean(
+                data.hideArmorWhenEmpty
+            )
+
+
+        const shouldShowArmor =
+            Boolean(data.showArmor) &&
+            !(
+                hideWhenEmpty &&
+                armor <= 0
+            )
+
+
         armorRow.style.display =
-            data.showArmor
+            shouldShowArmor
                 ? 'grid'
                 : 'none'
 
     }
+
+
+    //=====================================================
+    // HUNGER ROW
+    //=====================================================
 
     if (
         hungerRow &&
@@ -361,6 +443,11 @@ function updateStatus(data) {
                 : 'none'
 
     }
+
+
+    //=====================================================
+    // THIRST ROW
+    //=====================================================
 
     if (
         thirstRow &&
@@ -375,30 +462,15 @@ function updateStatus(data) {
     }
 
 
-    //=====================================================
-    // HIDE ARMOR WHEN EMPTY
-    //=====================================================
-
-    if (
-        armorRow &&
-        data.hideArmorWhenEmpty &&
-        Number(data.armor) <= 0
-    ) {
-
-        armorRow.style.display =
-            'none'
-
-    }
-
-
     /*
-        Status height can change when armor is hidden,
-        so immediately recalculate its minimap anchor.
+        Armor disappearing changes the total status panel
+        height, so snap the panel back above the minimap.
     */
 
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
@@ -412,6 +484,7 @@ function updateCompass(data) {
         return
     }
 
+
     if (
         data.direction !== undefined &&
         compassDirection
@@ -422,21 +495,34 @@ function updateCompass(data) {
 
     }
 
+
     if (
         data.heading !== undefined &&
         compassHeading
     ) {
 
-        const heading =
+        let heading =
             Math.round(
-                Number(data.heading) || 0
+                Number(
+                    data.heading
+                ) || 0
             )
+
+
+        heading =
+            (
+                (
+                    heading % 360
+                ) + 360
+            ) % 360
+
 
         compassHeading.textContent =
             `${String(heading)
                 .padStart(3, '0')}°`
 
     }
+
 
     if (
         data.left !== undefined &&
@@ -448,6 +534,7 @@ function updateCompass(data) {
 
     }
 
+
     if (
         data.right !== undefined &&
         compassLabelRight
@@ -457,6 +544,7 @@ function updateCompass(data) {
             data.right
 
     }
+
 
     if (
         data.street !== undefined &&
@@ -469,6 +557,7 @@ function updateCompass(data) {
 
     }
 
+
     if (
         data.crossing !== undefined &&
         crossingName
@@ -477,12 +566,14 @@ function updateCompass(data) {
         crossingName.textContent =
             data.crossing || ''
 
+
         crossingName.style.display =
             data.crossing
                 ? 'block'
                 : 'none'
 
     }
+
 }
 
 
@@ -496,6 +587,7 @@ function updateVehicle(data) {
         return
     }
 
+
     if (
         data.visible !== undefined &&
         vehicleHud
@@ -508,7 +600,10 @@ function updateVehicle(data) {
 
     }
 
-    if (!data.visible) {
+
+    if (
+        data.visible === false
+    ) {
         return
     }
 
@@ -524,34 +619,31 @@ function updateVehicle(data) {
 
         speed.textContent =
             Math.round(
-                Number(data.speed) || 0
+                Number(
+                    data.speed
+                ) || 0
             )
 
     }
 
 
     //=====================================================
-    // UNIT
+    // SPEED UNIT
     //=====================================================
 
+    const unit =
+        data.speedUnit !== undefined
+            ? data.speedUnit
+            : data.unit
+
+
     if (
-        data.unit !== undefined &&
+        unit !== undefined &&
         speedUnit
     ) {
 
         speedUnit.textContent =
-            String(data.unit)
-                .toUpperCase()
-
-    }
-
-    if (
-        data.speedUnit !== undefined &&
-        speedUnit
-    ) {
-
-        speedUnit.textContent =
-            String(data.speedUnit)
+            String(unit)
                 .toUpperCase()
 
     }
@@ -567,12 +659,17 @@ function updateVehicle(data) {
     ) {
 
         const gearValue =
-            Number(data.gear)
+            Number(
+                data.gear
+            )
+
 
         gear.textContent =
             gearValue === 0
                 ? 'N'
-                : String(data.gear)
+                : String(
+                    data.gear
+                )
 
     }
 
@@ -588,11 +685,17 @@ function updateVehicle(data) {
 
         const rpm =
             clamp(
-                Number(data.rpm) * 100
+                Number(
+                    data.rpm
+                ) * 100,
+                0,
+                100
             )
+
 
         const circumference =
             791.68
+
 
         const offset =
             circumference -
@@ -601,8 +704,10 @@ function updateVehicle(data) {
             ) *
             circumference
 
+
         rpmRing.style.strokeDasharray =
             `${circumference}`
+
 
         rpmRing.style.strokeDashoffset =
             `${offset}`
@@ -620,7 +725,11 @@ function updateVehicle(data) {
     ) {
 
         fuelFill.style.height =
-            `${clamp(data.fuel)}%`
+            `${clamp(
+                data.fuel,
+                0,
+                100
+            )}%`
 
     }
 
@@ -634,20 +743,29 @@ function updateVehicle(data) {
             ? data.engine
             : data.engineHealth
 
+
     if (
         engineValue !== undefined &&
         engineFill
     ) {
 
         let engine =
-            Number(engineValue) || 0
+            Number(
+                engineValue
+            ) || 0
+
 
         if (engine > 100) {
             engine /= 10
         }
 
+
         engineFill.style.height =
-            `${clamp(engine)}%`
+            `${clamp(
+                engine,
+                0,
+                100
+            )}%`
 
     }
 
@@ -662,19 +780,22 @@ function updateVehicle(data) {
     ) {
 
         const mileageValue =
-            Number(data.mileage) || 0
+            Number(
+                data.mileage
+            ) || 0
+
 
         const currentUnit =
-            (
-                data.speedUnit ||
-                data.unit ||
-                'MPH'
+            String(
+                unit || 'MPH'
             ).toUpperCase()
+
 
         const distanceUnit =
             currentUnit === 'MPH'
                 ? 'MI'
                 : 'KM'
+
 
         mileage.textContent =
             `${mileageValue
@@ -695,7 +816,10 @@ function updateVehicle(data) {
                 ? data.headlights
                 : data.lights
 
-        if (lights !== undefined) {
+
+        if (
+            lights !== undefined
+        ) {
 
             headlightIcon.classList.toggle(
                 'active',
@@ -718,12 +842,17 @@ function updateVehicle(data) {
 
         seatbeltIcon.classList.toggle(
             'active',
-            Boolean(data.seatbelt)
+            Boolean(
+                data.seatbelt
+            )
         )
+
 
         seatbeltIcon.classList.toggle(
             'warning',
-            !Boolean(data.seatbelt)
+            !Boolean(
+                data.seatbelt
+            )
         )
 
     }
@@ -740,15 +869,18 @@ function updateVehicle(data) {
 
         cruiseIcon.classList.toggle(
             'active',
-            Boolean(data.cruise)
+            Boolean(
+                data.cruise
+            )
         )
 
     }
+
 }
 
 
 //=========================================================
-// APPLY SAVED HUD POSITION
+// APPLY HUD POSITION
 //=========================================================
 
 function applyHudPosition(
@@ -763,11 +895,18 @@ function applyHudPosition(
         return
     }
 
+
     const x =
-        Number(position.x)
+        Number(
+            position.x
+        )
+
 
     const y =
-        Number(position.y)
+        Number(
+            position.y
+        )
+
 
     if (
         !Number.isFinite(x) ||
@@ -776,22 +915,27 @@ function applyHudPosition(
         return
     }
 
+
     element.style.left =
         `${x}%`
+
 
     element.style.top =
         `${y}%`
 
+
     element.style.right =
         'auto'
 
+
     element.style.bottom =
         'auto'
+
 }
 
 
 //=========================================================
-// ANCHOR STATUS DIRECTLY ABOVE REAL MINIMAP
+// STATUS → MINIMAP ANCHOR
 //=========================================================
 
 function anchorStatusToMinimap() {
@@ -803,18 +947,14 @@ function anchorStatusToMinimap() {
         return
     }
 
-    /*
-        Use actual rendered status dimensions.
-
-        This matters because hiding the armor row changes
-        the panel height.
-    */
 
     const statusWidth =
         statusBars.offsetWidth
 
+
     const statusHeight =
         statusBars.offsetHeight
+
 
     if (
         statusWidth <= 0 ||
@@ -824,14 +964,13 @@ function anchorStatusToMinimap() {
     }
 
 
-    //=====================================================
-    // LEFT POSITION
-    //=====================================================
-
     let left =
         lastMinimapGeometry.left
 
-    if (CENTER_STATUS_OVER_MINIMAP) {
+
+    if (
+        CENTER_STATUS_OVER_MINIMAP
+    ) {
 
         left =
             lastMinimapGeometry.left +
@@ -843,10 +982,6 @@ function anchorStatusToMinimap() {
     }
 
 
-    //=====================================================
-    // TOP POSITION
-    //=====================================================
-
     let top =
         lastMinimapGeometry.top -
         statusHeight -
@@ -854,7 +989,7 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // SCREEN SAFETY
+    // SCREEN CLAMP
     //=====================================================
 
     left =
@@ -867,6 +1002,7 @@ function anchorStatusToMinimap() {
             )
         )
 
+
     top =
         Math.max(
             0,
@@ -875,20 +1011,24 @@ function anchorStatusToMinimap() {
 
 
     //=====================================================
-    // FORCE THE FINAL POSITION
+    // APPLY
     //=====================================================
 
     statusBars.style.left =
         `${Math.round(left)}px`
 
+
     statusBars.style.top =
         `${Math.round(top)}px`
+
 
     statusBars.style.right =
         'auto'
 
+
     statusBars.style.bottom =
         'auto'
+
 }
 
 
@@ -903,11 +1043,9 @@ function applyHudLayout(layout) {
     }
 
 
-    //=====================================================
-    // PLAYER
-    //=====================================================
-
-    if (layout.player) {
+    if (
+        layout.player
+    ) {
 
         applyHudPosition(
             playerStats,
@@ -917,11 +1055,9 @@ function applyHudLayout(layout) {
     }
 
 
-    //=====================================================
-    // COMPASS
-    //=====================================================
-
-    if (layout.compass) {
+    if (
+        layout.compass
+    ) {
 
         applyHudPosition(
             compassWrapper,
@@ -931,15 +1067,18 @@ function applyHudLayout(layout) {
     }
 
 
-    //=====================================================
-    // STATUS
-    //
-    // We allow the editor layout to apply first, then
-    // immediately override it with the real minimap
-    // geometry if that geometry is available.
-    //=====================================================
+    /*
+        We still allow the editor/default layout to position
+        status initially.
 
-    if (layout.status) {
+        As soon as the real minimap geometry is available,
+        anchorStatusToMinimap() becomes the final source of
+        truth.
+    */
+
+    if (
+        layout.status
+    ) {
 
         applyHudPosition(
             statusBars,
@@ -949,11 +1088,9 @@ function applyHudLayout(layout) {
     }
 
 
-    //=====================================================
-    // VEHICLE
-    //=====================================================
-
-    if (layout.vehicle) {
+    if (
+        layout.vehicle
+    ) {
 
         applyHudPosition(
             vehicleHud,
@@ -963,13 +1100,10 @@ function applyHudLayout(layout) {
     }
 
 
-    //=====================================================
-    // FINAL STATUS ANCHOR
-    //=====================================================
-
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
@@ -984,48 +1118,51 @@ function setMinimapBorder(data) {
     }
 
 
-    //=====================================================
-    // HIDDEN
-    //=====================================================
-
-    if (!data.visible) {
+    if (
+        !data.visible
+    ) {
 
         minimapBorder.style.display =
             'none'
 
+
         lastMinimapGeometry =
             null
+
 
         return
     }
 
 
-    //=====================================================
-    // GEOMETRY
-    //=====================================================
-
     const left =
-        Number(data.left) || 0
+        Number(
+            data.left
+        ) || 0
+
 
     const top =
-        Number(data.top) || 0
+        Number(
+            data.top
+        ) || 0
+
 
     const width =
         Math.max(
             0,
-            Number(data.width) || 0
+            Number(
+                data.width
+            ) || 0
         )
+
 
     const height =
         Math.max(
             0,
-            Number(data.height) || 0
+            Number(
+                data.height
+            ) || 0
         )
 
-
-    //=====================================================
-    // SAVE REAL MINIMAP POSITION
-    //=====================================================
 
     lastMinimapGeometry = {
         left,
@@ -1035,40 +1172,35 @@ function setMinimapBorder(data) {
     }
 
 
-    //=====================================================
-    // BORDER
-    //=====================================================
-
     minimapBorder.style.left =
         `${left}px`
+
 
     minimapBorder.style.top =
         `${top}px`
 
+
     minimapBorder.style.width =
         `${width}px`
 
+
     minimapBorder.style.height =
         `${height}px`
+
 
     minimapBorder.style.display =
         'block'
 
 
-    //=====================================================
-    // STATUS
-    //
-    // This is now the source of truth.
-    //=====================================================
-
     requestAnimationFrame(
         anchorStatusToMinimap
     )
+
 }
 
 
 //=========================================================
-// MINIMAP BORDER VISIBILITY
+// BORDER VISIBILITY
 //=========================================================
 
 function setMinimapBorderVisible(
@@ -1079,10 +1211,12 @@ function setMinimapBorderVisible(
         return
     }
 
+
     minimapBorder.style.display =
         visible
             ? 'block'
             : 'none'
+
 
     if (visible) {
 
@@ -1091,11 +1225,12 @@ function setMinimapBorderVisible(
         )
 
     }
+
 }
 
 
 //=========================================================
-// GLOBAL HUD VISIBILITY
+// HUD VISIBILITY
 //=========================================================
 
 function setHudVisible(
@@ -1103,24 +1238,26 @@ function setHudVisible(
 ) {
 
     const hud =
-        document.getElementById('hud')
+        document.getElementById(
+            'hud'
+        )
+
 
     if (!hud) {
         return
     }
 
+
     hud.style.display =
         visible
             ? 'block'
             : 'none'
+
 }
 
 
 //=========================================================
 // WINDOW RESIZE
-//
-// Border geometry will normally be resent by Lua, but
-// this keeps the status anchored during the transition.
 //=========================================================
 
 window.addEventListener(
@@ -1136,7 +1273,7 @@ window.addEventListener(
 
 
 //=========================================================
-// NUI MESSAGE HANDLER
+// MESSAGE HANDLER
 //=========================================================
 
 window.addEventListener(
@@ -1146,6 +1283,7 @@ window.addEventListener(
         const data =
             event.data
 
+
         if (
             !data ||
             !data.action
@@ -1154,7 +1292,9 @@ window.addEventListener(
         }
 
 
-        switch (data.action) {
+        switch (
+            data.action
+        ) {
 
 
             //=================================================
@@ -1164,7 +1304,8 @@ window.addEventListener(
             case 'updatePlayer':
 
                 updatePlayer(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1173,7 +1314,8 @@ window.addEventListener(
             case 'player':
 
                 updatePlayer(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1186,7 +1328,8 @@ window.addEventListener(
             case 'updateStatus':
 
                 updateStatus(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1195,7 +1338,8 @@ window.addEventListener(
             case 'status':
 
                 updateStatus(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1208,7 +1352,8 @@ window.addEventListener(
             case 'updateCompass':
 
                 updateCompass(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1217,7 +1362,8 @@ window.addEventListener(
             case 'compass':
 
                 updateCompass(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1230,7 +1376,8 @@ window.addEventListener(
             case 'updateVehicle':
 
                 updateVehicle(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1239,7 +1386,8 @@ window.addEventListener(
             case 'vehicle':
 
                 updateVehicle(
-                    data.data || data
+                    data.data ||
+                    data
                 )
 
                 break
@@ -1247,7 +1395,9 @@ window.addEventListener(
 
             case 'showVehicle':
 
-                if (vehicleHud) {
+                if (
+                    vehicleHud
+                ) {
 
                     vehicleHud.style.display =
                         'block'
@@ -1259,7 +1409,9 @@ window.addEventListener(
 
             case 'hideVehicle':
 
-                if (vehicleHud) {
+                if (
+                    vehicleHud
+                ) {
 
                     vehicleHud.style.display =
                         'none'
@@ -1270,7 +1422,7 @@ window.addEventListener(
 
 
             //=================================================
-            // HUD VISIBILITY
+            // HUD
             //=================================================
 
             case 'showHud':
@@ -1294,14 +1446,16 @@ window.addEventListener(
             case 'setVisible':
 
                 setHudVisible(
-                    Boolean(data.visible)
+                    Boolean(
+                        data.visible
+                    )
                 )
 
                 break
 
 
             //=================================================
-            // SAVED HUD LAYOUT
+            // LAYOUT
             //=================================================
 
             case 'applyHudLayout':
@@ -1314,7 +1468,7 @@ window.addEventListener(
 
 
             //=================================================
-            // MINIMAP BORDER
+            // MINIMAP
             //=================================================
 
             case 'setMinimapBorder':
@@ -1329,14 +1483,16 @@ window.addEventListener(
             case 'setMinimapBorderVisible':
 
                 setMinimapBorderVisible(
-                    Boolean(data.visible)
+                    Boolean(
+                        data.visible
+                    )
                 )
 
                 break
 
 
             //=================================================
-            // QB-HUD COMPATIBILITY
+            // COMPATIBILITY
             //=================================================
 
             case 'setHarness':
