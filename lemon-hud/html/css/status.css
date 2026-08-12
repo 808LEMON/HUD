@@ -1,18 +1,13 @@
 #status-bars {
     position: absolute;
 
-    left: 1.55vw;
+    left: 1.50vw;
     bottom: 1.35vh;
 
-    /*
-        SAME WIDTH AS COMPASS.
-        This is what fixes the mismatch.
-    */
+    width: 15.25vw;
 
-    width: 15vw;
-
-    min-width: 230px;
-    max-width: 300px;
+    min-width: 235px;
+    max-width: 305px;
 
     display: flex;
     flex-direction: column;
@@ -22,13 +17,15 @@
     padding:
         7px 8px;
 
+    overflow: hidden;
+
     border-radius: 7px;
 
     background:
         linear-gradient(
             135deg,
-            rgba(5, 13, 22, 0.94),
-            rgba(8, 20, 32, 0.88)
+            rgba(5, 13, 22, 0.95),
+            rgba(8, 20, 32, 0.89)
         );
 
     border:
@@ -39,6 +36,10 @@
 }
 
 
+/*=========================================================
+    ROW
+=========================================================*/
+
 .status-row {
     width: 100%;
     height: 12px;
@@ -48,21 +49,35 @@
 }
 
 
+/*=========================================================
+    ICON
+=========================================================*/
+
 .status-icon {
     width: 17px;
+    height: 12px;
 
-    flex-shrink: 0;
+    flex: 0 0 17px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     margin-right: 6px;
-
-    text-align: center;
 
     color:
         rgba(225, 235, 245, 0.90);
 
     font-size: 8px;
+
+    line-height: 1;
 }
 
+
+/*=========================================================
+    TRACK
+=========================================================*/
 
 .status-track {
     position: relative;
@@ -82,6 +97,10 @@
         inset 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
+
+/*=========================================================
+    FILL
+=========================================================*/
 
 .status-fill {
     width: 100%;
@@ -103,6 +122,9 @@
             #36c95d,
             #72f08c
         );
+
+    box-shadow:
+        0 0 5px rgba(65, 225, 100, 0.28);
 }
 
 
@@ -115,6 +137,9 @@
             #296aff,
             #589cff
         );
+
+    box-shadow:
+        0 0 5px rgba(45, 115, 255, 0.28);
 }
 
 
@@ -127,6 +152,9 @@
             #d99531,
             #f0c65b
         );
+
+    box-shadow:
+        0 0 5px rgba(235, 180, 65, 0.25);
 }
 
 
@@ -139,4 +167,7 @@
             #249ce2,
             #62cafa
         );
+
+    box-shadow:
+        0 0 5px rgba(40, 175, 235, 0.25);
 }

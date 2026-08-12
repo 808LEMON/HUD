@@ -36,10 +36,11 @@ Config.ShowMinimap = true
 Config.MinimapOnlyInVehicle = false
 
 Config.Minimap = {
+
     Map = {
-        x = -0.0045,
-        y = -0.0220,
-        width = 0.1500,
+        x = -0.0040,
+        y = -0.0215,
+        width = 0.1515,
         height = 0.1880
     },
 
@@ -56,6 +57,7 @@ Config.Minimap = {
         width = 0.2660,
         height = 0.2370
     }
+
 }
 
 --=========================================================

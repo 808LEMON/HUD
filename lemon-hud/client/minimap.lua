@@ -38,38 +38,58 @@ local function ApplyMinimapPosition()
         blur.height
     )
 
-    SetRadarBigmapEnabled(true, false)
+    SetRadarBigmapEnabled(
+        true,
+        false
+    )
 
     Wait(100)
 
-    SetRadarBigmapEnabled(false, false)
+    SetRadarBigmapEnabled(
+        false,
+        false
+    )
+
 end
+
 
 CreateThread(function()
 
-    Wait(1500)
+    Wait(1000)
 
     ApplyMinimapPosition()
 
 end)
 
+
 CreateThread(function()
 
     while true do
 
-        local ped = PlayerPedId()
+        local ped =
+            PlayerPedId()
 
-        local shouldShow = Config.ShowMinimap
+        local shouldShow =
+            Config.ShowMinimap
 
         if Config.MinimapOnlyInVehicle then
-            shouldShow = IsPedInAnyVehicle(ped, false)
+
+            shouldShow =
+                IsPedInAnyVehicle(
+                    ped,
+                    false
+                )
+
         end
 
         if shouldShow ~= radarVisible then
 
-            radarVisible = shouldShow
+            radarVisible =
+                shouldShow
 
-            DisplayRadar(radarVisible)
+            DisplayRadar(
+                radarVisible
+            )
 
         end
 
@@ -79,8 +99,12 @@ CreateThread(function()
 
 end)
 
-RegisterNetEvent('lemon-hud:client:refreshMinimap', function()
 
-    ApplyMinimapPosition()
+RegisterNetEvent(
+    'lemon-hud:client:refreshMinimap',
+    function()
 
-end)
+        ApplyMinimapPosition()
+
+    end
+)
