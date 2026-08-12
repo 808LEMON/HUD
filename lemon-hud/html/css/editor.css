@@ -1,30 +1,37 @@
 /*=========================================================
-    HUD EDITOR GLOBAL
+    808LEMON HUD EDITOR
+=========================================================*/
+
+
+/*=========================================================
+    EDIT MODE POINTER EVENTS
 =========================================================*/
 
 body.hud-editing {
-    pointer-events: auto;
+    pointer-events: auto !important;
 }
 
 body.hud-editing #hud {
-    pointer-events: auto;
+    pointer-events: auto !important;
 }
 
 
 /*=========================================================
-    EDITOR COMPONENTS
+    NORMAL DRAGGABLE COMPONENTS
 =========================================================*/
 
 body.hud-editing .hud-editable {
     cursor: move !important;
 
+    pointer-events: auto !important;
+
     outline:
         1px dashed
-        rgba(223, 255, 69, 0.75) !important;
+        rgba(223, 255, 69, 0.80) !important;
 
     box-shadow:
-        0 0 0 2px rgba(223, 255, 69, 0.06),
-        0 0 18px rgba(0, 0, 0, 0.45) !important;
+        0 0 0 2px rgba(223, 255, 69, 0.05),
+        0 0 18px rgba(0, 0, 0, 0.40) !important;
 }
 
 body.hud-editing .hud-editable:hover {
@@ -34,7 +41,7 @@ body.hud-editing .hud-editable:hover {
 
 
 /*=========================================================
-    LABEL
+    COMPONENT LABEL
 =========================================================*/
 
 body.hud-editing .hud-editable::before {
@@ -56,14 +63,16 @@ body.hud-editing .hud-editable::before {
     border-radius: 4px;
 
     background:
-        rgba(4, 11, 17, 0.96);
+        rgba(4, 11, 17, 0.97);
 
     border:
         1px solid rgba(223, 255, 69, 0.45);
 
-    color: #dfff45;
+    color:
+        #dfff45;
 
     font-size: 8px;
+
     font-weight: 900;
 
     letter-spacing: 0.65px;
@@ -73,7 +82,7 @@ body.hud-editing .hud-editable::before {
 
 
 /*=========================================================
-    FORCE MODULES VISIBLE DURING EDIT
+    FORCE HUD MODULES VISIBLE DURING EDIT
 =========================================================*/
 
 body.hud-editing #player-stats,
@@ -85,62 +94,146 @@ body.hud-editing #vehicle-hud {
 
 
 /*=========================================================
-    MINIMAP EDIT BOX
+    MINIMAP HANDLE
 =========================================================*/
 
-#minimap-editor-box {
+#minimap-editor-handle {
     position: absolute;
+
+    z-index: 100500;
 
     display: none;
 
-    z-index: 99990;
-
-    cursor: move;
-
-    border:
-        1px dashed
-        rgba(223, 255, 69, 0.95);
-
-    border-radius: 5px;
-
-    background:
-        rgba(223, 255, 69, 0.035);
-
-    box-shadow:
-        inset 0 0 25px rgba(223, 255, 69, 0.025),
-        0 0 12px rgba(0, 0, 0, 0.25);
-}
-
-body.hud-editing #minimap-editor-box {
-    display: flex;
+    width: 130px;
+    height: 36px;
 
     align-items: center;
-    justify-content: center;
-}
-
-#minimap-editor-box::before {
-    content: 'MINIMAP';
 
     padding:
         5px 8px;
 
+    border-radius: 6px;
+
+    cursor: grab;
+
+    pointer-events: auto;
+
+    background:
+        rgba(4, 12, 20, 0.98);
+
+    border:
+        1px solid rgba(223, 255, 69, 0.80);
+
+    box-shadow:
+        0 5px 16px rgba(0, 0, 0, 0.50);
+
+    color: white;
+}
+
+
+body.hud-editing
+#minimap-editor-handle {
+    display: flex !important;
+
+    pointer-events: auto !important;
+}
+
+
+#minimap-editor-handle:hover {
+    border-color:
+        #dfff45;
+
+    background:
+        rgba(7, 18, 27, 0.99);
+}
+
+
+#minimap-editor-handle.dragging {
+    cursor: grabbing;
+
+    border-color:
+        #dfff45;
+
+    background:
+        rgba(10, 24, 31, 0.99);
+
+    box-shadow:
+        0 0 14px
+        rgba(223, 255, 69, 0.20);
+}
+
+
+/*=========================================================
+    MINIMAP HANDLE ICON
+=========================================================*/
+
+.minimap-handle-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 7px;
+
     border-radius: 4px;
 
     background:
-        rgba(4, 11, 17, 0.90);
-
-    border:
-        1px solid rgba(223, 255, 69, 0.30);
+        rgba(223, 255, 69, 0.10);
 
     color:
-        rgba(223, 255, 69, 0.92);
+        #dfff45;
 
-    font-size: 8px;
+    font-size: 13px;
+
     font-weight: 900;
 
-    letter-spacing: 0.7px;
+    pointer-events: none;
+}
+
+
+/*=========================================================
+    MINIMAP HANDLE TEXT
+=========================================================*/
+
+.minimap-handle-text {
+    display: flex;
+
+    flex-direction: column;
 
     pointer-events: none;
+}
+
+
+.minimap-handle-text span {
+    color:
+        rgba(245, 249, 252, 0.98);
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.65px;
+
+    line-height: 11px;
+}
+
+
+.minimap-handle-text small {
+    color:
+        rgba(160, 185, 205, 0.72);
+
+    font-size: 6px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.35px;
+
+    line-height: 9px;
 }
 
 
@@ -167,7 +260,9 @@ body.hud-editing #minimap-editor-box {
         );
 }
 
-body.hud-editing #hud-editor-overlay {
+
+body.hud-editing
+#hud-editor-overlay {
     display: block;
 }
 
@@ -203,17 +298,21 @@ body.hud-editing #hud-editor-overlay {
         );
 
     border:
-        1px solid rgba(65, 145, 215, 0.28);
+        1px solid
+        rgba(65, 145, 215, 0.28);
 
     box-shadow:
-        0 12px 35px rgba(0, 0, 0, 0.50);
+        0 12px 35px
+        rgba(0, 0, 0, 0.50);
 
     color: white;
 
     pointer-events: auto;
 }
 
-body.hud-editing #hud-editor-panel {
+
+body.hud-editing
+#hud-editor-panel {
     display: block;
 }
 
@@ -226,10 +325,12 @@ body.hud-editing #hud-editor-panel {
     display: flex;
 
     justify-content: space-between;
+
     align-items: center;
 
     margin-bottom: 8px;
 }
+
 
 .editor-title {
     font-size: 12px;
@@ -242,6 +343,7 @@ body.hud-editing #hud-editor-panel {
         rgba(245, 249, 252, 0.96);
 }
 
+
 .editor-version {
     padding:
         3px 6px;
@@ -251,13 +353,16 @@ body.hud-editing #hud-editor-panel {
     background:
         rgba(223, 255, 69, 0.09);
 
-    color: #dfff45;
+    color:
+        #dfff45;
 
     font-size: 7px;
+
     font-weight: 900;
 
     letter-spacing: 0.4px;
 }
+
 
 .editor-description {
     margin-bottom: 11px;
@@ -272,7 +377,7 @@ body.hud-editing #hud-editor-panel {
 
 
 /*=========================================================
-    BUTTON ROW
+    BUTTONS
 =========================================================*/
 
 .editor-buttons {
@@ -286,6 +391,7 @@ body.hud-editing #hud-editor-panel {
     gap: 6px;
 }
 
+
 .editor-button {
     height: 30px;
 
@@ -296,47 +402,42 @@ body.hud-editing #hud-editor-panel {
     cursor: pointer;
 
     font-size: 8px;
+
     font-weight: 900;
 
     letter-spacing: 0.6px;
-
-    transition:
-        transform 0.12s ease,
-        filter 0.12s ease;
 }
 
-.editor-button:hover {
-    transform:
-        translateY(-1px);
-
-    filter:
-        brightness(1.10);
-}
 
 .editor-save {
-    background: #dfff45;
+    background:
+        #dfff45;
 
     color:
         rgba(5, 15, 20, 0.95);
 }
+
 
 .editor-reset {
     background:
         rgba(42, 105, 160, 0.35);
 
     border:
-        1px solid rgba(70, 155, 225, 0.28);
+        1px solid
+        rgba(70, 155, 225, 0.28);
 
     color:
         rgba(220, 238, 250, 0.94);
 }
+
 
 .editor-cancel {
     background:
         rgba(180, 50, 45, 0.22);
 
     border:
-        1px solid rgba(230, 75, 65, 0.25);
+        1px solid
+        rgba(230, 75, 65, 0.25);
 
     color:
         rgba(255, 205, 200, 0.94);
