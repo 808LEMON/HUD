@@ -1,6 +1,15 @@
-const hud =
-    document.getElementById('hud')
+//=========================================================
+// 808LEMON HUD
+// MAIN NUI CONTROLLER
+//=========================================================
 
+console.log('[808LEMON HUD] app.js loaded')
+
+//=========================================================
+// DOM REFERENCES
+//=========================================================
+
+// PLAYER
 const playerStats =
     document.getElementById('player-stats')
 
@@ -20,32 +29,7 @@ const playerGrade =
     document.getElementById('player-grade')
 
 
-const healthRow =
-    document.getElementById('health-row')
-
-const armorRow =
-    document.getElementById('armor-row')
-
-const hungerRow =
-    document.getElementById('hunger-row')
-
-const thirstRow =
-    document.getElementById('thirst-row')
-
-
-const healthFill =
-    document.getElementById('health-fill')
-
-const armorFill =
-    document.getElementById('armor-fill')
-
-const hungerFill =
-    document.getElementById('hunger-fill')
-
-const thirstFill =
-    document.getElementById('thirst-fill')
-
-
+// COMPASS
 const compassWrapper =
     document.getElementById('compass-wrapper')
 
@@ -55,10 +39,10 @@ const compassDirection =
 const compassHeading =
     document.getElementById('compass-heading')
 
-const compassLeft =
+const compassLabelLeft =
     document.getElementById('compass-label-left')
 
-const compassRight =
+const compassLabelRight =
     document.getElementById('compass-label-right')
 
 const streetName =
@@ -68,11 +52,38 @@ const crossingName =
     document.getElementById('crossing-name')
 
 
+// STATUS
+const statusBars =
+    document.getElementById('status-bars')
+
+const healthRow =
+    document.getElementById('health-row')
+
+const healthFill =
+    document.getElementById('health-fill')
+
+const armorRow =
+    document.getElementById('armor-row')
+
+const armorFill =
+    document.getElementById('armor-fill')
+
+const hungerRow =
+    document.getElementById('hunger-row')
+
+const hungerFill =
+    document.getElementById('hunger-fill')
+
+const thirstRow =
+    document.getElementById('thirst-row')
+
+const thirstFill =
+    document.getElementById('thirst-fill')
+
+
+// VEHICLE
 const vehicleHud =
     document.getElementById('vehicle-hud')
-
-const rpmRing =
-    document.getElementById('rpm-ring')
 
 const speed =
     document.getElementById('speed')
@@ -83,6 +94,9 @@ const speedUnit =
 const gear =
     document.getElementById('gear')
 
+const rpmRing =
+    document.getElementById('rpm-ring')
+
 const fuelFill =
     document.getElementById('fuel-fill')
 
@@ -92,165 +106,647 @@ const engineFill =
 const mileage =
     document.getElementById('mileage')
 
-const seatbeltIcon =
-    document.getElementById('seatbelt-icon')
-
 const headlightIcon =
     document.getElementById('headlight-icon')
+
+const seatbeltIcon =
+    document.getElementById('seatbelt-icon')
 
 const cruiseIcon =
     document.getElementById('cruise-icon')
 
 
-function clamp(
-    value,
-    min = 0,
-    max = 100
-) {
+// MINIMAP BORDER
+const minimapBorder =
+    document.getElementById('minimap-border')
 
-    value =
-        Number(value) || 0
+
+//=========================================================
+// HELPERS
+//=========================================================
+
+function clamp(value, minimum = 0, maximum = 100) {
+
+    const number =
+        Number(value)
+
+    if (!Number.isFinite(number)) {
+        return minimum
+    }
 
     return Math.min(
-        Math.max(value, min),
-        max
+        maximum,
+        Math.max(
+            minimum,
+            number
+        )
     )
-
 }
 
 
-function money(value) {
+//=========================================================
+// MONEY FORMAT
+//=========================================================
 
-    value =
+function formatMoney(value) {
+
+    const number =
         Number(value) || 0
 
     return '$' +
-        value.toLocaleString('en-US')
-
+        Math.floor(number)
+            .toLocaleString('en-US')
 }
 
 
-function setBar(
-    element,
-    value
-) {
+//=========================================================
+// PERCENTAGE
+//=========================================================
+
+function setPercentage(element, value) {
+
+    if (!element) {
+        return
+    }
+
+    const percentage =
+        clamp(value)
 
     element.style.width =
-        `${clamp(value)}%`
-
+        `${percentage}%`
 }
 
 
-function setVerticalBar(
-    element,
-    value
-) {
+//=========================================================
+// PLAYER DATA
+//=========================================================
 
-    element.style.height =
-        `${clamp(value)}%`
+function updatePlayer(data) {
 
-}
+    if (!data) {
+        return
+    }
 
+    if (
+        data.id !== undefined &&
+        playerId
+    ) {
+        playerId.textContent =
+            data.id
+    }
 
-function getCompassNeighbors(heading) {
+    if (
+        data.cash !== undefined &&
+        playerCash
+    ) {
+        playerCash.textContent =
+            formatMoney(data.cash)
+    }
 
-    const directions = [
-        {
-            name: 'N',
-            degree: 0
-        },
+    if (
+        data.bank !== undefined &&
+        playerBank
+    ) {
+        playerBank.textContent =
+            formatMoney(data.bank)
+    }
 
-        {
-            name: 'NE',
-            degree: 45
-        },
+    if (
+        data.job !== undefined &&
+        playerJob
+    ) {
+        playerJob.textContent =
+            data.job || 'Unemployed'
+    }
 
-        {
-            name: 'E',
-            degree: 90
-        },
+    if (
+        data.grade !== undefined &&
+        playerGrade
+    ) {
 
-        {
-            name: 'SE',
-            degree: 135
-        },
+        playerGrade.textContent =
+            data.grade || ''
 
-        {
-            name: 'S',
-            degree: 180
-        },
-
-        {
-            name: 'SW',
-            degree: 225
-        },
-
-        {
-            name: 'W',
-            degree: 270
-        },
-
-        {
-            name: 'NW',
-            degree: 315
-        }
-    ]
-
-    let nearestIndex =
-        Math.round(
-            heading / 45
-        ) % 8
-
-    const left =
-        directions[
-            (nearestIndex + 7) % 8
-        ]
-
-    const right =
-        directions[
-            (nearestIndex + 1) % 8
-        ]
-
-    return {
-        left:
-            left.name,
-
-        right:
-            right.name
     }
 
 }
 
 
-function updateRpmRing(value) {
+//=========================================================
+// STATUS
+//=========================================================
 
-    const normalized =
-        clamp(
-            Number(value) * 100,
-            0,
-            100
+function updateStatus(data) {
+
+    if (!data) {
+        return
+    }
+
+    if (data.health !== undefined) {
+
+        setPercentage(
+            healthFill,
+            data.health
         )
 
-    /*
-        Main visible sweep is around 75%
-        of the circle.
+    }
 
-        593 is the visible arc length.
-    */
+    if (data.armor !== undefined) {
 
-    const progress =
-        593 *
-        (normalized / 100)
+        setPercentage(
+            armorFill,
+            data.armor
+        )
 
-    rpmRing.style.strokeDasharray =
-        `${progress} ${792 - progress}`
+    }
+
+    if (data.hunger !== undefined) {
+
+        setPercentage(
+            hungerFill,
+            data.hunger
+        )
+
+    }
+
+    if (data.thirst !== undefined) {
+
+        setPercentage(
+            thirstFill,
+            data.thirst
+        )
+
+    }
+
+    if (
+        armorRow &&
+        data.showArmor !== undefined
+    ) {
+
+        armorRow.style.display =
+            data.showArmor
+                ? 'flex'
+                : 'none'
+
+    }
 
 }
 
 
+//=========================================================
+// COMPASS
+//=========================================================
+
+function updateCompass(data) {
+
+    if (!data) {
+        return
+    }
+
+    if (
+        data.direction !== undefined &&
+        compassDirection
+    ) {
+
+        compassDirection.textContent =
+            data.direction
+
+    }
+
+    if (
+        data.heading !== undefined &&
+        compassHeading
+    ) {
+
+        const heading =
+            Math.round(
+                Number(data.heading) || 0
+            )
+
+        compassHeading.textContent =
+            `${String(heading).padStart(3, '0')}°`
+
+    }
+
+    if (
+        data.left !== undefined &&
+        compassLabelLeft
+    ) {
+
+        compassLabelLeft.textContent =
+            data.left
+
+    }
+
+    if (
+        data.right !== undefined &&
+        compassLabelRight
+    ) {
+
+        compassLabelRight.textContent =
+            data.right
+
+    }
+
+    if (
+        data.street !== undefined &&
+        streetName
+    ) {
+
+        streetName.textContent =
+            data.street || 'UNKNOWN ROAD'
+
+    }
+
+    if (
+        data.crossing !== undefined &&
+        crossingName
+    ) {
+
+        crossingName.textContent =
+            data.crossing || ''
+
+        crossingName.style.display =
+            data.crossing
+                ? 'block'
+                : 'none'
+
+    }
+
+}
+
+
+//=========================================================
+// VEHICLE
+//=========================================================
+
+function updateVehicle(data) {
+
+    if (!data) {
+        return
+    }
+
+    if (
+        data.visible !== undefined &&
+        vehicleHud
+    ) {
+
+        vehicleHud.style.display =
+            data.visible
+                ? 'block'
+                : 'none'
+
+    }
+
+    if (!data.visible) {
+        return
+    }
+
+    if (
+        data.speed !== undefined &&
+        speed
+    ) {
+
+        speed.textContent =
+            Math.round(
+                Number(data.speed) || 0
+            )
+
+    }
+
+    if (
+        data.unit !== undefined &&
+        speedUnit
+    ) {
+
+        speedUnit.textContent =
+            String(data.unit).toUpperCase()
+
+    }
+
+    if (
+        data.gear !== undefined &&
+        gear
+    ) {
+
+        const gearValue =
+            Number(data.gear)
+
+        gear.textContent =
+            gearValue === 0
+                ? 'N'
+                : String(data.gear)
+
+    }
+
+    if (
+        data.rpm !== undefined &&
+        rpmRing
+    ) {
+
+        const rpm =
+            clamp(
+                Number(data.rpm) * 100
+            )
+
+        /*
+            Circle radius = 126
+            Circumference ≈ 791.68
+        */
+
+        const circumference =
+            791.68
+
+        const offset =
+            circumference -
+            (
+                rpm / 100
+            ) *
+            circumference
+
+        rpmRing.style.strokeDasharray =
+            `${circumference}`
+
+        rpmRing.style.strokeDashoffset =
+            `${offset}`
+
+    }
+
+    if (
+        data.fuel !== undefined &&
+        fuelFill
+    ) {
+
+        fuelFill.style.height =
+            `${clamp(data.fuel)}%`
+
+    }
+
+    if (
+        data.engine !== undefined &&
+        engineFill
+    ) {
+
+        let engine =
+            Number(data.engine) || 0
+
+        if (engine > 100) {
+            engine /= 10
+        }
+
+        engineFill.style.height =
+            `${clamp(engine)}%`
+
+    }
+
+    if (
+        data.mileage !== undefined &&
+        mileage
+    ) {
+
+        const miles =
+            Number(data.mileage) || 0
+
+        mileage.textContent =
+            `${miles.toFixed(1)} MI`
+
+    }
+
+    if (
+        data.headlights !== undefined &&
+        headlightIcon
+    ) {
+
+        headlightIcon.classList.toggle(
+            'active',
+            Boolean(data.headlights)
+        )
+
+    }
+
+    if (
+        data.seatbelt !== undefined &&
+        seatbeltIcon
+    ) {
+
+        seatbeltIcon.classList.toggle(
+            'active',
+            Boolean(data.seatbelt)
+        )
+
+        seatbeltIcon.classList.toggle(
+            'warning',
+            !Boolean(data.seatbelt)
+        )
+
+    }
+
+    if (
+        data.cruise !== undefined &&
+        cruiseIcon
+    ) {
+
+        cruiseIcon.classList.toggle(
+            'active',
+            Boolean(data.cruise)
+        )
+
+    }
+
+}
+
+
+//=========================================================
+// APPLY SAVED HUD POSITION
+//=========================================================
+
+function applyHudPosition(element, position) {
+
+    if (
+        !element ||
+        !position
+    ) {
+        return
+    }
+
+    const x =
+        Number(position.x)
+
+    const y =
+        Number(position.y)
+
+    if (
+        !Number.isFinite(x) ||
+        !Number.isFinite(y)
+    ) {
+        return
+    }
+
+    element.style.left =
+        `${x}%`
+
+    element.style.top =
+        `${y}%`
+
+    element.style.right =
+        'auto'
+
+    element.style.bottom =
+        'auto'
+
+}
+
+
+//=========================================================
+// APPLY HUD LAYOUT
+//=========================================================
+
+function applyHudLayout(layout) {
+
+    if (!layout) {
+        return
+    }
+
+    if (layout.player) {
+
+        applyHudPosition(
+            playerStats,
+            layout.player
+        )
+
+    }
+
+    if (layout.compass) {
+
+        applyHudPosition(
+            compassWrapper,
+            layout.compass
+        )
+
+    }
+
+    if (layout.status) {
+
+        applyHudPosition(
+            statusBars,
+            layout.status
+        )
+
+    }
+
+    if (layout.vehicle) {
+
+        applyHudPosition(
+            vehicleHud,
+            layout.vehicle
+        )
+
+    }
+
+}
+
+
+//=========================================================
+// MINIMAP BORDER
+//=========================================================
+
+function setMinimapBorder(data) {
+
+    if (!minimapBorder) {
+        return
+    }
+
+    if (!data.visible) {
+
+        minimapBorder.style.display =
+            'none'
+
+        return
+
+    }
+
+    const left =
+        Number(data.left) || 0
+
+    const top =
+        Number(data.top) || 0
+
+    const width =
+        Math.max(
+            0,
+            Number(data.width) || 0
+        )
+
+    const height =
+        Math.max(
+            0,
+            Number(data.height) || 0
+        )
+
+    minimapBorder.style.left =
+        `${left}px`
+
+    minimapBorder.style.top =
+        `${top}px`
+
+    minimapBorder.style.width =
+        `${width}px`
+
+    minimapBorder.style.height =
+        `${height}px`
+
+    minimapBorder.style.display =
+        'block'
+
+}
+
+
+//=========================================================
+// MINIMAP BORDER VISIBILITY
+//=========================================================
+
+function setMinimapBorderVisible(visible) {
+
+    if (!minimapBorder) {
+        return
+    }
+
+    minimapBorder.style.display =
+        visible
+            ? 'block'
+            : 'none'
+
+}
+
+
+//=========================================================
+// GLOBAL HUD VISIBILITY
+//=========================================================
+
+function setHudVisible(visible) {
+
+    const hud =
+        document.getElementById('hud')
+
+    if (!hud) {
+        return
+    }
+
+    hud.style.display =
+        visible
+            ? 'block'
+            : 'none'
+
+}
+
+
+//=========================================================
+// NUI MESSAGE HANDLER
+//=========================================================
+
 window.addEventListener(
     'message',
-    function(event) {
+    event => {
 
         const data =
             event.data
@@ -262,193 +758,113 @@ window.addEventListener(
             return
         }
 
-
         switch (data.action) {
 
-
-            /* ==========================================
-               GLOBAL
-            ========================================== */
-
-            case 'setVisible':
-
-                hud.style.display =
-                    data.visible
-                        ? 'block'
-                        : 'none'
-
-                break
-
-
-            /* ==========================================
-               PLAYER
-            ========================================== */
+            //=================================================
+            // PLAYER
+            //=================================================
 
             case 'updatePlayer':
 
-                playerStats.style.display =
-                    data.visible
-                        ? 'block'
-                        : 'none'
-
-                playerId.textContent =
-                    data.playerId ?? 0
-
-                playerCash.textContent =
-                    money(data.cash)
-
-                playerBank.textContent =
-                    money(data.bank)
-
-                playerJob.textContent =
-                    data.job ||
-                    'Unemployed'
-
-                playerGrade.textContent =
-                    data.grade || ''
-
-
-                setBar(
-                    healthFill,
-                    data.health
+                updatePlayer(
+                    data.data || data
                 )
-
-                setBar(
-                    armorFill,
-                    data.armor
-                )
-
-                setBar(
-                    hungerFill,
-                    data.hunger
-                )
-
-                setBar(
-                    thirstFill,
-                    data.thirst
-                )
-
-
-                healthRow.style.display =
-                    data.showHealth
-                        ? 'flex'
-                        : 'none'
-
-
-                armorRow.style.display =
-                    data.showArmor
-                        ? 'flex'
-                        : 'none'
-
-
-                hungerRow.style.display =
-                    data.showHunger
-                        ? 'flex'
-                        : 'none'
-
-
-                thirstRow.style.display =
-                    data.showThirst
-                        ? 'flex'
-                        : 'none'
-
-
-                if (
-                    data.hideArmorWhenEmpty &&
-                    Number(data.armor) <= 0
-                ) {
-
-                    armorRow.style.display =
-                        'none'
-
-                }
 
                 break
 
 
-            /* ==========================================
-               COMPASS
-            ========================================== */
+            case 'player':
+
+                updatePlayer(
+                    data.data || data
+                )
+
+                break
+
+
+            //=================================================
+            // STATUS
+            //=================================================
+
+            case 'updateStatus':
+
+                updateStatus(
+                    data.data || data
+                )
+
+                break
+
+
+            case 'status':
+
+                updateStatus(
+                    data.data || data
+                )
+
+                break
+
+
+            //=================================================
+            // COMPASS
+            //=================================================
 
             case 'updateCompass':
 
-                compassWrapper.style.display =
-                    data.visible
-                        ? 'block'
-                        : 'none'
+                updateCompass(
+                    data.data || data
+                )
 
-                if (!data.visible)
-                    break
+                break
 
 
-                const heading =
-                    Number(
-                        data.heading
-                    ) || 0
+            case 'compass':
+
+                updateCompass(
+                    data.data || data
+                )
+
+                break
 
 
-                compassDirection.textContent =
-                    data.direction || 'N'
+            //=================================================
+            // VEHICLE
+            //=================================================
+
+            case 'updateVehicle':
+
+                updateVehicle(
+                    data.data || data
+                )
+
+                break
 
 
-                compassHeading.textContent =
-                    `${Math.round(heading)
-                        .toString()
-                        .padStart(3, '0')}°`
+            case 'vehicle':
+
+                updateVehicle(
+                    data.data || data
+                )
+
+                break
 
 
-                const neighbors =
-                    getCompassNeighbors(
-                        heading
-                    )
+            case 'showVehicle':
 
+                if (vehicleHud) {
 
-                compassLeft.textContent =
-                    neighbors.left
-
-
-                compassRight.textContent =
-                    neighbors.right
-
-
-                if (
-                    data.showStreetNames
-                ) {
-
-                    streetName.style.display =
+                    vehicleHud.style.display =
                         'block'
 
-                    streetName.textContent =
-                        (
-                            data.street ||
-                            'UNKNOWN ROAD'
-                        ).toUpperCase()
+                }
+
+                break
 
 
-                    if (
-                        data.crossing &&
-                        data.crossing.length > 0
-                    ) {
+            case 'hideVehicle':
 
-                        crossingName.style.display =
-                            'block'
+                if (vehicleHud) {
 
-                        crossingName.textContent =
-                            `/ ${data.crossing.toUpperCase()}`
-
-                    } else {
-
-                        crossingName.style.display =
-                            'none'
-
-                    }
-
-                } else {
-
-                    streetName.style.display =
-                        'none'
-
-                    crossingName.style.display =
+                    vehicleHud.style.display =
                         'none'
 
                 }
@@ -456,97 +872,58 @@ window.addEventListener(
                 break
 
 
-            /* ==========================================
-               VEHICLE
-            ========================================== */
+            //=================================================
+            // HUD VISIBILITY
+            //=================================================
 
-            case 'updateVehicle':
+            case 'showHud':
 
-                vehicleHud.style.display =
-                    data.visible
-                        ? 'block'
-                        : 'none'
-
-
-                if (!data.visible)
-                    break
-
-
-                speed.textContent =
-                    data.speed ?? 0
-
-
-                speedUnit.textContent =
-                    data.speedUnit ||
-                    'MPH'
-
-
-                gear.textContent =
-                    data.gear ||
-                    'N'
-
-
-                updateRpmRing(
-                    data.rpm
-                )
-
-
-                setVerticalBar(
-                    fuelFill,
-                    data.fuel
-                )
-
-
-                setVerticalBar(
-                    engineFill,
-                    data.engineHealth
-                )
-
-
-                const mileageValue =
-                    Number(
-                        data.mileage
-                    ) || 0
-
-
-                mileage.textContent =
-                    `${mileageValue
-                        .toFixed(1)
-                        .padStart(6, '0')} ${
-                        data.speedUnit === 'MPH'
-                            ? 'MI'
-                            : 'KM'
-                    }`
-
-
-                seatbeltIcon.classList.toggle(
-                    'active',
-                    !!data.seatbelt
-                )
-
-
-                seatbeltIcon.classList.toggle(
-                    'warning',
-                    !data.seatbelt
-                )
-
-
-                headlightIcon.classList.toggle(
-                    'active',
-                    !!data.lights
-                )
-
-
-                cruiseIcon.classList.toggle(
-                    'active',
-                    !!data.cruise
-                )
-
+                setHudVisible(true)
 
                 break
 
 
-            case 'setHarness':
+            case 'hideHud':
+
+                setHudVisible(false)
+
+                break
+
+
+            //=================================================
+            // SAVED HUD LAYOUT
+            //=================================================
+
+            case 'applyHudLayout':
+
+                applyHudLayout(
+                    data.layout
+                )
+
+                break
+
+
+            //=================================================
+            // MINIMAP BORDER
+            //=================================================
+
+            case 'setMinimapBorder':
+
+                setMinimapBorder(data)
+
+                break
+
+
+            case 'setMinimapBorderVisible':
+
+                setMinimapBorderVisible(
+                    Boolean(data.visible)
+                )
+
+                break
+
+
+            default:
 
                 break
 

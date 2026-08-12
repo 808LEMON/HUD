@@ -28,16 +28,10 @@ Config.ShowMinimap = true
 Config.MinimapOnlyInVehicle = false
 
 --=========================================================
--- MINIMAP STYLE
---=========================================================
-
-Config.MinimapStyle = 'square'
-
---=========================================================
 -- SQUARE MINIMAP
 --
--- Based on the current qb-hud style of positioning:
--- map, mask and blur deliberately use DIFFERENT values.
+-- These are the same baseline geometry values used by
+-- cx-hud for its square map.
 --=========================================================
 
 Config.Minimap = {
@@ -66,21 +60,14 @@ Config.Minimap = {
 }
 
 --=========================================================
--- CUSTOM MINIMAP BORDER
---
--- NUI border only.
--- Does NOT control the native minimap.
--- We'll calibrate this after the native map is fixed.
+-- MINIMAP BORDER
 --=========================================================
 
 Config.MinimapBorder = {
     enabled = true,
 
-    x = 1.55,
-    y = 72.6,
-
-    width = 14.3,
-    height = 17.1
+    -- Small visual padding around calculated radar bounds.
+    padding = 2
 }
 
 --=========================================================
@@ -108,8 +95,6 @@ Config.CompassUpdateInterval = 75
 
 --=========================================================
 -- HUD EDITOR
---
--- Leave this configured, but don't use minimap editing yet.
 --=========================================================
 
 Config.HudEditor = {}
@@ -117,7 +102,7 @@ Config.HudEditor = {}
 Config.HudEditor.Command = 'edithud'
 Config.HudEditor.ResetCommand = 'resethud'
 
-Config.HudEditor.KvpName = 'lemon_hud_layout_v2'
+Config.HudEditor.KvpName = 'lemon_hud_layout'
 
 Config.HudEditor.DefaultLayout = {
 

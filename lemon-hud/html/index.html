@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -10,30 +11,76 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>808Lemon HUD</title>
+    <title>
+        808Lemon HUD
+    </title>
+
 
     <!--==================================================
-        HUD CSS
+        MAIN HUD STYLES
     ===================================================-->
 
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/player.css">
-    <link rel="stylesheet" href="css/compass.css">
-    <link rel="stylesheet" href="css/status.css">
-    <link rel="stylesheet" href="css/vehicle.css">
-    <link rel="stylesheet" href="css/editor.css">
+    <link
+        rel="stylesheet"
+        href="css/main.css"
+    >
+
+
+    <!--==================================================
+        COMPONENT STYLES
+    ===================================================-->
+
+    <link
+        rel="stylesheet"
+        href="css/player.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/compass.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/status.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/vehicle.css"
+    >
+
+
+    <!--==================================================
+        HUD EDITOR
+    ===================================================-->
+
+    <link
+        rel="stylesheet"
+        href="css/editor.css"
+    >
 
 </head>
 
+
 <body>
 
+
+<!--======================================================
+    HUD ROOT
+=======================================================-->
+
 <div id="hud">
+
 
     <!--==================================================
         PLAYER STATS
     ===================================================-->
 
     <div id="player-stats">
+
+
+        <!-- HEADER -->
 
         <div class="player-header">
 
@@ -45,7 +92,10 @@
 
         </div>
 
-        <!-- PLAYER ID -->
+
+        <!--================================================
+            PLAYER ID
+        =================================================-->
 
         <div class="player-row">
 
@@ -67,7 +117,10 @@
 
         </div>
 
-        <!-- CASH -->
+
+        <!--================================================
+            CASH
+        =================================================-->
 
         <div class="player-row">
 
@@ -78,7 +131,7 @@
             <div class="player-content">
 
                 <span class="player-label">
-                    Cash
+                    CASH
                 </span>
 
                 <span id="player-cash">
@@ -89,7 +142,10 @@
 
         </div>
 
-        <!-- BANK -->
+
+        <!--================================================
+            BANK
+        =================================================-->
 
         <div class="player-row">
 
@@ -100,7 +156,7 @@
             <div class="player-content">
 
                 <span class="player-label">
-                    Bank
+                    BANK
                 </span>
 
                 <span id="player-bank">
@@ -111,7 +167,10 @@
 
         </div>
 
-        <!-- JOB -->
+
+        <!--================================================
+            JOB
+        =================================================-->
 
         <div class="player-row">
 
@@ -122,7 +181,7 @@
             <div class="player-content">
 
                 <span class="player-label">
-                    Job
+                    JOB
                 </span>
 
                 <span id="player-job">
@@ -135,16 +194,21 @@
 
         </div>
 
+
     </div>
 
 
     <!--==================================================
-        COMPASS / STREET
+        COMPASS / STREET INFORMATION
     ===================================================-->
 
     <div id="compass-wrapper">
 
+
+        <!-- COMPASS -->
+
         <div class="compass-top">
+
 
             <!-- CURRENT DIRECTION -->
 
@@ -161,9 +225,15 @@
 
             <div class="compass-tape">
 
+
+                <!-- LEFT -->
+
                 <div id="compass-label-left">
                     NW
                 </div>
+
+
+                <!-- CENTER -->
 
                 <div class="compass-center">
 
@@ -175,16 +245,23 @@
 
                 </div>
 
+
+                <!-- RIGHT -->
+
                 <div id="compass-label-right">
                     NE
                 </div>
 
+
             </div>
+
 
         </div>
 
 
-        <!-- STREET INFORMATION -->
+        <!--================================================
+            STREET
+        =================================================-->
 
         <div id="street-wrapper">
 
@@ -196,6 +273,7 @@
 
         </div>
 
+
     </div>
 
 
@@ -205,14 +283,19 @@
 
     <div id="status-bars">
 
-        <!-- HEALTH -->
+
+        <!--================================================
+            HEALTH
+        =================================================-->
 
         <div
             id="health-row"
             class="status-row"
         >
 
-            <div class="status-icon health-icon">
+            <div
+                class="status-icon health-icon"
+            >
                 ♥
             </div>
 
@@ -228,14 +311,18 @@
         </div>
 
 
-        <!-- ARMOR -->
+        <!--================================================
+            ARMOR
+        =================================================-->
 
         <div
             id="armor-row"
             class="status-row"
         >
 
-            <div class="status-icon armor-icon">
+            <div
+                class="status-icon armor-icon"
+            >
                 ◆
             </div>
 
@@ -251,14 +338,18 @@
         </div>
 
 
-        <!-- HUNGER -->
+        <!--================================================
+            HUNGER
+        =================================================-->
 
         <div
             id="hunger-row"
             class="status-row"
         >
 
-            <div class="status-icon hunger-icon">
+            <div
+                class="status-icon hunger-icon"
+            >
                 ●
             </div>
 
@@ -274,14 +365,18 @@
         </div>
 
 
-        <!-- THIRST -->
+        <!--================================================
+            THIRST
+        =================================================-->
 
         <div
             id="thirst-row"
             class="status-row"
         >
 
-            <div class="status-icon thirst-icon">
+            <div
+                class="status-icon thirst-icon"
+            >
                 ▼
             </div>
 
@@ -296,6 +391,7 @@
 
         </div>
 
+
     </div>
 
 
@@ -305,16 +401,20 @@
 
     <div id="vehicle-hud">
 
+
         <div class="gauge-shell">
 
-            <!--==========================================
-                RPM SVG
-            ===========================================-->
+
+            <!--============================================
+                RPM RINGS
+            =============================================-->
 
             <svg
                 class="gauge-svg"
                 viewBox="0 0 300 300"
             >
+
+                <!-- BACKGROUND -->
 
                 <circle
                     class="gauge-bg-ring"
@@ -323,6 +423,9 @@
                     r="126"
                 />
 
+
+                <!-- RPM -->
+
                 <circle
                     id="rpm-ring"
                     class="gauge-progress rpm-ring"
@@ -330,6 +433,9 @@
                     cy="150"
                     r="126"
                 />
+
+
+                <!-- INNER -->
 
                 <circle
                     class="gauge-inner-ring"
@@ -341,9 +447,9 @@
             </svg>
 
 
-            <!--==========================================
-                RPM NUMBERS
-            ===========================================-->
+            <!--============================================
+                RPM SCALE
+            =============================================-->
 
             <div class="rpm-scale">
 
@@ -390,11 +496,14 @@
             </div>
 
 
-            <!--==========================================
-                CENTER
-            ===========================================-->
+            <!--============================================
+                VEHICLE CENTER
+            =============================================-->
 
             <div class="vehicle-center">
+
+
+                <!-- GEAR -->
 
                 <div
                     id="gear"
@@ -403,29 +512,39 @@
                     N
                 </div>
 
+
+                <!-- SPEED -->
+
                 <div id="speed">
                     0
                 </div>
+
+
+                <!-- UNIT -->
 
                 <div id="speed-unit">
                     MPH
                 </div>
 
+
             </div>
 
 
-            <!-- RPM LABEL -->
+            <!--============================================
+                RPM LABEL
+            =============================================-->
 
             <div class="rpm-label">
                 x1000 RPM
             </div>
 
 
-            <!--==========================================
-                VEHICLE ICONS
-            ===========================================-->
+            <!--============================================
+                VEHICLE INDICATORS
+            =============================================-->
 
             <div class="vehicle-icons">
+
 
                 <!-- HEADLIGHTS -->
 
@@ -449,7 +568,7 @@
                 </div>
 
 
-                <!-- CRUISE -->
+                <!-- CRUISE CONTROL -->
 
                 <div
                     id="cruise-icon"
@@ -459,18 +578,21 @@
                     C
                 </div>
 
+
             </div>
 
 
-            <!--==========================================
+            <!--============================================
                 FUEL
-            ===========================================-->
+            =============================================-->
 
             <div class="side-meter fuel-meter">
+
 
                 <div class="side-meter-label">
                     F
                 </div>
+
 
                 <div class="side-meter-track">
 
@@ -481,18 +603,21 @@
 
                 </div>
 
+
             </div>
 
 
-            <!--==========================================
+            <!--============================================
                 ENGINE
-            ===========================================-->
+            =============================================-->
 
             <div class="side-meter engine-meter">
+
 
                 <div class="side-meter-label">
                     E
                 </div>
+
 
                 <div class="side-meter-track">
 
@@ -503,12 +628,13 @@
 
                 </div>
 
+
             </div>
 
 
-            <!--==========================================
+            <!--============================================
                 ODOMETER
-            ===========================================-->
+            =============================================-->
 
             <div
                 id="mileage"
@@ -517,76 +643,88 @@
                 0000.0 MI
             </div>
 
+
         </div>
+
 
     </div>
 
 
     <!--==================================================
-        MINIMAP FRAME
+        NATIVE MINIMAP BORDER
 
-        This is the border around the native GTA minimap.
+        IMPORTANT:
 
-        Normal mode:
-        subtle permanent border.
+        This is NOT the minimap.
 
-        /edithud:
-        becomes draggable.
+        GTA renders the actual minimap.
+
+        client/minimap.lua calculates the actual native
+        minimap screen position and sends its dimensions
+        to this element.
+
+        This prevents the HTML border from becoming
+        detached from the real GTA radar.
     ===================================================-->
 
-    <div id="minimap-frame">
-
-        <div id="minimap-editor-label">
-            MINIMAP • DRAG TO MOVE
-        </div>
-
-    </div>
+    <div id="minimap-border"></div>
 
 
     <!--==================================================
-        HUD EDITOR SCREEN OVERLAY
+        HUD EDITOR OVERLAY
     ===================================================-->
 
     <div id="hud-editor-overlay"></div>
 
 
     <!--==================================================
-        HUD EDITOR PANEL
+        HUD EDITOR
     ===================================================-->
 
     <div id="hud-editor-panel">
 
-        <!-- HEADER -->
+
+        <!--==============================================
+            HEADER
+        ===============================================-->
 
         <div class="editor-title-row">
+
 
             <div class="editor-title">
                 808LEMON HUD EDITOR
             </div>
 
+
             <div class="editor-version">
                 EDIT MODE
             </div>
 
+
         </div>
 
 
-        <!-- DESCRIPTION -->
+        <!--==============================================
+            DESCRIPTION
+        ===============================================-->
 
         <div class="editor-description">
 
             Drag each highlighted HUD component anywhere
             on your screen.
 
-            Drag the border around the minimap to move the
-            actual native GTA radar.
+            Minimap positioning is temporarily locked while
+            the native square radar system is calibrated.
 
         </div>
 
 
-        <!-- BUTTONS -->
+        <!--==============================================
+            BUTTONS
+        ===============================================-->
 
         <div class="editor-buttons">
+
 
             <!-- SAVE -->
 
@@ -620,26 +758,35 @@
                 CANCEL
             </button>
 
+
         </div>
 
 
-        <!-- CURRENT POSITION -->
+        <!--==============================================
+            POSITION READOUT
+        ===============================================-->
 
         <div id="editor-position-readout">
             DRAG A HUD COMPONENT
         </div>
 
+
     </div>
+
 
 </div>
 
 
 <!--======================================================
     JAVASCRIPT
+
+    app.js MUST load before editor.js.
 =======================================================-->
 
 <script src="js/app.js"></script>
+
 <script src="js/editor.js"></script>
+
 
 </body>
 

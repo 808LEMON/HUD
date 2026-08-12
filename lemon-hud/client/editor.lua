@@ -1,6 +1,6 @@
 --=========================================================
 -- 808LEMON HUD EDITOR
--- TEMP VERSION - MINIMAP EDITING DISABLED
+-- MINIMAP EDITING TEMPORARILY DISABLED
 --=========================================================
 
 local editorOpen = false
@@ -21,16 +21,23 @@ local function DeepCopy(value)
     local result = {}
 
     for key, item in pairs(value) do
-        result[key] = DeepCopy(item)
+        result[key] =
+            DeepCopy(item)
     end
 
     return result
+
 end
 
+local function Clamp(
+    value,
+    minimum,
+    maximum
+)
 
-local function Clamp(value, minimum, maximum)
-
-    value = tonumber(value) or minimum
+    value =
+        tonumber(value)
+        or minimum
 
     return math.max(
         minimum,
@@ -39,24 +46,16 @@ local function Clamp(value, minimum, maximum)
             value
         )
     )
+
 end
-
-
---=========================================================
--- DEFAULT LAYOUT
---=========================================================
 
 local function GetDefaultLayout()
 
     return DeepCopy(
         Config.HudEditor.DefaultLayout
     )
+
 end
-
-
---=========================================================
--- SANITIZE
---=========================================================
 
 local function SanitizeLayout(layout)
 
@@ -76,7 +75,9 @@ local function SanitizeLayout(layout)
         'vehicle'
     }
 
-    for _, name in ipairs(components) do
+    for _, name in ipairs(
+        components
+    ) do
 
         local incoming =
             layout[name]
@@ -109,11 +110,11 @@ local function SanitizeLayout(layout)
     end
 
     return clean
+
 end
 
-
 --=========================================================
--- APPLY LAYOUT
+-- APPLY
 --=========================================================
 
 local function ApplyLayout(layout)
@@ -123,16 +124,18 @@ local function ApplyLayout(layout)
 
     SendNUIMessage({
 
-        action = 'applyHudLayout',
+        action =
+            'applyHudLayout',
 
-        layout = layout
+        layout =
+            layout
 
     })
+
 end
 
-
 --=========================================================
--- LOAD SAVED LAYOUT
+-- LOAD
 --=========================================================
 
 local function LoadLayout()
@@ -149,6 +152,7 @@ local function LoadLayout()
             GetDefaultLayout()
 
         return savedLayout
+
     end
 
     local success, decoded =
@@ -164,14 +168,15 @@ local function LoadLayout()
             GetDefaultLayout()
 
         return savedLayout
+
     end
 
     savedLayout =
         SanitizeLayout(decoded)
 
     return savedLayout
-end
 
+end
 
 --=========================================================
 -- SAVE
@@ -188,11 +193,11 @@ local function SaveLayout(layout)
     )
 
     ApplyLayout(savedLayout)
+
 end
 
-
 --=========================================================
--- OPEN EDITOR
+-- OPEN
 --=========================================================
 
 local function OpenEditor()
@@ -222,21 +227,24 @@ local function OpenEditor()
 
     SendNUIMessage({
 
-        action = 'openHudEditor',
+        action =
+            'openHudEditor',
 
-        layout = workingLayout,
+        layout =
+            workingLayout,
 
         defaults =
             GetDefaultLayout(),
 
-        minimapEditing = false
+        minimapEditing =
+            false
 
     })
+
 end
 
-
 --=========================================================
--- CLOSE EDITOR
+-- CLOSE
 --=========================================================
 
 local function CloseEditor(
@@ -269,13 +277,11 @@ local function CloseEditor(
     end
 
     SendNUIMessage({
-
         action =
             'closeHudEditor'
-
     })
-end
 
+end
 
 --=========================================================
 -- COMMANDS
@@ -290,7 +296,6 @@ RegisterCommand(
     end,
     false
 )
-
 
 RegisterCommand(
     Config.HudEditor.ResetCommand,
@@ -322,9 +327,8 @@ RegisterCommand(
     false
 )
 
-
 --=========================================================
--- PREVIEW NORMAL HUD COMPONENTS
+-- PREVIEW
 --=========================================================
 
 RegisterNUICallback(
@@ -338,16 +342,19 @@ RegisterNUICallback(
             })
 
             return
+
         end
 
         if type(data) ~= 'table'
-        or type(data.layout) ~= 'table' then
+        or type(data.layout) ~= 'table'
+        then
 
             cb({
                 success = false
             })
 
             return
+
         end
 
         workingLayout =
@@ -358,9 +365,9 @@ RegisterNUICallback(
         cb({
             success = true
         })
+
     end
 )
-
 
 --=========================================================
 -- SAVE CALLBACK
@@ -371,13 +378,15 @@ RegisterNUICallback(
     function(data, cb)
 
         if type(data) ~= 'table'
-        or type(data.layout) ~= 'table' then
+        or type(data.layout) ~= 'table'
+        then
 
             cb({
                 success = false
             })
 
             return
+
         end
 
         SaveLayout(
@@ -387,16 +396,14 @@ RegisterNUICallback(
         workingLayout =
             DeepCopy(savedLayout)
 
-        CloseEditor(
-            false
-        )
+        CloseEditor(false)
 
         cb({
             success = true
         })
+
     end
 )
-
 
 --=========================================================
 -- RESET CALLBACK
@@ -436,9 +443,9 @@ RegisterNUICallback(
                 savedLayout
 
         })
+
     end
 )
-
 
 --=========================================================
 -- CLOSE CALLBACK
@@ -448,33 +455,17 @@ RegisterNUICallback(
     'closeHudEditor',
     function(_, cb)
 
-        CloseEditor(
-            true
-        )
+        CloseEditor(true)
 
         cb({
             success = true
         })
-    end
-)
-
-
---=========================================================
--- EXTERNAL EVENT
---=========================================================
-
-RegisterNetEvent(
-    'lemon-hud:client:openEditor',
-    function()
-
-        OpenEditor()
 
     end
 )
 
-
 --=========================================================
--- INITIAL LOAD
+-- RESOURCE START
 --=========================================================
 
 CreateThread(function()
@@ -487,9 +478,8 @@ CreateThread(function()
 
 end)
 
-
 --=========================================================
--- RESOURCE STOP
+-- STOP SAFETY
 --=========================================================
 
 AddEventHandler(
@@ -504,10 +494,6 @@ AddEventHandler(
 
         SetNuiFocus(
             false,
-            false
-        )
-
-        SetNuiFocusKeepInput(
             false
         )
 

@@ -3,7 +3,7 @@ game 'gta5'
 
 author '808Lemon'
 description '808Lemon QBCore HUD Replacement'
-version '1.1.0'
+version '1.2.0'
 
 lua54 'yes'
 
@@ -33,7 +33,9 @@ files {
     'html/css/editor.css',
 
     'html/js/app.js',
-    'html/js/editor.js'
+    'html/js/editor.js',
+
+    'stream/squaremap.ytd'
 }
 
 dependency 'qb-core'

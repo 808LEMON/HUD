@@ -1,10 +1,24 @@
+/*=========================================================
+    808LEMON HUD
+    MAIN STYLES
+=========================================================*/
+
+
+/*=========================================================
+    RESET
+=========================================================*/
+
 * {
     box-sizing: border-box;
+
     margin: 0;
     padding: 0;
 
     user-select: none;
+
+    -webkit-user-select: none;
 }
+
 
 html,
 body {
@@ -13,25 +27,201 @@ body {
 
     overflow: hidden;
 
-    background: transparent;
+    background: transparent !important;
+}
+
+
+body {
+    position: relative;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
-}
 
-body {
+    color: #ffffff;
+
     pointer-events: none;
 }
 
+
+/*=========================================================
+    HUD ROOT
+=========================================================*/
+
 #hud {
-    position: relative;
+    position: fixed;
+
+    inset: 0;
 
     width: 100vw;
     height: 100vh;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    background: transparent;
 }
+
+
+/*=========================================================
+    GLOBAL HUD FONT RENDERING
+=========================================================*/
+
+#hud {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    text-rendering: geometricPrecision;
+}
+
+
+/*=========================================================
+    GENERAL HUD COMPONENTS
+=========================================================*/
+
+#player-stats,
+#compass-wrapper,
+#status-bars,
+#vehicle-hud {
+    position: absolute;
+}
+
+
+/*=========================================================
+    PLAYER DEFAULT POSITION
+=========================================================*/
+
+#player-stats {
+    left: 82%;
+    top: 2%;
+}
+
+
+/*=========================================================
+    COMPASS DEFAULT POSITION
+=========================================================*/
+
+#compass-wrapper {
+    left: 1.5%;
+    top: 64%;
+}
+
+
+/*=========================================================
+    STATUS DEFAULT POSITION
+=========================================================*/
+
+#status-bars {
+    left: 1.5%;
+    top: 88%;
+}
+
+
+/*=========================================================
+    VEHICLE DEFAULT POSITION
+=========================================================*/
+
+#vehicle-hud {
+    left: 82%;
+    top: 68%;
+}
+
+
+/*=========================================================
+    MINIMAP BORDER
+=========================================================*/
+
+#minimap-border {
+    position: absolute;
+
+    display: none;
+
+    pointer-events: none;
+
+    z-index: 100;
+
+    border:
+        1px solid
+        rgba(60, 150, 220, 0.34);
+
+    border-radius: 5px;
+
+    background:
+        transparent;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(255, 255, 255, 0.018),
+        0 0 10px
+        rgba(0, 0, 0, 0.20);
+
+    transition:
+        border-color 120ms ease,
+        box-shadow 120ms ease;
+
+    transform: translateZ(0);
+}
+
+
+/*=========================================================
+    HUD EDITOR MINIMAP BORDER
+
+    It is NOT draggable right now.
+
+    We simply make the real calculated radar boundary more
+    obvious while the editor is open.
+=========================================================*/
+
+body.hud-editing #minimap-border {
+    border:
+        1px dashed
+        rgba(223, 255, 69, 0.90);
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(223, 255, 69, 0.05),
+        0 0 12px
+        rgba(223, 255, 69, 0.12);
+}
+
+
+/*=========================================================
+    UTILITY
+=========================================================*/
 
 .hidden {
     display: none !important;
+}
+
+
+.visible {
+    display: block !important;
+}
+
+
+/*=========================================================
+    PREVENT NUI BACKGROUND
+=========================================================*/
+
+body::before,
+body::after,
+#hud::before,
+#hud::after {
+    pointer-events: none;
+}
+
+
+/*=========================================================
+    RESPONSIVE SAFETY
+=========================================================*/
+
+@media screen and (max-width: 1280px) {
+
+    #hud {
+        transform-origin:
+            top left;
+    }
+
 }

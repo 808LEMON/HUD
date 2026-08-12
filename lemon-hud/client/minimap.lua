@@ -1,10 +1,110 @@
 --=========================================================
 -- 808LEMON HUD
--- NATIVE GTA MINIMAP CONTROLLER
+-- SQUARE MINIMAP CONTROLLER
 --=========================================================
 
 local radarVisible = false
+
 local minimapScaleform = nil
+
+local squaremapLoaded = false
+local mapPatched = false
+
+local lastSafezone = nil
+local lastResolutionX = nil
+local lastResolutionY = nil
+
+--=========================================================
+-- DEBUG
+--=========================================================
+
+local function DebugPrint(message)
+
+    if Config.Debug then
+
+        print(
+            '[LEMON-HUD MINIMAP] '
+            .. tostring(message)
+        )
+
+    end
+
+end
+
+--=========================================================
+-- LOAD SQUAREMAP TEXTURE
+--=========================================================
+
+local function LoadSquaremap()
+
+    if squaremapLoaded then
+        return true
+    end
+
+    DebugPrint(
+        'Loading squaremap texture dictionary...'
+    )
+
+    RequestStreamedTextureDict(
+        'squaremap',
+        false
+    )
+
+    local waited = 0
+
+    while not HasStreamedTextureDictLoaded(
+        'squaremap'
+    ) do
+
+        Wait(100)
+
+        waited = waited + 100
+
+        if waited >= 5000 then
+
+            print(
+                '[LEMON-HUD] squaremap.ytd failed to load.'
+            )
+
+            return false
+
+        end
+
+    end
+
+    --=====================================================
+    -- FORCE SQUARE CLIP
+    --=====================================================
+
+    SetMinimapClipType(0)
+
+    --=====================================================
+    -- REPLACE GTA RADAR MASKS
+    --=====================================================
+
+    AddReplaceTexture(
+        'platform:/textures/graphics',
+        'radarmasksm',
+        'squaremap',
+        'radarmasksm'
+    )
+
+    AddReplaceTexture(
+        'platform:/textures/graphics',
+        'radarmask1g',
+        'squaremap',
+        'radarmasksm'
+    )
+
+    squaremapLoaded = true
+
+    DebugPrint(
+        'Squaremap texture loaded.'
+    )
+
+    return true
+
+end
 
 --=========================================================
 -- LOAD MINIMAP SCALEFORM
@@ -31,15 +131,14 @@ local function LoadMinimapScaleform()
         minimapScaleform
     ) do
 
-        if GetGameTimer() >
-            timeout
-        then
+        if GetGameTimer() > timeout then
 
             print(
                 '[LEMON-HUD] Failed to load minimap scaleform.'
             )
 
             return false
+
         end
 
         Wait(25)
@@ -47,10 +146,11 @@ local function LoadMinimapScaleform()
     end
 
     return true
+
 end
 
 --=========================================================
--- HIDE STOCK HEALTH / ARMOR
+-- HIDE DEFAULT GTA HEALTH / ARMOR
 --=========================================================
 
 local function HideDefaultHealthArmor()
@@ -69,10 +169,11 @@ local function HideDefaultHealthArmor()
     )
 
     EndScaleformMovieMethod()
+
 end
 
 --=========================================================
--- HIDE STOCK NORTH INDICATOR
+-- HIDE NORTH BLIP
 --=========================================================
 
 local function HideNorthRadarBlip()
@@ -89,13 +190,45 @@ local function HideNorthRadarBlip()
         )
 
     end
+
 end
 
 --=========================================================
--- APPLY MINIMAP COMPONENT POSITIONS
+-- ASPECT RATIO OFFSET
 --=========================================================
 
-local function ApplyMinimapPosition()
+local function GetBaseOffset()
+
+    local aspectRatio =
+        GetAspectRatio(false)
+
+    if aspectRatio >
+        (1920 / 1080)
+    then
+
+        return (
+            (
+                (1920 / 1080)
+                - aspectRatio
+            ) / 3.6
+        ) - 0.008,
+        aspectRatio
+
+    end
+
+    return 0.0,
+           aspectRatio
+
+end
+
+--=========================================================
+-- APPLY NATIVE COMPONENT POSITIONS
+--=========================================================
+
+local function ApplyComponentPositions()
+
+    local baseOffset =
+        GetBaseOffset()
 
     local map =
         Config.Minimap.Map
@@ -106,16 +239,10 @@ local function ApplyMinimapPosition()
     local blur =
         Config.Minimap.Blur
 
-    --=====================================================
-    -- SQUARE CLIP
-    --=====================================================
-
-    SetMinimapClipType(
-        0
-    )
+    SetMinimapClipType(0)
 
     --=====================================================
-    -- ACTUAL MAP FEED
+    -- MAP
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -123,7 +250,7 @@ local function ApplyMinimapPosition()
         'L',
         'B',
 
-        map.x,
+        map.x + baseOffset,
         map.y,
 
         map.width,
@@ -131,10 +258,7 @@ local function ApplyMinimapPosition()
     )
 
     --=====================================================
-    -- ICON / BLIP MASK
-    --
-    -- THIS IS CRITICAL.
-    -- Do NOT give this the same dimensions as the map.
+    -- MASK / PLAYER BLIPS
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -142,7 +266,7 @@ local function ApplyMinimapPosition()
         'L',
         'B',
 
-        mask.x,
+        mask.x + baseOffset,
         mask.y,
 
         mask.width,
@@ -150,7 +274,7 @@ local function ApplyMinimapPosition()
     )
 
     --=====================================================
-    -- BLUR / BACKING LAYER
+    -- BLUR
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -158,7 +282,7 @@ local function ApplyMinimapPosition()
         'L',
         'B',
 
-        blur.x,
+        blur.x + baseOffset,
         blur.y,
 
         blur.width,
@@ -168,63 +292,337 @@ local function ApplyMinimapPosition()
 end
 
 --=========================================================
--- REFRESH MAP
+-- CALCULATE TRUE MINIMAP SCREEN GEOMETRY
 --=========================================================
 
-local function RefreshRadar()
+local function CalculateMinimapGeometry()
 
-    SetRadarBigmapEnabled(
+    SetBigmapActive(
+        false,
+        false
+    )
+
+    local resX, resY =
+        GetActiveScreenResolution()
+
+    if not resX
+    or not resY
+    or resX <= 0
+    or resY <= 0
+    then
+
+        return nil
+
+    end
+
+    local baseOffset,
+          aspectRatio =
+        GetBaseOffset()
+
+    --=====================================================
+    -- FIND GTA MINIMAP ORIGIN
+    --=====================================================
+
+    SetScriptGfxAlign(
+        string.byte('L'),
+        string.byte('B')
+    )
+
+    local rawX, rawY =
+        GetScriptGfxPosition(
+            0.0,
+            -0.227888
+        )
+
+    ResetScriptGfxAlign()
+
+    --=====================================================
+    -- SAFEZONE INSET
+    --=====================================================
+
+    SetScriptGfxAlign(
+        string.byte('L'),
+        string.byte('T')
+    )
+
+    local safeX, safeY =
+        GetScriptGfxPosition(
+            0.0,
+            0.0
+        )
+
+    ResetScriptGfxAlign()
+
+    --=====================================================
+    -- CALCULATED RADAR SIZE
+    --
+    -- Same geometry method cx-hud uses.
+    --=====================================================
+
+    local width =
+        resX /
+        (
+            3.48
+            * aspectRatio
+        )
+
+    local height =
+        resY / 5.55
+
+    local left =
+        (
+            rawX
+            + baseOffset
+        ) * resX
+
+    local top =
+        rawY * resY
+
+    return {
+
+        left =
+            math.floor(
+                left + 0.5
+            ),
+
+        top =
+            math.floor(
+                top + 0.5
+            ),
+
+        width =
+            math.floor(
+                width + 0.5
+            ),
+
+        height =
+            math.floor(
+                height + 0.5
+            ),
+
+        insetX =
+            math.floor(
+                safeX
+                * resX
+                + 0.5
+            ),
+
+        insetY =
+            math.floor(
+                safeY
+                * resY
+                + 0.5
+            )
+
+    }
+
+end
+
+--=========================================================
+-- SEND BORDER GEOMETRY TO NUI
+--=========================================================
+
+local function UpdateMinimapBorder()
+
+    if not Config.MinimapBorder.enabled then
+
+        SendNUIMessage({
+            action = 'setMinimapBorder',
+            visible = false
+        })
+
+        return
+
+    end
+
+    local geo =
+        CalculateMinimapGeometry()
+
+    if not geo then
+        return
+    end
+
+    local padding =
+        Config.MinimapBorder.padding
+        or 0
+
+    SendNUIMessage({
+
+        action =
+            'setMinimapBorder',
+
+        visible =
+            true,
+
+        left =
+            geo.left - padding,
+
+        top =
+            geo.top - padding,
+
+        width =
+            geo.width
+            + (padding * 2),
+
+        height =
+            geo.height
+            + (padding * 2)
+
+    })
+
+end
+
+--=========================================================
+-- PATCH MINIMAP
+--=========================================================
+
+local function PatchMinimap()
+
+    if mapPatched then
+
+        UpdateMinimapBorder()
+
+        return
+
+    end
+
+    if not LoadSquaremap() then
+        return
+    end
+
+    ApplyComponentPositions()
+
+    HideNorthRadarBlip()
+
+    HideDefaultHealthArmor()
+
+    --=====================================================
+    -- FORCE GTA TO REFRESH THE RADAR
+    --=====================================================
+
+    SetBigmapActive(
         true,
         false
     )
 
-    Wait(50)
+    Wait(0)
 
-    SetRadarBigmapEnabled(
+    SetBigmapActive(
         false,
         false
+    )
+
+    mapPatched = true
+
+    Wait(50)
+
+    UpdateMinimapBorder()
+
+    DebugPrint(
+        'Minimap patched.'
     )
 
 end
 
 --=========================================================
--- INITIAL SETUP
+-- INITIALIZE
 --=========================================================
 
 CreateThread(function()
 
-    Wait(750)
+    Wait(1000)
 
-    LoadMinimapScaleform()
+    lastSafezone =
+        GetSafeZoneSize()
 
-    ApplyMinimapPosition()
+    lastResolutionX,
+    lastResolutionY =
+        GetActiveScreenResolution()
 
-    RefreshRadar()
-
-    Wait(100)
-
-    HideDefaultHealthArmor()
-
-    HideNorthRadarBlip()
+    PatchMinimap()
 
 end)
 
 --=========================================================
--- KEEP STOCK MINIMAP UI DISABLED
---
--- GTA or other resources can reinitialize this stuff,
--- so lightly reassert it.
+-- KEEP STOCK HUD ELEMENTS DISABLED
 --=========================================================
 
 CreateThread(function()
 
     while true do
 
-        HideDefaultHealthArmor()
-
         HideNorthRadarBlip()
 
+        HideDefaultHealthArmor()
+
         Wait(1000)
+
+    end
+
+end)
+
+--=========================================================
+-- WATCH SAFEZONE / RESOLUTION
+--=========================================================
+
+CreateThread(function()
+
+    while true do
+
+        Wait(2000)
+
+        local currentSafezone =
+            GetSafeZoneSize()
+
+        local currentResX,
+              currentResY =
+            GetActiveScreenResolution()
+
+        local needsRefresh =
+            false
+
+        if lastSafezone == nil
+        or math.abs(
+            currentSafezone
+            - lastSafezone
+        ) > 0.001
+        then
+
+            lastSafezone =
+                currentSafezone
+
+            needsRefresh =
+                true
+
+        end
+
+        if currentResX ~=
+            lastResolutionX
+        or currentResY ~=
+            lastResolutionY
+        then
+
+            lastResolutionX =
+                currentResX
+
+            lastResolutionY =
+                currentResY
+
+            needsRefresh =
+                true
+
+        end
+
+        if needsRefresh then
+
+            mapPatched =
+                false
+
+            Wait(100)
+
+            PatchMinimap()
+
+        end
 
     end
 
@@ -265,6 +663,16 @@ CreateThread(function()
                 radarVisible
             )
 
+            SendNUIMessage({
+
+                action =
+                    'setMinimapBorderVisible',
+
+                visible =
+                    radarVisible
+
+            })
+
         end
 
         Wait(250)
@@ -274,24 +682,19 @@ CreateThread(function()
 end)
 
 --=========================================================
--- PLAYER LOAD
+-- PLAYER LOADED
 --=========================================================
 
 RegisterNetEvent(
     'QBCore:Client:OnPlayerLoaded',
     function()
 
-        Wait(750)
+        Wait(1000)
 
-        ApplyMinimapPosition()
+        mapPatched =
+            false
 
-        RefreshRadar()
-
-        Wait(100)
-
-        HideDefaultHealthArmor()
-
-        HideNorthRadarBlip()
+        PatchMinimap()
 
     end
 )
@@ -304,43 +707,35 @@ RegisterNetEvent(
     'lemon-hud:client:refreshMinimap',
     function()
 
-        ApplyMinimapPosition()
+        mapPatched =
+            false
 
-        RefreshRadar()
-
-        Wait(50)
-
-        HideDefaultHealthArmor()
-
-        HideNorthRadarBlip()
+        PatchMinimap()
 
     end
 )
 
 --=========================================================
--- EXPORT
+-- EXPORTS
 --=========================================================
 
 exports(
     'RefreshMinimap',
     function()
 
-        ApplyMinimapPosition()
+        mapPatched =
+            false
 
-        RefreshRadar()
-
-        HideDefaultHealthArmor()
-
-        HideNorthRadarBlip()
+        PatchMinimap()
 
     end
 )
 
 exports(
-    'HideDefaultHealthArmor',
+    'GetMinimapGeometry',
     function()
 
-        HideDefaultHealthArmor()
+        return CalculateMinimapGeometry()
 
     end
 )
