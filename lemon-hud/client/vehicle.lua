@@ -2,8 +2,13 @@
 -- 808LEMON HUD
 -- VEHICLE HUD
 -- QBCORE / QB-FUEL
+-- GEAR SHIFT + HIGH SPEED EFFECTS
 --=========================================================
 
+
+--=========================================================
+-- VEHICLE HUD STATE
+--=========================================================
 
 local vehicleHudVisible = false
 
@@ -15,20 +20,89 @@ local nitrousActive = false
 
 local harnessHealth = 0
 
+
+--=========================================================
+-- ODOMETER STATE
+--=========================================================
+
 local currentOdometer = 0.0
+
 local lastCoords = nil
 local lastVehicle = 0
+
+
+--=========================================================
+-- GEAR EFFECT STATE
+--=========================================================
+
+local lastGear = 0
+
+local highSpeedEffectActive = false
+
+local currentEffectVehicle = 0
+
+
+--=========================================================
+-- EFFECT SETTINGS
+--=========================================================
+
+local GearEffects = {
+
+    -- 4TH GEAR SHIFT PUNCH
+
+    FourthGearShake = 0.35,
+
+
+    -- 5TH GEAR SHIFT PUNCH
+
+    FifthGearShake = 0.60,
+
+
+    -- CONTINUOUS HIGH SPEED SHAKE
+
+    HighSpeedShake = 0.30,
+
+
+    -- START EFFECT
+
+    HighSpeedMinimumMPH = 110.0,
+
+    HighSpeedMinimumKMH = 175.0,
+
+
+    -- SCREEN EFFECT
+
+    ScreenEffect = 'RaceTurbo',
+
+
+    -- TIMECYCLE
+
+    TimecycleModifier = 'MP_corona_switch',
+
+    TimecycleStrength = 0.30,
+
+
+    -- DEBUG GEAR CHANGES
+
+    Debug = false
+
+}
 
 
 --=========================================================
 -- HELPERS
 --=========================================================
 
-local function Clamp(value, minimum, maximum)
+local function Clamp(
+    value,
+    minimum,
+    maximum
+)
 
     value =
         tonumber(value)
         or minimum
+
 
     return math.max(
         minimum,
@@ -50,6 +124,7 @@ local function GetSpeed(vehicle)
     local speed =
         GetEntitySpeed(vehicle)
 
+
     if Config.UseMPH then
 
         return math.floor(
@@ -58,9 +133,32 @@ local function GetSpeed(vehicle)
 
     end
 
+
     return math.floor(
         speed * 3.6
     )
+
+end
+
+
+--=========================================================
+-- SPEED FLOAT
+--=========================================================
+
+local function GetSpeedFloat(vehicle)
+
+    local speed =
+        GetEntitySpeed(vehicle)
+
+
+    if Config.UseMPH then
+
+        return speed * 2.236936
+
+    end
+
+
+    return speed * 3.6
 
 end
 
@@ -74,6 +172,7 @@ local function GetRPM(vehicle)
     local rpm =
         GetVehicleCurrentRpm(vehicle)
 
+
     return Clamp(
         rpm,
         0.0,
@@ -84,13 +183,27 @@ end
 
 
 --=========================================================
--- GEAR
+-- RAW GEAR
+--=========================================================
+
+local function GetRawGear(vehicle)
+
+    return tonumber(
+        GetVehicleCurrentGear(vehicle)
+    ) or 0
+
+end
+
+
+--=========================================================
+-- DISPLAY GEAR
 --=========================================================
 
 local function GetGear(vehicle)
 
     local currentGear =
-        GetVehicleCurrentGear(vehicle)
+        GetRawGear(vehicle)
+
 
     local speed =
         GetEntitySpeed(vehicle)
@@ -103,6 +216,7 @@ local function GetGear(vehicle)
             return 'N'
 
         end
+
 
         return 'R'
 
@@ -126,7 +240,7 @@ local function GetFuel(vehicle)
 
 
     --=====================================================
-    -- QB-FUEL
+    -- QB-FUEL EXPORT
     --=====================================================
 
     if GetResourceState('qb-fuel') == 'started' then
@@ -145,10 +259,13 @@ local function GetFuel(vehicle)
 
 
         if success
-        and result ~= nil then
+        and result ~= nil
+        then
 
             fuel =
-                tonumber(result)
+                tonumber(
+                    result
+                )
 
         end
 
@@ -156,7 +273,7 @@ local function GetFuel(vehicle)
 
 
     --=====================================================
-    -- FALLBACK
+    -- NATIVE FALLBACK
     --=====================================================
 
     if fuel == nil then
@@ -187,7 +304,9 @@ end
 local function GetEngineHealth(vehicle)
 
     local health =
-        GetVehicleEngineHealth(vehicle)
+        GetVehicleEngineHealth(
+            vehicle
+        )
 
 
     health =
@@ -258,27 +377,46 @@ end
 local function UpdateOdometer(vehicle)
 
     local coords =
-        GetEntityCoords(vehicle)
+        GetEntityCoords(
+            vehicle
+        )
 
+
+    --=====================================================
+    -- NEW VEHICLE
+    --=====================================================
 
     if vehicle ~= lastVehicle then
 
         lastVehicle =
             vehicle
 
+
         lastCoords =
             coords
+
 
         return
 
     end
 
 
+    --=====================================================
+    -- DISTANCE
+    --=====================================================
+
     if lastCoords then
 
         local distance =
             #(coords - lastCoords)
 
+
+        /*
+            Ignore huge coordinate jumps.
+
+            Prevents teleports / vehicle changes from
+            adding fake mileage.
+        */
 
         if distance < 100.0 then
 
@@ -297,6 +435,10 @@ local function UpdateOdometer(vehicle)
 end
 
 
+--=========================================================
+-- DISPLAYED MILEAGE
+--=========================================================
+
 local function GetDisplayedMileage()
 
     if Config.UseMPH then
@@ -314,29 +456,308 @@ end
 
 
 --=========================================================
+-- FOURTH / FIFTH GEAR SHIFT PUNCH
+--=========================================================
+
+local function DoGearShiftPunch(gear)
+
+    --=====================================================
+    -- FOURTH
+    --=====================================================
+
+    if gear == 4 then
+
+        ShakeGameplayCam(
+            'JOLT_SHAKE',
+            GearEffects.FourthGearShake
+        )
+
+
+        /*
+            Briefly emphasize the shake.
+        */
+
+        SetGameplayCamShakeAmplitude(
+            GearEffects.FourthGearShake
+        )
+
+
+    --=====================================================
+    -- FIFTH+
+    --=====================================================
+
+    elseif gear >= 5 then
+
+        ShakeGameplayCam(
+            'JOLT_SHAKE',
+            GearEffects.FifthGearShake
+        )
+
+
+        SetGameplayCamShakeAmplitude(
+            GearEffects.FifthGearShake
+        )
+
+    end
+
+end
+
+
+--=========================================================
+-- START HIGH SPEED EFFECT
+--=========================================================
+
+local function StartHighSpeedEffect(vehicle)
+
+    if highSpeedEffectActive
+    and currentEffectVehicle == vehicle
+    then
+
+        return
+
+    end
+
+
+    highSpeedEffectActive =
+        true
+
+
+    currentEffectVehicle =
+        vehicle
+
+
+    --=====================================================
+    -- POST FX
+    --=====================================================
+
+    AnimpostfxPlay(
+        GearEffects.ScreenEffect,
+        0,
+        true
+    )
+
+
+    --=====================================================
+    -- TIMECYCLE
+    --=====================================================
+
+    SetTimecycleModifier(
+        GearEffects.TimecycleModifier
+    )
+
+
+    SetTimecycleModifierStrength(
+        GearEffects.TimecycleStrength
+    )
+
+
+    --=====================================================
+    -- CAMERA VIBRATION
+    --=====================================================
+
+    ShakeGameplayCam(
+        'VIBRATE_SHAKE',
+        GearEffects.HighSpeedShake
+    )
+
+
+    SetGameplayCamShakeAmplitude(
+        GearEffects.HighSpeedShake
+    )
+
+end
+
+
+--=========================================================
+-- STOP HIGH SPEED EFFECT
+--=========================================================
+
+local function StopHighSpeedEffect()
+
+    if not highSpeedEffectActive then
+
+        return
+
+    end
+
+
+    highSpeedEffectActive =
+        false
+
+
+    currentEffectVehicle =
+        0
+
+
+    --=====================================================
+    -- SCREEN EFFECT
+    --=====================================================
+
+    AnimpostfxStop(
+        GearEffects.ScreenEffect
+    )
+
+
+    --=====================================================
+    -- CAMERA
+    --=====================================================
+
+    StopGameplayCamShaking(
+        true
+    )
+
+
+    --=====================================================
+    -- TIMECYCLE
+    --=====================================================
+
+    ClearTimecycleModifier()
+
+end
+
+
+--=========================================================
+-- UPDATE GEAR EFFECTS
+--=========================================================
+
+local function UpdateGearEffects(vehicle)
+
+    local currentGear =
+        GetRawGear(
+            vehicle
+        )
+
+
+    local currentSpeed =
+        GetSpeedFloat(
+            vehicle
+        )
+
+
+    --=====================================================
+    -- DEBUG
+    --=====================================================
+
+    if GearEffects.Debug
+    and currentGear ~= lastGear
+    then
+
+        print(
+            '[808LEMON HUD] Gear:',
+            lastGear,
+            '->',
+            currentGear,
+            '| Speed:',
+            math.floor(
+                currentSpeed
+            )
+        )
+
+    end
+
+
+    --=====================================================
+    -- GEAR CHANGED
+    --=====================================================
+
+    if currentGear ~= lastGear then
+
+
+        --=================================================
+        -- ENTERING FOURTH
+        --=================================================
+
+        if currentGear == 4 then
+
+            DoGearShiftPunch(
+                4
+            )
+
+
+        --=================================================
+        -- ENTERING FIFTH OR HIGHER
+        --=================================================
+
+        elseif currentGear >= 5 then
+
+            DoGearShiftPunch(
+                currentGear
+            )
+
+        end
+
+
+        lastGear =
+            currentGear
+
+    end
+
+
+    --=====================================================
+    -- SPEED REQUIRED FOR HIGH SPEED FX
+    --=====================================================
+
+    local minimumSpeed =
+        Config.UseMPH
+        and GearEffects.HighSpeedMinimumMPH
+        or GearEffects.HighSpeedMinimumKMH
+
+
+    --=====================================================
+    -- HIGH SPEED MODE
+    --=====================================================
+
+    if currentGear >= 5
+    and currentSpeed >= minimumSpeed
+    then
+
+        StartHighSpeedEffect(
+            vehicle
+        )
+
+    else
+
+        StopHighSpeedEffect()
+
+    end
+
+end
+
+
+--=========================================================
 -- VEHICLE HUD UPDATE
 --=========================================================
 
 local function UpdateVehicleHud(vehicle)
 
-    UpdateOdometer(vehicle)
+    UpdateOdometer(
+        vehicle
+    )
 
 
     local lightsOn,
           highBeams =
-        GetLightState(vehicle)
+        GetLightState(
+            vehicle
+        )
 
 
     local fuel =
-        GetFuel(vehicle)
+        GetFuel(
+            vehicle
+        )
 
 
     local engineHealth =
-        GetEngineHealth(vehicle)
+        GetEngineHealth(
+            vehicle
+        )
 
 
     local rpm =
-        GetRPM(vehicle)
+        GetRPM(
+            vehicle
+        )
 
 
     SendNUIMessage({
@@ -353,7 +774,9 @@ local function UpdateVehicleHud(vehicle)
         --=================================================
 
         speed =
-            GetSpeed(vehicle),
+            GetSpeed(
+                vehicle
+            ),
 
         speedUnit =
             Config.UseMPH
@@ -364,7 +787,9 @@ local function UpdateVehicleHud(vehicle)
             rpm,
 
         gear =
-            GetGear(vehicle),
+            GetGear(
+                vehicle
+            ),
 
 
         --=================================================
@@ -378,7 +803,9 @@ local function UpdateVehicleHud(vehicle)
             engineHealth,
 
         engineRunning =
-            GetEngineRunning(vehicle),
+            GetEngineRunning(
+                vehicle
+            ),
 
 
         --=================================================
@@ -392,7 +819,9 @@ local function UpdateVehicleHud(vehicle)
             cruise,
 
         handbrake =
-            GetHandbrake(vehicle),
+            GetHandbrake(
+                vehicle
+            ),
 
 
         --=================================================
@@ -407,7 +836,7 @@ local function UpdateVehicleHud(vehicle)
 
 
         --=================================================
-        -- OTHER QB-HUD COMPATIBILITY
+        -- QB-HUD COMPATIBILITY
         --=================================================
 
         nitrous =
@@ -429,7 +858,7 @@ local function UpdateVehicleHud(vehicle)
 
 
         --=================================================
-        -- CONFIG VISIBILITY
+        -- CONFIG
         --=================================================
 
         showRPM =
@@ -462,7 +891,7 @@ end
 
 
 --=========================================================
--- SEATBELT COMPATIBILITY
+-- SEATBELT
 --=========================================================
 
 RegisterNetEvent(
@@ -510,7 +939,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- CRUISE COMPATIBILITY
+-- CRUISE
 --=========================================================
 
 RegisterNetEvent(
@@ -547,7 +976,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- NITROUS COMPATIBILITY
+-- NITROUS
 --=========================================================
 
 RegisterNetEvent(
@@ -555,7 +984,9 @@ RegisterNetEvent(
     function(level, active)
 
         nitrousLevel =
-            tonumber(level)
+            tonumber(
+                level
+            )
             or 0
 
 
@@ -567,7 +998,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- HARNESS COMPATIBILITY
+-- HARNESS
 --=========================================================
 
 RegisterNetEvent(
@@ -575,7 +1006,9 @@ RegisterNetEvent(
     function(health)
 
         harnessHealth =
-            tonumber(health)
+            tonumber(
+                health
+            )
             or 0
 
     end
@@ -583,7 +1016,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- VEHICLE THREAD
+-- MAIN VEHICLE THREAD
 --=========================================================
 
 CreateThread(function()
@@ -593,6 +1026,10 @@ CreateThread(function()
         local ped =
             PlayerPedId()
 
+
+        --=================================================
+        -- PLAYER IN VEHICLE
+        --=================================================
 
         if Config.VehicleHUD
         and IsPedInAnyVehicle(
@@ -608,11 +1045,49 @@ CreateThread(function()
                 )
 
 
-            if DoesEntityExist(vehicle) then
+            if DoesEntityExist(
+                vehicle
+            )
+            then
+
+
+                --=========================================
+                -- VEHICLE CHANGED
+                --=========================================
+
+                if lastVehicle ~= 0
+                and lastVehicle ~= vehicle
+                then
+
+                    lastGear =
+                        0
+
+
+                    StopHighSpeedEffect()
+
+                end
+
+
+                --=========================================
+                -- HUD
+                --=========================================
 
                 vehicleHudVisible =
                     true
 
+
+                --=========================================
+                -- EFFECTS
+                --=========================================
+
+                UpdateGearEffects(
+                    vehicle
+                )
+
+
+                --=========================================
+                -- HUD DATA
+                --=========================================
 
                 UpdateVehicleHud(
                     vehicle
@@ -626,11 +1101,42 @@ CreateThread(function()
 
             else
 
-                Wait(500)
+
+                StopHighSpeedEffect()
+
+
+                lastGear =
+                    0
+
+
+                Wait(
+                    500
+                )
 
             end
 
+
+        --=================================================
+        -- PLAYER OUTSIDE VEHICLE
+        --=================================================
+
         else
+
+
+            --=================================================
+            -- STOP EFFECTS
+            --=================================================
+
+            StopHighSpeedEffect()
+
+
+            lastGear =
+                0
+
+
+            --=================================================
+            -- HIDE HUD
+            --=================================================
 
             if vehicleHudVisible then
 
@@ -659,10 +1165,33 @@ CreateThread(function()
             end
 
 
-            Wait(400)
+            Wait(
+                400
+            )
 
         end
 
     end
 
 end)
+
+
+--=========================================================
+-- RESOURCE STOP CLEANUP
+--=========================================================
+
+AddEventHandler(
+    'onResourceStop',
+    function(resourceName)
+
+        if resourceName ~= GetCurrentResourceName() then
+
+            return
+
+        end
+
+
+        StopHighSpeedEffect()
+
+    end
+)
