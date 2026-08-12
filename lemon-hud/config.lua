@@ -75,25 +75,21 @@ Config.UpdateInterval = 250
 Config.VehicleUpdateInterval = 75
 Config.CompassUpdateInterval = 75
 
+
 --=========================================================
 -- HUD EDITOR
 --=========================================================
 
 Config.HudEditor = {}
 
-Config.HudEditor.Command = 'edithud'
-Config.HudEditor.ResetCommand = 'resethud'
+Config.HudEditor.Command =
+    'edithud'
 
-Config.HudEditor.KvpName = 'lemon_hud_layout'
+Config.HudEditor.ResetCommand =
+    'resethud'
 
--- These are percentages of the screen.
---
--- x = distance from LEFT
--- y = distance from TOP
---
--- These are only the STARTING/default positions.
--- Once you drag everything where you want it, we can
--- replace these with your final official layout.
+Config.HudEditor.KvpName =
+    'lemon_hud_layout'
 
 Config.HudEditor.DefaultLayout = {
 
@@ -108,12 +104,12 @@ Config.HudEditor.DefaultLayout = {
     },
 
     minimap = {
-        x = 1.55,
+        x = 1.5,
         y = 72.0
     },
 
     status = {
-        x = 1.55,
+        x = 1.5,
         y = 88.0
     },
 
@@ -121,28 +117,5 @@ Config.HudEditor.DefaultLayout = {
         x = 82.0,
         y = 68.0
     }
-
-}
-
---=========================================================
--- MINIMAP EDITOR CALIBRATION
---=========================================================
---
--- GTA's minimap is native, while the editor uses HTML.
---
--- These values describe where the minimap appears visually
--- when using the Config.Minimap native values above.
---
--- When you drag the minimap box, lemon-hud calculates the
--- movement difference and applies that same movement to
--- minimap, mask and blur.
-
-Config.HudEditor.MinimapReference = {
-
-    x = Config.HudEditor.DefaultLayout.minimap.x,
-    y = Config.HudEditor.DefaultLayout.minimap.y,
-
-    width = 14.2,
-    height = 15.0
 
 }

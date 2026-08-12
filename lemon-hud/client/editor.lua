@@ -4,39 +4,53 @@ local savedLayout = nil
 local workingLayout = nil
 
 --=========================================================
--- HELPERS
+-- COPY TABLE
 --=========================================================
 
-local function DeepCopy(original)
+local function DeepCopy(value)
 
-    if type(original) ~= 'table' then
-        return original
+    if type(value) ~= 'table' then
+        return value
     end
 
     local copy = {}
 
-    for key, value in pairs(original) do
+    for key, item in pairs(value) do
 
-        if type(value) == 'table' then
-            copy[key] = DeepCopy(value)
-        else
-            copy[key] = value
-        end
+        copy[key] =
+            DeepCopy(item)
 
     end
 
     return copy
 end
 
-local function Clamp(value, minimum, maximum)
+--=========================================================
+-- CLAMP
+--=========================================================
 
-    value = tonumber(value) or minimum
+local function Clamp(
+    value,
+    minimum,
+    maximum
+)
+
+    value =
+        tonumber(value)
+        or minimum
 
     return math.max(
         minimum,
-        math.min(maximum, value)
+        math.min(
+            maximum,
+            value
+        )
     )
 end
+
+--=========================================================
+-- SANITIZE
+--=========================================================
 
 local function SanitizeLayout(layout)
 
@@ -44,7 +58,11 @@ local function SanitizeLayout(layout)
         Config.HudEditor.DefaultLayout
 
     if type(layout) ~= 'table' then
-        return DeepCopy(defaults)
+
+        return DeepCopy(
+            defaults
+        )
+
     end
 
     local clean = {}
@@ -57,7 +75,9 @@ local function SanitizeLayout(layout)
         'minimap'
     }
 
-    for _, name in ipairs(components) do
+    for _, name in ipairs(
+        components
+    ) do
 
         local default =
             defaults[name]
@@ -70,17 +90,23 @@ local function SanitizeLayout(layout)
         end
 
         clean[name] = {
+
             x = Clamp(
-                incoming.x or default.x,
-                0.0,
-                100.0
+                incoming.x
+                or default.x,
+
+                -10,
+                100
             ),
 
             y = Clamp(
-                incoming.y or default.y,
-                0.0,
-                100.0
+                incoming.y
+                or default.y,
+
+                -10,
+                100
             )
+
         }
 
     end
@@ -89,7 +115,7 @@ local function SanitizeLayout(layout)
 end
 
 --=========================================================
--- MINIMAP
+-- NATIVE MINIMAP
 --=========================================================
 
 local function ApplyNativeMinimap(layout)
@@ -100,30 +126,49 @@ local function ApplyNativeMinimap(layout)
     end
 
     local defaults =
-        Config.HudEditor.DefaultLayout.minimap
+        Config.HudEditor
+            .DefaultLayout
+            .minimap
 
     local position =
         layout.minimap
 
     -------------------------------------------------------
-    -- Editor coordinates are percentages.
+    -- Browser coordinates:
     --
-    -- Convert movement from the default editor position
-    -- into GTA normalized HUD coordinates.
+    -- +X = right
+    -- +Y = down
+    --
+    -- Native minimap using "B":
+    --
+    -- +X = right
+    -- +Y behaves opposite vertically
     -------------------------------------------------------
 
     local deltaX =
-        (position.x - defaults.x) / 100.0
+        (
+            position.x -
+            defaults.x
+        ) / 100.0
 
     local deltaY =
-        (position.y - defaults.y) / 100.0
+        (
+            position.y -
+            defaults.y
+        ) / 100.0
+
+    local map =
+        Config.Minimap.Map
+
+    local mask =
+        Config.Minimap.Mask
+
+    local blur =
+        Config.Minimap.Blur
 
     -------------------------------------------------------
     -- MAP
     -------------------------------------------------------
-
-    local map =
-        Config.Minimap.Map
 
     SetMinimapComponentPosition(
         'minimap',
@@ -131,9 +176,6 @@ local function ApplyNativeMinimap(layout)
         'B',
 
         map.x + deltaX,
-
-        -- Native bottom anchoring works opposite to
-        -- browser top coordinates.
         map.y - deltaY,
 
         map.width,
@@ -143,9 +185,6 @@ local function ApplyNativeMinimap(layout)
     -------------------------------------------------------
     -- MASK
     -------------------------------------------------------
-
-    local mask =
-        Config.Minimap.Mask
 
     SetMinimapComponentPosition(
         'minimap_mask',
@@ -163,9 +202,6 @@ local function ApplyNativeMinimap(layout)
     -- BLUR
     -------------------------------------------------------
 
-    local blur =
-        Config.Minimap.Blur
-
     SetMinimapComponentPosition(
         'minimap_blur',
         'L',
@@ -179,6 +215,10 @@ local function ApplyNativeMinimap(layout)
     )
 end
 
+--=========================================================
+-- RADAR REFRESH
+--=========================================================
+
 local function RefreshRadar()
 
     SetRadarBigmapEnabled(
@@ -186,7 +226,7 @@ local function RefreshRadar()
         false
     )
 
-    Wait(40)
+    Wait(35)
 
     SetRadarBigmapEnabled(
         false,
@@ -201,18 +241,27 @@ end
 local function ApplyLayout(layout)
 
     layout =
-        SanitizeLayout(layout)
+        SanitizeLayout(
+            layout
+        )
 
     SendNUIMessage({
-        action = 'applyHudLayout',
-        layout = layout
+
+        action =
+            'applyHudLayout',
+
+        layout =
+            layout
+
     })
 
-    ApplyNativeMinimap(layout)
+    ApplyNativeMinimap(
+        layout
+    )
 end
 
 --=========================================================
--- LOAD
+-- LOAD SAVED
 --=========================================================
 
 local function LoadLayout()
@@ -227,10 +276,12 @@ local function LoadLayout()
 
         savedLayout =
             DeepCopy(
-                Config.HudEditor.DefaultLayout
+                Config.HudEditor
+                    .DefaultLayout
             )
 
         return savedLayout
+
     end
 
     local success, decoded =
@@ -244,14 +295,18 @@ local function LoadLayout()
 
         savedLayout =
             DeepCopy(
-                Config.HudEditor.DefaultLayout
+                Config.HudEditor
+                    .DefaultLayout
             )
 
         return savedLayout
+
     end
 
     savedLayout =
-        SanitizeLayout(decoded)
+        SanitizeLayout(
+            decoded
+        )
 
     return savedLayout
 end
@@ -263,18 +318,24 @@ end
 local function SaveLayout(layout)
 
     savedLayout =
-        SanitizeLayout(layout)
+        SanitizeLayout(
+            layout
+        )
 
     SetResourceKvp(
         Config.HudEditor.KvpName,
-        json.encode(savedLayout)
+        json.encode(
+            savedLayout
+        )
     )
 
-    ApplyLayout(savedLayout)
+    ApplyLayout(
+        savedLayout
+    )
 end
 
 --=========================================================
--- OPEN EDITOR
+-- OPEN
 --=========================================================
 
 local function OpenEditor()
@@ -284,66 +345,86 @@ local function OpenEditor()
     end
 
     if not savedLayout then
+
         LoadLayout()
+
     end
 
     workingLayout =
-        DeepCopy(savedLayout)
+        DeepCopy(
+            savedLayout
+        )
 
-    editorOpen = true
+    editorOpen =
+        true
 
     SetNuiFocus(
         true,
         true
     )
 
-    SetNuiFocusKeepInput(false)
+    SetNuiFocusKeepInput(
+        false
+    )
 
     SendNUIMessage({
-        action = 'openHudEditor',
 
-        layout = workingLayout,
+        action =
+            'openHudEditor',
+
+        layout =
+            workingLayout,
 
         defaults =
-            Config.HudEditor.DefaultLayout
+            Config.HudEditor
+                .DefaultLayout
+
     })
 end
 
 --=========================================================
--- CLOSE EDITOR
+-- CLOSE
 --=========================================================
 
-local function CloseEditor(restoreSaved)
+local function CloseEditor(
+    restoreSaved
+)
 
     if not editorOpen then
         return
     end
 
-    editorOpen = false
+    editorOpen =
+        false
 
     SetNuiFocus(
         false,
         false
     )
 
-    SetNuiFocusKeepInput(false)
+    SetNuiFocusKeepInput(
+        false
+    )
 
     if restoreSaved then
 
         ApplyLayout(
             savedLayout
-            or Config.HudEditor.DefaultLayout
+            or
+            Config.HudEditor
+                .DefaultLayout
         )
 
     end
 
     SendNUIMessage({
-        action = 'closeHudEditor'
+        action =
+            'closeHudEditor'
     })
 end
 
 --=========================================================
--- COMMANDS
+-- COMMAND
 --=========================================================
 
 RegisterCommand(
@@ -356,6 +437,10 @@ RegisterCommand(
     false
 )
 
+--=========================================================
+-- RESET COMMAND
+--=========================================================
+
 RegisterCommand(
     Config.HudEditor.ResetCommand,
     function()
@@ -366,20 +451,20 @@ RegisterCommand(
 
         savedLayout =
             DeepCopy(
-                Config.HudEditor.DefaultLayout
+                Config.HudEditor
+                    .DefaultLayout
             )
 
         workingLayout =
-            DeepCopy(savedLayout)
+            DeepCopy(
+                savedLayout
+            )
 
-        ApplyLayout(savedLayout)
+        ApplyLayout(
+            savedLayout
+        )
 
         RefreshRadar()
-
-        SendNUIMessage({
-            action = 'hudEditorReset',
-            layout = savedLayout
-        })
 
     end,
     false
@@ -407,11 +492,6 @@ RegisterNUICallback(
                 data.layout
             )
 
-        ---------------------------------------------------
-        -- Only the native minimap needs Lua-side preview.
-        -- Normal NUI elements move directly in JS.
-        ---------------------------------------------------
-
         ApplyNativeMinimap(
             workingLayout
         )
@@ -423,24 +503,25 @@ RegisterNUICallback(
 )
 
 --=========================================================
--- SAVE
+-- SAVE CALLBACK
 --=========================================================
 
 RegisterNUICallback(
     'saveHudLayout',
     function(data, cb)
 
-        local layout =
-            SanitizeLayout(
-                data.layout
-            )
-
-        SaveLayout(layout)
+        SaveLayout(
+            data.layout
+        )
 
         workingLayout =
-            DeepCopy(savedLayout)
+            DeepCopy(
+                savedLayout
+            )
 
-        CloseEditor(false)
+        CloseEditor(
+            false
+        )
 
         cb({
             success = true
@@ -449,7 +530,7 @@ RegisterNUICallback(
 )
 
 --=========================================================
--- RESET
+-- RESET CALLBACK
 --=========================================================
 
 RegisterNUICallback(
@@ -462,19 +543,29 @@ RegisterNUICallback(
 
         savedLayout =
             DeepCopy(
-                Config.HudEditor.DefaultLayout
+                Config.HudEditor
+                    .DefaultLayout
             )
 
         workingLayout =
-            DeepCopy(savedLayout)
+            DeepCopy(
+                savedLayout
+            )
 
-        ApplyLayout(savedLayout)
+        ApplyLayout(
+            savedLayout
+        )
 
         RefreshRadar()
 
         SendNUIMessage({
-            action = 'hudEditorReset',
-            layout = savedLayout
+
+            action =
+                'hudEditorReset',
+
+            layout =
+                savedLayout
+
         })
 
         cb({
@@ -492,7 +583,9 @@ RegisterNUICallback(
     'closeHudEditor',
     function(_, cb)
 
-        CloseEditor(true)
+        CloseEditor(
+            true
+        )
 
         cb({
             success = true
@@ -501,20 +594,7 @@ RegisterNUICallback(
 )
 
 --=========================================================
--- EXTERNAL OPEN EVENT
---=========================================================
-
-RegisterNetEvent(
-    'lemon-hud:client:openEditor',
-    function()
-
-        OpenEditor()
-
-    end
-)
-
---=========================================================
--- INITIAL LOAD
+-- LOAD ON RESOURCE START
 --=========================================================
 
 CreateThread(function()
@@ -523,9 +603,12 @@ CreateThread(function()
 
     LoadLayout()
 
-    ApplyLayout(savedLayout)
+    ApplyLayout(
+        savedLayout
+    )
 
-    Wait(150)
+    Wait(100)
 
     RefreshRadar()
+
 end)

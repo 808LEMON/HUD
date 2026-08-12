@@ -1,21 +1,18 @@
 local radarVisible = false
 
+local minimapScaleform = nil
+
+--=========================================================
+-- APPLY BASE MINIMAP
+--=========================================================
+
 local function ApplyBaseMinimapPosition()
 
-    local map =
-        Config.Minimap.Map
-
-    local mask =
-        Config.Minimap.Mask
-
-    local blur =
-        Config.Minimap.Blur
+    local map = Config.Minimap.Map
+    local mask = Config.Minimap.Mask
+    local blur = Config.Minimap.Blur
 
     SetMinimapClipType(0)
-
-    --=====================================================
-    -- MAP
-    --=====================================================
 
     SetMinimapComponentPosition(
         'minimap',
@@ -27,10 +24,6 @@ local function ApplyBaseMinimapPosition()
         map.height
     )
 
-    --=====================================================
-    -- MASK
-    --=====================================================
-
     SetMinimapComponentPosition(
         'minimap_mask',
         'L',
@@ -41,10 +34,6 @@ local function ApplyBaseMinimapPosition()
         mask.height
     )
 
-    --=====================================================
-    -- BLUR
-    --=====================================================
-
     SetMinimapComponentPosition(
         'minimap_blur',
         'L',
@@ -54,23 +43,50 @@ local function ApplyBaseMinimapPosition()
         blur.width,
         blur.height
     )
-
 end
+
+--=========================================================
+-- REFRESH RADAR
+--=========================================================
 
 local function RefreshRadar()
 
-    SetRadarBigmapEnabled(
-        true,
-        false
+    SetRadarBigmapEnabled(true, false)
+
+    Wait(50)
+
+    SetRadarBigmapEnabled(false, false)
+end
+
+--=========================================================
+-- REMOVE GTA HEALTH / ARMOR BARS
+--=========================================================
+
+local function HideDefaultHealthArmor()
+
+    if not minimapScaleform then
+
+        minimapScaleform =
+            RequestScaleformMovie('minimap')
+
+    end
+
+    if not HasScaleformMovieLoaded(
+        minimapScaleform
+    ) then
+        return
+    end
+
+    BeginScaleformMovieMethod(
+        minimapScaleform,
+        'SETUP_HEALTH_ARMOUR'
     )
 
-    Wait(75)
+    -- 3 removes GTA's stock health/armor bars
+    -- while leaving the radar itself active.
+    ScaleformMovieMethodAddParamInt(3)
 
-    SetRadarBigmapEnabled(
-        false,
-        false
-    )
-
+    EndScaleformMovieMethod()
 end
 
 --=========================================================
@@ -79,11 +95,42 @@ end
 
 CreateThread(function()
 
-    Wait(750)
+    minimapScaleform =
+        RequestScaleformMovie('minimap')
+
+    while not HasScaleformMovieLoaded(
+        minimapScaleform
+    ) do
+
+        Wait(50)
+
+    end
+
+    Wait(500)
 
     ApplyBaseMinimapPosition()
 
     RefreshRadar()
+
+    Wait(100)
+
+    HideDefaultHealthArmor()
+
+end)
+
+--=========================================================
+-- KEEP STOCK HEALTH/ARMOR DISABLED
+--=========================================================
+
+CreateThread(function()
+
+    while true do
+
+        HideDefaultHealthArmor()
+
+        Wait(1000)
+
+    end
 
 end)
 
@@ -129,16 +176,31 @@ CreateThread(function()
 end)
 
 --=========================================================
--- MANUAL REFRESH
+-- BASE RESET
 --=========================================================
 
 RegisterNetEvent(
-    'lemon-hud:client:refreshMinimap',
+    'lemon-hud:client:resetNativeMinimap',
     function()
 
         ApplyBaseMinimapPosition()
 
         RefreshRadar()
+
+        HideDefaultHealthArmor()
+
+    end
+)
+
+--=========================================================
+-- EXPORT
+--=========================================================
+
+exports(
+    'HideDefaultHealthArmor',
+    function()
+
+        HideDefaultHealthArmor()
 
     end
 )
