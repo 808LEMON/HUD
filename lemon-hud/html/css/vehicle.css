@@ -1,0 +1,407 @@
+#vehicle-hud {
+    position: absolute;
+
+    right: 1.75vw;
+    bottom: 2.25vh;
+
+    width: 280px;
+    height: 280px;
+
+    display: none;
+
+    color: white;
+
+    filter:
+        drop-shadow(
+            0 8px 20px rgba(0, 0, 0, 0.45)
+        );
+}
+
+
+/* =====================================================
+   MAIN GAUGE
+===================================================== */
+
+.gauge-shell {
+    position: relative;
+
+    width: 280px;
+    height: 280px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(5, 35, 49, 0.98) 0%,
+            rgba(4, 28, 42, 0.98) 52%,
+            rgba(5, 18, 29, 0.96) 74%,
+            rgba(4, 12, 20, 0.92) 100%
+        );
+
+    border:
+        1px solid rgba(90, 190, 235, 0.20);
+
+    box-shadow:
+        inset 0 0 32px rgba(30, 180, 235, 0.08),
+        0 0 24px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =====================================================
+   SVG RINGS
+===================================================== */
+
+.gauge-svg {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform:
+        rotate(135deg);
+}
+
+.gauge-svg circle {
+    fill: none;
+}
+
+.gauge-bg-ring {
+    stroke:
+        rgba(255, 255, 255, 0.09);
+
+    stroke-width: 8;
+
+    stroke-linecap: round;
+
+    stroke-dasharray:
+        593 199;
+}
+
+.gauge-progress {
+    stroke-width: 9;
+
+    stroke-linecap: round;
+
+    stroke-dasharray:
+        0 792;
+
+    transition:
+        stroke-dasharray 0.07s linear;
+}
+
+.rpm-ring {
+    stroke:
+        rgba(50, 200, 245, 0.95);
+
+    filter:
+        drop-shadow(
+            0 0 5px rgba(50, 200, 245, 0.35)
+        );
+}
+
+.gauge-inner-ring {
+    stroke:
+        rgba(255, 255, 255, 0.055);
+
+    stroke-width: 1;
+}
+
+
+/* =====================================================
+   RPM NUMBERS
+===================================================== */
+
+.rpm-number {
+    position: absolute;
+
+    color:
+        rgba(225, 238, 245, 0.88);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.n1  { left: 45px;  top: 205px; }
+.n2  { left: 29px;  top: 167px; }
+.n3  { left: 30px;  top: 124px; }
+.n4  { left: 48px;  top: 83px; }
+.n5  { left: 83px;  top: 52px; }
+.n6  { left: 128px; top: 39px; }
+.n7  { right: 82px; top: 52px; }
+.n8  { right: 46px; top: 84px; }
+.n9  { right: 29px; top: 125px; }
+.n10 { right: 29px; top: 169px; }
+
+
+/* =====================================================
+   CENTER
+===================================================== */
+
+.vehicle-center {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -47%);
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+.gear-circle {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 7px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(248, 251, 253, 0.96);
+
+    color:
+        rgba(6, 32, 45, 1);
+
+    font-size: 15px;
+    font-weight: 900;
+}
+
+
+#speed {
+    min-width: 100px;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 55px;
+
+    font-weight: 800;
+
+    line-height: 50px;
+
+    letter-spacing: -2px;
+}
+
+
+#speed-unit {
+    margin-top: 6px;
+
+    color:
+        rgba(170, 195, 210, 0.70);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.7px;
+}
+
+
+.rpm-label {
+    position: absolute;
+
+    left: 43px;
+    bottom: 69px;
+
+    transform:
+        rotate(62deg);
+
+    color:
+        rgba(150, 175, 190, 0.64);
+
+    font-size: 7px;
+    font-weight: 700;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =====================================================
+   SIDE METERS
+===================================================== */
+
+.side-meter {
+    position: absolute;
+
+    bottom: 52px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+}
+
+.fuel-meter {
+    left: 11px;
+}
+
+.engine-meter {
+    right: 11px;
+
+    flex-direction: row-reverse;
+}
+
+.side-meter-label {
+    color:
+        rgba(220, 235, 245, 0.88);
+
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.side-meter-track {
+    position: relative;
+
+    width: 7px;
+    height: 65px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.06);
+}
+
+.side-meter-fill {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    transition:
+        height 0.15s ease;
+}
+
+#fuel-fill {
+    background:
+        linear-gradient(
+            0deg,
+            #34aaff,
+            #74d8ff
+        );
+}
+
+#engine-fill {
+    background:
+        linear-gradient(
+            0deg,
+            #37d67a,
+            #8affaa
+        );
+}
+
+
+/* =====================================================
+   ICONS
+===================================================== */
+
+.vehicle-icons {
+    position: absolute;
+
+    top: 16px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    gap: 17px;
+}
+
+.vehicle-icon {
+    min-width: 15px;
+
+    text-align: center;
+
+    color:
+        rgba(165, 185, 200, 0.40);
+
+    font-size: 9px;
+    font-weight: 800;
+
+    transition:
+        color 0.15s ease,
+        text-shadow 0.15s ease;
+}
+
+.vehicle-icon.active {
+    color: white;
+
+    text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.35);
+}
+
+.vehicle-icon.warning {
+    color:
+        rgba(240, 85, 70, 0.92);
+}
+
+.vehicle-icon.warning.active {
+    color: #dfff45;
+
+    text-shadow:
+        0 0 7px rgba(223, 255, 69, 0.40);
+}
+
+
+/* =====================================================
+   MILEAGE
+===================================================== */
+
+.mileage {
+    position: absolute;
+
+    left: 50%;
+    bottom: 24px;
+
+    transform:
+        translateX(-50%);
+
+    min-width: 88px;
+
+    padding:
+        3px 7px;
+
+    text-align: center;
+
+    border-radius: 4px;
+
+    background:
+        rgba(3, 12, 18, 0.75);
+
+    color:
+        rgba(225, 235, 240, 0.86);
+
+    font-size: 9px;
+
+    font-family:
+        Consolas,
+        monospace;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}

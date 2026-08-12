@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>808Lemon HUD</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="css/compass.css">
+    <link rel="stylesheet" href="css/status.css">
+    <link rel="stylesheet" href="css/vehicle.css">
+
+</head>
+
+<body>
+
+<div id="hud">
+
+    <!--==================================================
+        PLAYER STATS
+    ===================================================-->
+
+    <div id="player-stats">
+
+        <div class="player-header">
+
+            <span>PLAYER STATS</span>
+
+            <div class="online-dot"></div>
+
+        </div>
+
+        <div class="player-row">
+
+            <div class="player-icon">
+                ID
+            </div>
+
+            <div class="player-content">
+
+                <span class="player-label">
+                    ID
+                </span>
+
+                <span id="player-id">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="player-row">
+
+            <div class="player-icon">
+                $
+            </div>
+
+            <div class="player-content">
+
+                <span class="player-label">
+                    Cash
+                </span>
+
+                <span id="player-cash">
+                    $0
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="player-row">
+
+            <div class="player-icon">
+                B
+            </div>
+
+            <div class="player-content">
+
+                <span class="player-label">
+                    Bank
+                </span>
+
+                <span id="player-bank">
+                    $0
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="player-row">
+
+            <div class="player-icon">
+                J
+            </div>
+
+            <div class="player-content">
+
+                <span class="player-label">
+                    Job
+                </span>
+
+                <span id="player-job">
+                    Unemployed
+                </span>
+
+                <span id="player-grade"></span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!--==================================================
+        COMPASS
+    ===================================================-->
+
+    <div id="compass-wrapper">
+
+        <div class="compass-top">
+
+            <div class="direction-pill">
+
+                <span id="compass-direction">
+                    N
+                </span>
+
+            </div>
+
+            <div class="compass-tape">
+
+                <div id="compass-label-left">
+                    NW
+                </div>
+
+                <div class="compass-center">
+
+                    <div class="compass-arrow"></div>
+
+                    <span id="compass-heading">
+                        000°
+                    </span>
+
+                </div>
+
+                <div id="compass-label-right">
+                    NE
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="street-wrapper">
+
+            <div id="street-name">
+                UNKNOWN ROAD
+            </div>
+
+            <div id="crossing-name"></div>
+
+        </div>
+
+    </div>
+
+
+    <!--==================================================
+        STATUS
+    ===================================================-->
+
+    <div id="status-bars">
+
+        <div
+            id="health-row"
+            class="status-row"
+        >
+
+            <div class="status-icon health-icon">
+                ♥
+            </div>
+
+            <div class="status-track">
+
+                <div
+                    id="health-fill"
+                    class="status-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="armor-row"
+            class="status-row"
+        >
+
+            <div class="status-icon armor-icon">
+                ◆
+            </div>
+
+            <div class="status-track">
+
+                <div
+                    id="armor-fill"
+                    class="status-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="hunger-row"
+            class="status-row"
+        >
+
+            <div class="status-icon hunger-icon">
+                ●
+            </div>
+
+            <div class="status-track">
+
+                <div
+                    id="hunger-fill"
+                    class="status-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="thirst-row"
+            class="status-row"
+        >
+
+            <div class="status-icon thirst-icon">
+                ▼
+            </div>
+
+            <div class="status-track">
+
+                <div
+                    id="thirst-fill"
+                    class="status-fill"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!--==================================================
+        VEHICLE HUD
+    ===================================================-->
+
+    <div id="vehicle-hud">
+
+        <div class="gauge-shell">
+
+            <svg
+                class="gauge-svg"
+                viewBox="0 0 300 300"
+            >
+
+                <circle
+                    class="gauge-bg-ring"
+                    cx="150"
+                    cy="150"
+                    r="126"
+                />
+
+                <circle
+                    id="rpm-ring"
+                    class="gauge-progress rpm-ring"
+                    cx="150"
+                    cy="150"
+                    r="126"
+                />
+
+                <circle
+                    class="gauge-inner-ring"
+                    cx="150"
+                    cy="150"
+                    r="105"
+                />
+
+            </svg>
+
+
+            <div class="rpm-scale">
+
+                <span class="rpm-number n1">1</span>
+                <span class="rpm-number n2">2</span>
+                <span class="rpm-number n3">3</span>
+                <span class="rpm-number n4">4</span>
+                <span class="rpm-number n5">5</span>
+                <span class="rpm-number n6">6</span>
+                <span class="rpm-number n7">7</span>
+                <span class="rpm-number n8">8</span>
+                <span class="rpm-number n9">9</span>
+                <span class="rpm-number n10">10</span>
+
+            </div>
+
+
+            <div class="vehicle-center">
+
+                <div
+                    id="gear"
+                    class="gear-circle"
+                >
+                    N
+                </div>
+
+                <div id="speed">
+                    0
+                </div>
+
+                <div id="speed-unit">
+                    MPH
+                </div>
+
+            </div>
+
+
+            <div class="rpm-label">
+                x1000 RPM
+            </div>
+
+
+            <div class="vehicle-icons">
+
+                <div
+                    id="headlight-icon"
+                    class="vehicle-icon"
+                >
+                    ◉
+                </div>
+
+                <div
+                    id="seatbelt-icon"
+                    class="vehicle-icon warning"
+                >
+                    ▰
+                </div>
+
+                <div
+                    id="cruise-icon"
+                    class="vehicle-icon"
+                >
+                    C
+                </div>
+
+            </div>
+
+
+            <div class="side-meter fuel-meter">
+
+                <div class="side-meter-label">
+                    F
+                </div>
+
+                <div class="side-meter-track">
+
+                    <div
+                        id="fuel-fill"
+                        class="side-meter-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="side-meter engine-meter">
+
+                <div class="side-meter-label">
+                    E
+                </div>
+
+                <div class="side-meter-track">
+
+                    <div
+                        id="engine-fill"
+                        class="side-meter-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="mileage"
+                class="mileage"
+            >
+                000000 MI
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/app.js"></script>
+
+</body>
+
+</html>

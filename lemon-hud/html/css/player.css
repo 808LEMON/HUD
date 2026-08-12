@@ -1,0 +1,177 @@
+#player-stats {
+    position: absolute;
+
+    top: 2.15vh;
+    right: 1.7vw;
+
+    width: 16.25vw;
+
+    min-width: 250px;
+    max-width: 320px;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(5, 13, 22, 0.94),
+            rgba(8, 20, 32, 0.86)
+        );
+
+    border:
+        1px solid rgba(50, 135, 215, 0.23);
+
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.35),
+        inset 0 0 20px rgba(35, 110, 180, 0.035);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.player-header {
+
+    height: 24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding:
+        0 2px 6px 2px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.25px;
+
+    color:
+        rgba(205, 220, 235, 0.78);
+}
+
+.online-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #dfff45;
+
+    box-shadow:
+        0 0 8px rgba(223, 255, 69, 0.75);
+}
+
+/* =========================================
+   ROW
+========================================= */
+
+.player-row {
+
+    display: flex;
+
+    align-items: center;
+
+    min-height: 39px;
+
+    padding:
+        4px 2px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.045);
+}
+
+/* =========================================
+   ICON
+========================================= */
+
+.player-icon {
+
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 9px;
+
+    border-radius: 6px;
+
+    background:
+        rgba(25, 95, 170, 0.19);
+
+    border:
+        1px solid rgba(50, 135, 220, 0.23);
+
+    color:
+        #8ecbff;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+/* =========================================
+   TEXT
+========================================= */
+
+.player-content {
+
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.player-label {
+
+    margin-bottom: 1px;
+
+    font-size: 8px;
+
+    font-weight: 500;
+
+    color:
+        rgba(155, 178, 200, 0.65);
+}
+
+.player-content > span:not(.player-label) {
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    font-size: 12px;
+
+    font-weight: 650;
+
+    color:
+        rgba(248, 250, 252, 0.96);
+}
+
+#player-grade {
+
+    margin-top: 1px;
+
+    font-size: 9px;
+
+    font-weight: 500;
+
+    color:
+        rgba(165, 185, 205, 0.70);
+}
