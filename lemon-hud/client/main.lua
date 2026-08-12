@@ -2,20 +2,33 @@ local QBCore =
     exports['qb-core']:GetCoreObject()
 
 
+--=========================================================
+-- PLAYER DATA
+--=========================================================
+
 local PlayerData = {}
 
-local hudVisible =
-    true
+
+--=========================================================
+-- HUD SESSION STATE
+--=========================================================
+
+local hudVisible = false
+
+local characterLoaded = false
+
+local spawnFinished = false
 
 
-local hunger =
-    100
+--=========================================================
+-- STATUS VALUES
+--=========================================================
 
-local thirst =
-    100
+local hunger = 100
 
-local stress =
-    0
+local thirst = 100
+
+local stress = 0
 
 
 --=========================================================
@@ -48,9 +61,51 @@ local function Clamp(
 end
 
 
+--=========================================================
+-- NUI
+--=========================================================
+
 local function SendHudMessage(data)
 
-    SendNUIMessage(data)
+    SendNUIMessage(
+        data
+    )
+
+end
+
+
+--=========================================================
+-- VISIBILITY
+--=========================================================
+
+local function SetHudVisible(state)
+
+    hudVisible =
+        state == true
+
+
+    SendHudMessage({
+
+        action =
+            'setVisible',
+
+        visible =
+            hudVisible
+
+    })
+
+end
+
+
+--=========================================================
+-- HUD READY CHECK
+--=========================================================
+
+local function CanShowHud()
+
+    return
+        characterLoaded
+        and spawnFinished
 
 end
 
@@ -85,6 +140,10 @@ local function RefreshPlayerData()
     if PlayerData.metadata then
 
 
+        --=================================================
+        -- HUNGER
+        --=================================================
+
         if PlayerData.metadata['hunger'] ~= nil then
 
             hunger =
@@ -96,6 +155,10 @@ local function RefreshPlayerData()
         end
 
 
+        --=================================================
+        -- THIRST
+        --=================================================
+
         if PlayerData.metadata['thirst'] ~= nil then
 
             thirst =
@@ -106,6 +169,10 @@ local function RefreshPlayerData()
 
         end
 
+
+        --=================================================
+        -- STRESS
+        --=================================================
 
         if PlayerData.metadata['stress'] ~= nil then
 
@@ -167,7 +234,7 @@ end
 
 
 --=========================================================
--- GET STATUS VALUES
+-- STATUS VALUES
 --=========================================================
 
 local function GetStatusValues()
@@ -192,11 +259,15 @@ local function GetStatusValues()
     --=====================================================
 
     local rawHealth =
-        GetEntityHealth(ped)
+        GetEntityHealth(
+            ped
+        )
 
 
     local rawMaxHealth =
-        GetEntityMaxHealth(ped)
+        GetEntityMaxHealth(
+            ped
+        )
 
 
     local usableHealth =
@@ -217,10 +288,9 @@ local function GetStatusValues()
 
     local health =
         (
-            usableHealth
-            / usableMaxHealth
-        )
-        * 100
+            usableHealth /
+            usableMaxHealth
+        ) * 100
 
 
     health =
@@ -240,7 +310,9 @@ local function GetStatusValues()
     local armor =
         math.floor(
             Clamp(
-                GetPedArmour(ped),
+                GetPedArmour(
+                    ped
+                ),
                 0,
                 100
             )
@@ -285,12 +357,17 @@ end
 
 
 --=========================================================
--- SEND PLAYER INFORMATION
+-- PLAYER INFORMATION
 --=========================================================
 
 local function SendPlayerInformation()
 
     if not hudVisible then
+        return
+    end
+
+
+    if not CanShowHud() then
         return
     end
 
@@ -303,12 +380,9 @@ local function SendPlayerInformation()
         GetPlayerJob()
 
 
-    local cash =
-        0
+    local cash = 0
 
-
-    local bank =
-        0
+    local bank = 0
 
 
     if PlayerData.money then
@@ -360,12 +434,17 @@ end
 
 
 --=========================================================
--- SEND STATUS INFORMATION
+-- STATUS INFORMATION
 --=========================================================
 
 local function SendStatusInformation()
 
     if not hudVisible then
+        return
+    end
+
+
+    if not CanShowHud() then
         return
     end
 
@@ -415,12 +494,17 @@ end
 
 
 --=========================================================
--- UPDATE HUD
+-- FULL HUD UPDATE
 --=========================================================
 
 local function UpdateHud()
 
     if not hudVisible then
+        return
+    end
+
+
+    if not CanShowHud() then
         return
     end
 
@@ -433,32 +517,72 @@ end
 
 
 --=========================================================
--- PLAYER LOADED
+-- CHARACTER LOADED
 --=========================================================
 
 RegisterNetEvent(
     'QBCore:Client:OnPlayerLoaded',
     function()
 
-        RefreshPlayerData()
-
-
-        hudVisible =
+        characterLoaded =
             true
 
 
-        SendHudMessage({
-
-            action =
-                'setVisible',
-
-            visible =
-                true
-
-        })
+        spawnFinished =
+            false
 
 
-        Wait(250)
+        RefreshPlayerData()
+
+
+        --=================================================
+        -- IMPORTANT
+        -- KEEP HUD HIDDEN DURING QB-SPAWN
+        --=================================================
+
+        SetHudVisible(
+            false
+        )
+
+    end
+)
+
+
+--=========================================================
+-- QB-SPAWN FINISHED
+--=========================================================
+
+RegisterNetEvent(
+    'lemon-hud:client:spawnFinished',
+    function()
+
+        if not characterLoaded then
+            return
+        end
+
+
+        spawnFinished =
+            true
+
+
+        RefreshPlayerData()
+
+
+        -- Small delay so qb-spawn can finish fading/cameras
+
+        Wait(
+            150
+        )
+
+
+        SetHudVisible(
+            true
+        )
+
+
+        Wait(
+            100
+        )
 
 
         UpdateHud()
@@ -468,7 +592,7 @@ RegisterNetEvent(
 
 
 --=========================================================
--- PLAYER UNLOADED
+-- PLAYER UNLOAD
 --=========================================================
 
 RegisterNetEvent(
@@ -478,26 +602,24 @@ RegisterNetEvent(
         PlayerData = {}
 
 
-        hudVisible =
+        characterLoaded =
             false
 
 
-        SendHudMessage({
+        spawnFinished =
+            false
 
-            action =
-                'setVisible',
 
-            visible =
-                false
-
-        })
+        SetHudVisible(
+            false
+        )
 
     end
 )
 
 
 --=========================================================
--- QBCORE PLAYER DATA UPDATE
+-- PLAYER DATA UPDATE
 --=========================================================
 
 RegisterNetEvent(
@@ -547,9 +669,13 @@ RegisterNetEvent(
         end
 
 
-        SendPlayerInformation()
+        if hudVisible
+        and CanShowHud()
+        then
 
-        SendStatusInformation()
+            UpdateHud()
+
+        end
 
     end
 )
@@ -567,14 +693,90 @@ RegisterNetEvent(
             job
 
 
-        SendPlayerInformation()
+        if hudVisible
+        and CanShowHud()
+        then
+
+            SendPlayerInformation()
+
+        end
 
     end
 )
 
 
 --=========================================================
--- QB-HUD MONEY CHANGE COMPATIBILITY
+-- NEEDS COMPATIBILITY
+--=========================================================
+
+RegisterNetEvent(
+    'hud:client:UpdateNeeds',
+    function(
+        newHunger,
+        newThirst
+    )
+
+        if newHunger ~= nil then
+
+            hunger =
+                Clamp(
+                    newHunger,
+                    0,
+                    100
+                )
+
+        end
+
+
+        if newThirst ~= nil then
+
+            thirst =
+                Clamp(
+                    newThirst,
+                    0,
+                    100
+                )
+
+        end
+
+
+        if hudVisible
+        and CanShowHud()
+        then
+
+            SendStatusInformation()
+
+        end
+
+    end
+)
+
+
+--=========================================================
+-- STRESS COMPATIBILITY
+--=========================================================
+
+RegisterNetEvent(
+    'hud:client:UpdateStress',
+    function(newStress)
+
+        if newStress ~= nil then
+
+            stress =
+                Clamp(
+                    newStress,
+                    0,
+                    100
+                )
+
+        end
+
+    end
+)
+
+
+--=========================================================
+-- MONEY CHANGE COMPATIBILITY
 --=========================================================
 
 RegisterNetEvent(
@@ -585,23 +787,26 @@ RegisterNetEvent(
         isMinus
     )
 
-        /*
-            Give QBCore a moment to update the local
-            PlayerData table before reading it again.
-        */
-
-        Wait(50)
+        Wait(
+            50
+        )
 
 
         RefreshPlayerData()
 
 
-        local cash =
-            0
+        if not hudVisible
+        or not CanShowHud()
+        then
+
+            return
+
+        end
 
 
-        local bank =
-            0
+        local cash = 0
+
+        local bank = 0
 
 
         if PlayerData.money then
@@ -646,11 +851,6 @@ RegisterNetEvent(
         })
 
 
-        /*
-            Also send the normal player update so our UI
-            can never get stuck on an old value.
-        */
-
         SendPlayerInformation()
 
     end
@@ -658,81 +858,21 @@ RegisterNetEvent(
 
 
 --=========================================================
--- OPTIONAL QB-HUD ACCOUNT DISPLAY COMPATIBILITY
+-- SHOW ACCOUNTS COMPATIBILITY
 --=========================================================
 
 RegisterNetEvent(
     'hud:client:ShowAccounts',
-    function(
-        moneyType,
-        amount
-    )
+    function()
 
         RefreshPlayerData()
 
-        SendPlayerInformation()
 
-    end
-)
+        if hudVisible
+        and CanShowHud()
+        then
 
-
---=========================================================
--- NEEDS
---=========================================================
-
-RegisterNetEvent(
-    'hud:client:UpdateNeeds',
-    function(
-        newHunger,
-        newThirst
-    )
-
-        if newHunger ~= nil then
-
-            hunger =
-                Clamp(
-                    newHunger,
-                    0,
-                    100
-                )
-
-        end
-
-
-        if newThirst ~= nil then
-
-            thirst =
-                Clamp(
-                    newThirst,
-                    0,
-                    100
-                )
-
-        end
-
-
-        SendStatusInformation()
-
-    end
-)
-
-
---=========================================================
--- STRESS
---=========================================================
-
-RegisterNetEvent(
-    'hud:client:UpdateStress',
-    function(newStress)
-
-        if newStress ~= nil then
-
-            stress =
-                Clamp(
-                    newStress,
-                    0,
-                    100
-                )
+            SendPlayerInformation()
 
         end
 
@@ -748,24 +888,34 @@ RegisterNetEvent(
     'lemon-hud:client:setVisible',
     function(state)
 
-        hudVisible =
-            state == true
+        if state == true then
 
 
-        SendHudMessage({
+            if not CanShowHud() then
 
-            action =
-                'setVisible',
+                SetHudVisible(
+                    false
+                )
 
-            visible =
-                hudVisible
+                return
 
-        })
+            end
 
 
-        if hudVisible then
+            SetHudVisible(
+                true
+            )
+
 
             UpdateHud()
+
+
+        else
+
+
+            SetHudVisible(
+                false
+            )
 
         end
 
@@ -808,7 +958,13 @@ RegisterNetEvent(
         end
 
 
-        SendStatusInformation()
+        if hudVisible
+        and CanShowHud()
+        then
+
+            SendStatusInformation()
+
+        end
 
     end
 )
@@ -838,26 +994,62 @@ RegisterNetEvent(
 
 
 --=========================================================
--- MAIN LOOP
+-- INITIAL RESOURCE START
 --=========================================================
 
 CreateThread(function()
 
-    Wait(1000)
+    -- Give NUI enough time to initialize.
+
+    Wait(
+        250
+    )
 
 
-    RefreshPlayerData()
+    --=====================================================
+    -- ALWAYS START HIDDEN
+    --=====================================================
 
+    SetHudVisible(
+        false
+    )
+
+end)
+
+
+--=========================================================
+-- MAIN HUD LOOP
+--=========================================================
+
+CreateThread(function()
 
     while true do
 
-        UpdateHud()
+
+        if hudVisible
+        and CanShowHud()
+        then
+
+            RefreshPlayerData()
 
 
-        Wait(
-            Config.UpdateInterval
-            or 250
-        )
+            UpdateHud()
+
+
+            Wait(
+                Config.UpdateInterval
+                or 250
+            )
+
+
+        else
+
+
+            Wait(
+                500
+            )
+
+        end
 
     end
 
