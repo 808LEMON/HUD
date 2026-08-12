@@ -15,13 +15,12 @@ const editorState = {
     dragOffsetX: 0,
     dragOffsetY: 0,
 
-    lastMouseX: 0,
-    lastMouseY: 0,
+    minimapFrameWidth: 12.30,
+    minimapFrameHeight: 10.85,
 
-    minimapBusy: false,
+    minimapRequestBusy: false,
+    queuedMinimapPosition: null
 
-    queuedMinimapDX: 0,
-    queuedMinimapDY: 0
 }
 
 
@@ -83,7 +82,7 @@ const editableComponents = {
 
 
 //=========================================================
-// MINIMAP FRAME
+// MINIMAP
 //=========================================================
 
 const minimapFrame =
@@ -93,7 +92,7 @@ const minimapFrame =
 
 
 //=========================================================
-// EDITOR CONTROLS
+// CONTROLS
 //=========================================================
 
 const saveButton =
@@ -134,6 +133,7 @@ function clamp(
         ),
         maximum
     )
+
 }
 
 
@@ -142,6 +142,7 @@ function cloneLayout(layout) {
     return JSON.parse(
         JSON.stringify(layout)
     )
+
 }
 
 
@@ -157,6 +158,7 @@ function getResourceName() {
     }
 
     return 'lemon-hud'
+
 }
 
 
@@ -169,14 +171,11 @@ function nuiPost(
         `https://${getResourceName()}/${callback}`,
         {
 
-            method:
-                'POST',
+            method: 'POST',
 
             headers: {
-
                 'Content-Type':
                     'application/json; charset=UTF-8'
-
             },
 
             body:
@@ -184,11 +183,12 @@ function nuiPost(
 
         }
     )
+
 }
 
 
 //=========================================================
-// NORMAL COMPONENT POSITION
+// APPLY STANDARD COMPONENT
 //=========================================================
 
 function applyComponentPosition(
@@ -221,11 +221,48 @@ function applyComponentPosition(
 
     element.style.bottom =
         'auto'
+
 }
 
 
 //=========================================================
-// APPLY LAYOUT
+// APPLY MINIMAP FRAME
+//=========================================================
+
+function applyMinimapFrame(
+    position
+) {
+
+    if (
+        !minimapFrame ||
+        !position
+    ) {
+        return
+    }
+
+    minimapFrame.style.left =
+        `${position.x}%`
+
+    minimapFrame.style.top =
+        `${position.y}%`
+
+    minimapFrame.style.width =
+        `${editorState.minimapFrameWidth}vw`
+
+    minimapFrame.style.height =
+        `${editorState.minimapFrameHeight}vh`
+
+    minimapFrame.style.right =
+        'auto'
+
+    minimapFrame.style.bottom =
+        'auto'
+
+}
+
+
+//=========================================================
+// APPLY FULL NUI LAYOUT
 //=========================================================
 
 function applyLayout(layout) {
@@ -250,11 +287,22 @@ function applyLayout(layout) {
 
         }
     )
+
+    if (
+        layout.minimap
+    ) {
+
+        applyMinimapFrame(
+            layout.minimap
+        )
+
+    }
+
 }
 
 
 //=========================================================
-// EDITABLE DECORATION
+// EDIT DECORATIONS
 //=========================================================
 
 function prepareEditableElements() {
@@ -286,6 +334,7 @@ function prepareEditableElements() {
 
         }
     )
+
 }
 
 
@@ -308,11 +357,12 @@ function removeEditableElements() {
 
         }
     )
+
 }
 
 
 //=========================================================
-// NORMAL DRAG START
+// START NORMAL DRAG
 //=========================================================
 
 function startNormalDrag(
@@ -357,11 +407,12 @@ function startNormalDrag(
             `MOVING ${component.label}`
 
     }
+
 }
 
 
 //=========================================================
-// MINIMAP DRAG START
+// START MINIMAP DRAG
 //=========================================================
 
 function startMinimapDrag(event) {
@@ -376,20 +427,20 @@ function startMinimapDrag(event) {
     event.preventDefault()
     event.stopPropagation()
 
+    const rect =
+        minimapFrame
+            .getBoundingClientRect()
+
     editorState.dragging =
         'minimap'
 
-    editorState.lastMouseX =
-        event.clientX
+    editorState.dragOffsetX =
+        event.clientX -
+        rect.left
 
-    editorState.lastMouseY =
-        event.clientY
-
-    editorState.queuedMinimapDX =
-        0
-
-    editorState.queuedMinimapDY =
-        0
+    editorState.dragOffsetY =
+        event.clientY -
+        rect.top
 
     minimapFrame
         .classList
@@ -403,51 +454,50 @@ function startMinimapDrag(event) {
             'MOVING MINIMAP'
 
     }
+
 }
 
 
 //=========================================================
-// SEND MINIMAP DELTAS
+// SEND ABSOLUTE MINIMAP POSITION
 //=========================================================
 
-async function flushMinimapMovement() {
+async function flushMinimapPosition() {
 
     if (
-        editorState.minimapBusy
+        editorState.minimapRequestBusy
     ) {
         return
     }
 
     if (
-        editorState.queuedMinimapDX === 0 &&
-        editorState.queuedMinimapDY === 0
+        !editorState.queuedMinimapPosition
     ) {
         return
     }
 
-    editorState.minimapBusy =
+    editorState.minimapRequestBusy =
         true
 
-    const dx =
-        editorState.queuedMinimapDX
+    const position =
+        editorState.queuedMinimapPosition
 
-    const dy =
-        editorState.queuedMinimapDY
-
-    editorState.queuedMinimapDX =
-        0
-
-    editorState.queuedMinimapDY =
-        0
+    editorState.queuedMinimapPosition =
+        null
 
     try {
 
         const response =
             await nuiPost(
-                'moveMinimap',
+                'setMinimapPosition',
                 {
-                    dx,
-                    dy
+
+                    x:
+                        position.x,
+
+                    y:
+                        position.y
+
                 }
             )
 
@@ -459,45 +509,13 @@ async function flushMinimapMovement() {
             result.success
         ) {
 
-            if (!editorState.layout.minimap) {
+            editorState.layout.minimap = {
 
-                editorState.layout.minimap = {
-                    offsetX: 0,
-                    offsetY: 0
-                }
+                x:
+                    Number(result.x),
 
-            }
-
-            editorState.layout
-                .minimap
-                .offsetX =
-                    Number(
-                        result.offsetX
-                    ) || 0
-
-
-            editorState.layout
-                .minimap
-                .offsetY =
-                    Number(
-                        result.offsetY
-                    ) || 0
-
-
-            if (positionReadout) {
-
-                positionReadout.textContent =
-                    `MINIMAP  X: ${
-                        editorState.layout
-                            .minimap
-                            .offsetX
-                            .toFixed(4)
-                    }  Y: ${
-                        editorState.layout
-                            .minimap
-                            .offsetY
-                            .toFixed(4)
-                    }`
+                y:
+                    Number(result.y)
 
             }
 
@@ -506,33 +524,53 @@ async function flushMinimapMovement() {
     } catch (error) {
 
         console.error(
-            '[LEMON HUD] Minimap movement error:',
+            '[LEMON HUD] Minimap position error:',
             error
         )
 
     } finally {
 
-        editorState.minimapBusy =
+        editorState.minimapRequestBusy =
             false
 
     }
 
-
     if (
-        editorState.queuedMinimapDX !== 0 ||
-        editorState.queuedMinimapDY !== 0
+        editorState.queuedMinimapPosition
     ) {
 
         requestAnimationFrame(
-            flushMinimapMovement
+            flushMinimapPosition
         )
 
     }
+
 }
 
 
 //=========================================================
-// MOVE DRAG
+// QUEUE ABSOLUTE MINIMAP POSITION
+//=========================================================
+
+function queueMinimapPosition(
+    x,
+    y
+) {
+
+    editorState.queuedMinimapPosition = {
+        x,
+        y
+    }
+
+    requestAnimationFrame(
+        flushMinimapPosition
+    )
+
+}
+
+
+//=========================================================
+// MOUSE MOVE
 //=========================================================
 
 function moveDrag(event) {
@@ -554,92 +592,101 @@ function moveDrag(event) {
         'minimap'
     ) {
 
-        const dxPixels =
+        const frameWidth =
+            minimapFrame.offsetWidth
+
+        const frameHeight =
+            minimapFrame.offsetHeight
+
+        let leftPx =
             event.clientX -
-            editorState.lastMouseX
+            editorState.dragOffsetX
 
-        const dyPixels =
+        let topPx =
             event.clientY -
-            editorState.lastMouseY
+            editorState.dragOffsetY
 
 
-        editorState.lastMouseX =
-            event.clientX
-
-        editorState.lastMouseY =
-            event.clientY
-
-
-        //=================================================
-        // MOVE THE HTML BORDER FIRST
-        //=================================================
-
-        const rect =
-            minimapFrame
-                .getBoundingClientRect()
-
-        let left =
-            rect.left +
-            dxPixels
-
-        let top =
-            rect.top +
-            dyPixels
-
-
-        left =
+        leftPx =
             clamp(
-                left,
+                leftPx,
                 0,
                 window.innerWidth -
-                rect.width
+                frameWidth
             )
 
-        top =
+
+        topPx =
             clamp(
-                top,
+                topPx,
                 0,
                 window.innerHeight -
-                rect.height
+                frameHeight
             )
 
 
-        minimapFrame.style.left =
-            `${left}px`
+        const x =
+            (
+                leftPx /
+                window.innerWidth
+            ) * 100
 
-        minimapFrame.style.top =
-            `${top}px`
 
-        minimapFrame.style.right =
-            'auto'
+        const y =
+            (
+                topPx /
+                window.innerHeight
+            ) * 100
 
-        minimapFrame.style.bottom =
-            'auto'
+
+        editorState.layout.minimap = {
+
+            x:
+                Number(
+                    x.toFixed(4)
+                ),
+
+            y:
+                Number(
+                    y.toFixed(4)
+                )
+
+        }
 
 
         //=================================================
-        // SEND EXACT SAME MOVEMENT TO GTA
+        // BORDER
         //=================================================
 
-        editorState.queuedMinimapDX +=
-            dxPixels /
-            window.innerWidth
-
-        editorState.queuedMinimapDY +=
-            dyPixels /
-            window.innerHeight
-
-
-        requestAnimationFrame(
-            flushMinimapMovement
+        applyMinimapFrame(
+            editorState.layout.minimap
         )
 
+
+        //=================================================
+        // ACTUAL GTA RADAR
+        //=================================================
+
+        queueMinimapPosition(
+            editorState.layout.minimap.x,
+            editorState.layout.minimap.y
+        )
+
+
+        if (positionReadout) {
+
+            positionReadout.textContent =
+                `MINIMAP  X: ${x.toFixed(2)}%  Y: ${y.toFixed(2)}%`
+
+        }
+
         return
+
     }
 
 
     //=====================================================
-    // NORMAL NUI COMPONENT
+    // NORMAL HUD
     //=====================================================
 
     const name =
@@ -659,32 +706,33 @@ function moveDrag(event) {
     const element =
         component.element
 
-
     const rect =
         element
             .getBoundingClientRect()
 
 
-    let left =
+    let leftPx =
         event.clientX -
         editorState.dragOffsetX
 
-    let top =
+
+    let topPx =
         event.clientY -
         editorState.dragOffsetY
 
 
-    left =
+    leftPx =
         clamp(
-            left,
+            leftPx,
             0,
             window.innerWidth -
             rect.width
         )
 
-    top =
+
+    topPx =
         clamp(
-            top,
+            topPx,
             0,
             window.innerHeight -
             rect.height
@@ -693,13 +741,14 @@ function moveDrag(event) {
 
     const x =
         (
-            left /
+            leftPx /
             window.innerWidth
         ) * 100
 
+
     const y =
         (
-            top /
+            topPx /
             window.innerHeight
         ) * 100
 
@@ -731,23 +780,28 @@ function moveDrag(event) {
             `${component.label}  X: ${x.toFixed(2)}%  Y: ${y.toFixed(2)}%`
 
     }
+
 }
 
 
 //=========================================================
-// DRAG END
+// STOP DRAG
 //=========================================================
 
 function stopDrag() {
 
-    if (!editorState.dragging) {
+    if (
+        !editorState.dragging
+    ) {
         return
     }
 
     editorState.dragging =
         null
 
-    if (minimapFrame) {
+    if (
+        minimapFrame
+    ) {
 
         minimapFrame
             .classList
@@ -756,11 +810,12 @@ function stopDrag() {
             )
 
     }
+
 }
 
 
 //=========================================================
-// OPEN EDITOR
+// OPEN
 //=========================================================
 
 function openEditor(data) {
@@ -784,6 +839,26 @@ function openEditor(data) {
         )
 
 
+    if (
+        data.minimapFrame
+    ) {
+
+        editorState.minimapFrameWidth =
+            Number(
+                data.minimapFrame.width
+            )
+            || editorState.minimapFrameWidth
+
+
+        editorState.minimapFrameHeight =
+            Number(
+                data.minimapFrame.height
+            )
+            || editorState.minimapFrameHeight
+
+    }
+
+
     document.body
         .classList
         .add(
@@ -805,11 +880,12 @@ function openEditor(data) {
             'DRAG A HUD COMPONENT'
 
     }
+
 }
 
 
 //=========================================================
-// CLOSE EDITOR
+// CLOSE
 //=========================================================
 
 function closeEditorUI() {
@@ -820,11 +896,8 @@ function closeEditorUI() {
     editorState.dragging =
         null
 
-    editorState.queuedMinimapDX =
-        0
-
-    editorState.queuedMinimapDY =
-        0
+    editorState.queuedMinimapPosition =
+        null
 
 
     document.body
@@ -837,7 +910,9 @@ function closeEditorUI() {
     removeEditableElements()
 
 
-    if (minimapFrame) {
+    if (
+        minimapFrame
+    ) {
 
         minimapFrame
             .classList
@@ -846,6 +921,7 @@ function closeEditorUI() {
             )
 
     }
+
 }
 
 
@@ -864,8 +940,10 @@ async function saveLayout() {
         await nuiPost(
             'saveHudLayout',
             {
+
                 layout:
                     editorState.layout
+
             }
         )
 
@@ -886,6 +964,7 @@ async function saveLayout() {
         )
 
     }
+
 }
 
 
@@ -904,28 +983,9 @@ async function resetLayout() {
             editorState.defaults
         )
 
-
     applyLayout(
         editorState.layout
     )
-
-
-    if (minimapFrame) {
-
-        minimapFrame.style.left =
-            '1.45vw'
-
-        minimapFrame.style.top =
-            '73.1vh'
-
-        minimapFrame.style.right =
-            'auto'
-
-        minimapFrame.style.bottom =
-            'auto'
-
-    }
-
 
     try {
 
@@ -933,6 +993,13 @@ async function resetLayout() {
             'resetHudLayout',
             {}
         )
+
+        if (positionReadout) {
+
+            positionReadout.textContent =
+                'DEFAULT LAYOUT RESTORED'
+
+        }
 
     } catch (error) {
 
@@ -943,13 +1010,6 @@ async function resetLayout() {
 
     }
 
-
-    if (positionReadout) {
-
-        positionReadout.textContent =
-            'DEFAULT LAYOUT RESTORED'
-
-    }
 }
 
 
@@ -963,11 +1023,9 @@ async function cancelEditor() {
         return
     }
 
-
     applyLayout(
         editorState.savedLayout
     )
-
 
     try {
 
@@ -985,13 +1043,13 @@ async function cancelEditor() {
 
     }
 
-
     closeEditorUI()
+
 }
 
 
 //=========================================================
-// NORMAL DRAG EVENTS
+// NORMAL DRAG LISTENERS
 //=========================================================
 
 Object.entries(
@@ -999,7 +1057,9 @@ Object.entries(
 ).forEach(
     ([name, component]) => {
 
-        if (!component.element) {
+        if (
+            !component.element
+        ) {
             return
         }
 
@@ -1021,10 +1081,12 @@ Object.entries(
 
 
 //=========================================================
-// MINIMAP FRAME DRAG
+// MINIMAP DRAG LISTENER
 //=========================================================
 
-if (minimapFrame) {
+if (
+    minimapFrame
+) {
 
     minimapFrame
         .addEventListener(
@@ -1036,7 +1098,7 @@ if (minimapFrame) {
 
 
 //=========================================================
-// GLOBAL MOUSE
+// GLOBAL MOUSE EVENTS
 //=========================================================
 
 window.addEventListener(
@@ -1061,45 +1123,56 @@ window.addEventListener(
 // BUTTONS
 //=========================================================
 
-if (saveButton) {
+if (
+    saveButton
+) {
 
-    saveButton.addEventListener(
-        'click',
-        saveLayout
-    )
-
-}
-
-
-if (resetButton) {
-
-    resetButton.addEventListener(
-        'click',
-        resetLayout
-    )
+    saveButton
+        .addEventListener(
+            'click',
+            saveLayout
+        )
 
 }
 
 
-if (cancelButton) {
+if (
+    resetButton
+) {
 
-    cancelButton.addEventListener(
-        'click',
-        cancelEditor
-    )
+    resetButton
+        .addEventListener(
+            'click',
+            resetLayout
+        )
+
+}
+
+
+if (
+    cancelButton
+) {
+
+    cancelButton
+        .addEventListener(
+            'click',
+            cancelEditor
+        )
 
 }
 
 
 //=========================================================
-// ESC
+// ESCAPE
 //=========================================================
 
 window.addEventListener(
     'keydown',
     event => {
 
-        if (!editorState.open) {
+        if (
+            !editorState.open
+        ) {
             return
         }
 
@@ -1142,6 +1215,26 @@ window.addEventListener(
 
             case 'applyHudLayout':
 
+                if (
+                    data.minimapFrame
+                ) {
+
+                    editorState.minimapFrameWidth =
+                        Number(
+                            data.minimapFrame.width
+                        )
+                        || editorState.minimapFrameWidth
+
+
+                    editorState.minimapFrameHeight =
+                        Number(
+                            data.minimapFrame.height
+                        )
+                        || editorState.minimapFrameHeight
+
+                }
+
+
                 applyLayout(
                     data.layout
                 )
@@ -1166,6 +1259,26 @@ window.addEventListener(
 
 
             case 'hudEditorReset':
+
+                if (
+                    data.minimapFrame
+                ) {
+
+                    editorState.minimapFrameWidth =
+                        Number(
+                            data.minimapFrame.width
+                        )
+                        || editorState.minimapFrameWidth
+
+
+                    editorState.minimapFrameHeight =
+                        Number(
+                            data.minimapFrame.height
+                        )
+                        || editorState.minimapFrameHeight
+
+                }
+
 
                 if (
                     data.layout

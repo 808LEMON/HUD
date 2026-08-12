@@ -17,33 +17,34 @@ body.hud-editing #hud {
 
 
 /*=========================================================
-    NORMAL EDITABLE MODULES
+    STANDARD EDITABLE COMPONENTS
 =========================================================*/
 
 body.hud-editing .hud-editable {
     cursor: move !important;
+
     pointer-events: auto !important;
 
     outline:
         1px dashed
         rgba(223, 255, 69, 0.80) !important;
-
-    box-shadow:
-        0 0 0 2px rgba(223, 255, 69, 0.04),
-        0 0 18px rgba(0, 0, 0, 0.40) !important;
 }
 
-body.hud-editing .hud-editable:hover {
+
+body.hud-editing
+.hud-editable:hover {
     outline-color:
-        rgba(223, 255, 69, 1) !important;
+        #dfff45 !important;
 }
 
 
 /*=========================================================
-    EDITABLE LABELS
+    EDITOR LABEL
 =========================================================*/
 
-body.hud-editing .hud-editable::before {
+body.hud-editing
+.hud-editable::before {
+
     content:
         attr(data-editor-label);
 
@@ -53,8 +54,6 @@ body.hud-editing .hud-editable::before {
     top: -22px;
 
     z-index: 99999;
-
-    min-width: max-content;
 
     padding:
         4px 7px;
@@ -76,12 +75,14 @@ body.hud-editing .hud-editable::before {
 
     letter-spacing: 0.65px;
 
+    white-space: nowrap;
+
     pointer-events: none;
 }
 
 
 /*=========================================================
-    FORCE MODULES VISIBLE WHILE EDITING
+    FORCE VEHICLE HUD VISIBLE DURING EDIT
 =========================================================*/
 
 body.hud-editing #player-stats,
@@ -97,94 +98,90 @@ body.hud-editing #vehicle-hud {
 =========================================================*/
 
 #minimap-frame {
+
     position: absolute;
 
-    /*
-        These values are tuned around the current
-        808Lemon minimap configuration.
+    left: 1.50vw;
+    top: 73.15vh;
 
-        editor.js overrides them after loading a saved
-        minimap layout.
-    */
-
-    left: 1.45vw;
-    top: 73.1vh;
-
-    width: 14.25vw;
-    height: 16.0vh;
+    width: 12.30vw;
+    height: 10.85vh;
 
     z-index: 80000;
 
-    border-radius: 5px;
+    border-radius: 4px;
+
+    /*
+        SUBTLE PERMANENT BORDER
+    */
 
     border:
         1px solid
-        rgba(55, 145, 205, 0.30);
+        rgba(55, 145, 205, 0.24);
 
     box-shadow:
         inset 0 0 0 1px
-        rgba(255, 255, 255, 0.018);
+        rgba(255, 255, 255, 0.015);
+
+    background: transparent;
 
     pointer-events: none;
-
-    transition:
-        border-color 0.12s ease,
-        box-shadow 0.12s ease;
 }
 
 
 /*=========================================================
-    MINIMAP EDIT MODE
+    MINIMAP FRAME - EDITING
 =========================================================*/
 
-body.hud-editing #minimap-frame {
+body.hud-editing
+#minimap-frame {
 
-    /*
-        Now the border itself becomes the drag surface.
-    */
+    pointer-events:
+        auto !important;
 
-    pointer-events: auto !important;
-
-    cursor: grab;
+    cursor:
+        grab;
 
     border:
         1px dashed
-        rgba(223, 255, 69, 0.90);
+        rgba(223, 255, 69, 0.95);
 
     background:
         rgba(223, 255, 69, 0.015);
 
     box-shadow:
-        inset 0 0 18px
-        rgba(223, 255, 69, 0.025),
         0 0 12px
-        rgba(0, 0, 0, 0.32);
+        rgba(0, 0, 0, 0.35);
 }
 
 
 body.hud-editing
 #minimap-frame:hover {
+
     border-color:
         #dfff45;
+
 }
 
 
 body.hud-editing
 #minimap-frame.dragging {
-    cursor: grabbing;
 
-    border-style: solid;
+    cursor:
+        grabbing;
+
+    border-style:
+        solid;
 
     box-shadow:
-        inset 0 0 18px
-        rgba(223, 255, 69, 0.04),
-        0 0 11px
-        rgba(223, 255, 69, 0.15);
+        0 0 12px
+        rgba(223, 255, 69, 0.16);
+
 }
 
 
 /*=========================================================
-    MINIMAP EDITOR LABEL
+    MINIMAP EDIT LABEL
 =========================================================*/
 
 #minimap-editor-label {
@@ -194,6 +191,7 @@ body.hud-editing
 
 body.hud-editing
 #minimap-editor-label {
+
     position: absolute;
 
     left: 0;
@@ -219,11 +217,14 @@ body.hud-editing
     font-size: 8px;
     font-weight: 900;
 
-    letter-spacing: 0.60px;
+    letter-spacing:
+        0.60px;
 
-    pointer-events: none;
+    white-space:
+        nowrap;
 
-    white-space: nowrap;
+    pointer-events:
+        none;
 }
 
 
@@ -232,13 +233,14 @@ body.hud-editing
 =========================================================*/
 
 #hud-editor-overlay {
+
     position: fixed;
 
     inset: 0;
 
-    display: none;
-
     z-index: 70000;
+
+    display: none;
 
     pointer-events: none;
 
@@ -253,7 +255,9 @@ body.hud-editing
 
 body.hud-editing
 #hud-editor-overlay {
+
     display: block;
+
 }
 
 
@@ -262,6 +266,7 @@ body.hud-editing
 =========================================================*/
 
 #hud-editor-panel {
+
     position: fixed;
 
     left: 50%;
@@ -280,6 +285,8 @@ body.hud-editing
 
     border-radius: 9px;
 
+    color: white;
+
     background:
         linear-gradient(
             135deg,
@@ -295,49 +302,62 @@ body.hud-editing
         0 12px 35px
         rgba(0, 0, 0, 0.50);
 
-    color: white;
-
     pointer-events: auto;
 }
 
 
 body.hud-editing
 #hud-editor-panel {
+
     display: block;
+
 }
 
 
 /*=========================================================
-    PANEL HEADER
+    HEADER
 =========================================================*/
 
 .editor-title-row {
+
     display: flex;
 
-    justify-content: space-between;
-    align-items: center;
+    justify-content:
+        space-between;
 
-    margin-bottom: 8px;
+    align-items:
+        center;
+
+    margin-bottom:
+        8px;
+
 }
 
 
 .editor-title {
-    font-size: 12px;
 
-    font-weight: 900;
+    font-size:
+        12px;
 
-    letter-spacing: 1.1px;
+    font-weight:
+        900;
+
+    letter-spacing:
+        1.1px;
 
     color:
         rgba(245, 249, 252, 0.96);
+
 }
 
 
 .editor-version {
+
     padding:
         3px 6px;
 
-    border-radius: 4px;
+    border-radius:
+        4px;
 
     background:
         rgba(223, 255, 69, 0.09);
@@ -345,23 +365,33 @@ body.hud-editing
     color:
         #dfff45;
 
-    font-size: 7px;
+    font-size:
+        7px;
 
-    font-weight: 900;
+    font-weight:
+        900;
 
-    letter-spacing: 0.4px;
 }
 
 
+/*=========================================================
+    DESCRIPTION
+=========================================================*/
+
 .editor-description {
-    margin-bottom: 11px;
+
+    margin-bottom:
+        11px;
 
     color:
         rgba(155, 178, 198, 0.78);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
-    line-height: 14px;
+    line-height:
+        14px;
+
 }
 
 
@@ -370,6 +400,7 @@ body.hud-editing
 =========================================================*/
 
 .editor-buttons {
+
     display: grid;
 
     grid-template-columns:
@@ -377,37 +408,51 @@ body.hud-editing
         1fr
         1fr;
 
-    gap: 6px;
+    gap:
+        6px;
+
 }
 
 
 .editor-button {
-    height: 30px;
 
-    border: none;
+    height:
+        30px;
 
-    border-radius: 5px;
+    border:
+        none;
 
-    cursor: pointer;
+    border-radius:
+        5px;
 
-    font-size: 8px;
+    cursor:
+        pointer;
 
-    font-weight: 900;
+    font-size:
+        8px;
 
-    letter-spacing: 0.6px;
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.6px;
+
 }
 
 
 .editor-save {
+
     background:
         #dfff45;
 
     color:
         rgba(5, 15, 20, 0.95);
+
 }
 
 
 .editor-reset {
+
     background:
         rgba(42, 105, 160, 0.35);
 
@@ -417,10 +462,12 @@ body.hud-editing
 
     color:
         rgba(220, 238, 250, 0.94);
+
 }
 
 
 .editor-cancel {
+
     background:
         rgba(180, 50, 45, 0.22);
 
@@ -430,19 +477,24 @@ body.hud-editing
 
     color:
         rgba(255, 205, 200, 0.94);
+
 }
 
 
 /*=========================================================
-    POSITION READOUT
+    READOUT
 =========================================================*/
 
 #editor-position-readout {
-    margin-top: 9px;
 
-    min-height: 14px;
+    margin-top:
+        9px;
 
-    text-align: center;
+    min-height:
+        14px;
+
+    text-align:
+        center;
 
     color:
         rgba(140, 165, 185, 0.68);
@@ -451,5 +503,7 @@ body.hud-editing
         Consolas,
         monospace;
 
-    font-size: 8px;
+    font-size:
+        8px;
+
 }

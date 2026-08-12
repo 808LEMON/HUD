@@ -8,15 +8,7 @@ local savedLayout = nil
 local workingLayout = nil
 
 --=========================================================
--- NATIVE MINIMAP OFFSETS
---=========================================================
-
-local minimapOffsetX = 0.0
-local minimapOffsetY = 0.0
-
-
---=========================================================
--- DEEP COPY
+-- HELPERS
 --=========================================================
 
 local function DeepCopy(value)
@@ -25,42 +17,26 @@ local function DeepCopy(value)
         return value
     end
 
-    local copy = {}
+    local result = {}
 
     for key, item in pairs(value) do
-
-        copy[key] =
-            DeepCopy(item)
-
+        result[key] = DeepCopy(item)
     end
 
-    return copy
+    return result
+
 end
 
+local function Clamp(value, minimum, maximum)
 
---=========================================================
--- CLAMP
---=========================================================
-
-local function Clamp(
-    value,
-    minimum,
-    maximum
-)
-
-    value =
-        tonumber(value)
-        or minimum
+    value = tonumber(value) or minimum
 
     return math.max(
         minimum,
-        math.min(
-            maximum,
-            value
-        )
+        math.min(maximum, value)
     )
-end
 
+end
 
 --=========================================================
 -- DEFAULT LAYOUT
@@ -68,90 +44,55 @@ end
 
 local function GetDefaultLayout()
 
-    local layout =
-        DeepCopy(
-            Config.HudEditor.DefaultLayout
-        )
+    return DeepCopy(
+        Config.HudEditor.DefaultLayout
+    )
 
-    --=====================================================
-    -- Native minimap uses offsets instead of normal
-    -- HTML x/y positions.
-    --=====================================================
-
-    layout.minimap = {
-
-        offsetX = 0.0,
-        offsetY = 0.0
-
-    }
-
-    return layout
 end
 
-
 --=========================================================
--- SANITIZE LAYOUT
+-- SANITIZE
 --=========================================================
 
 local function SanitizeLayout(layout)
 
-    local defaults =
-        GetDefaultLayout()
+    local defaults = GetDefaultLayout()
 
     if type(layout) ~= 'table' then
-
         return defaults
-
     end
-
 
     local clean = {}
 
-
     --=====================================================
-    -- NORMAL HTML COMPONENTS
+    -- STANDARD NUI COMPONENTS
     --=====================================================
 
-    local nuiComponents = {
-
+    local components = {
         'player',
         'compass',
         'status',
         'vehicle'
-
     }
 
+    for _, name in ipairs(components) do
 
-    for _, name in ipairs(
-        nuiComponents
-    ) do
-
-        local incoming =
-            layout[name]
-
-        local default =
-            defaults[name]
-
+        local incoming = layout[name]
 
         if type(incoming) ~= 'table' then
-
             incoming = {}
-
         end
-
 
         clean[name] = {
 
             x = Clamp(
-                incoming.x
-                or default.x,
+                incoming.x or defaults[name].x,
                 0.0,
                 100.0
             ),
 
             y = Clamp(
-                incoming.y
-                or default.y,
+                incoming.y or defaults[name].y,
                 0.0,
                 100.0
             )
@@ -160,78 +101,83 @@ local function SanitizeLayout(layout)
 
     end
 
-
     --=====================================================
-    -- NATIVE MINIMAP
+    -- MINIMAP FRAME
     --=====================================================
 
-    local minimap =
-        layout.minimap
+    local incomingMinimap = layout.minimap
 
-
-    if type(minimap) ~= 'table' then
-
-        minimap = {}
-
+    if type(incomingMinimap) ~= 'table' then
+        incomingMinimap = {}
     end
-
 
     clean.minimap = {
 
-        offsetX = Clamp(
-            minimap.offsetX
-            or 0.0,
-            -0.08,
-            0.68
+        x = Clamp(
+            incomingMinimap.x or defaults.minimap.x,
+            0.0,
+            100.0 - Config.MinimapFrame.width
         ),
 
-        offsetY = Clamp(
-            minimap.offsetY
-            or 0.0,
-            -0.70,
-            0.08
+        y = Clamp(
+            incomingMinimap.y or defaults.minimap.y,
+            0.0,
+            100.0 - Config.MinimapFrame.height
         )
 
     }
 
-
     return clean
+
 end
 
-
 --=========================================================
--- APPLY NATIVE MINIMAP
+-- APPLY NATIVE MINIMAP FROM ABSOLUTE FRAME POSITION
 --=========================================================
 
-local function ApplyNativeMinimap(
-    offsetX,
-    offsetY
-)
+local function ApplyNativeMinimap(frameX, frameY)
 
-    offsetX =
-        tonumber(offsetX)
-        or 0.0
+    frameX = tonumber(frameX) or Config.MinimapFrame.x
+    frameY = tonumber(frameY) or Config.MinimapFrame.y
 
-    offsetY =
-        tonumber(offsetY)
-        or 0.0
+    --=====================================================
+    -- IMPORTANT
+    --
+    -- HTML position uses percentage from:
+    --
+    -- LEFT / TOP
+    --
+    -- Native minimap uses normalized screen values and
+    -- bottom anchoring.
+    --
+    -- We calculate EVERYTHING from the original/default
+    -- reference on every update.
+    --
+    -- Nothing accumulates.
+    --=====================================================
 
+    local deltaXPercent =
+        frameX -
+        Config.MinimapFrame.x
 
-    local map =
-        Config.Minimap.Map
+    local deltaYPercent =
+        frameY -
+        Config.MinimapFrame.y
 
-    local mask =
-        Config.Minimap.Mask
+    local deltaX =
+        deltaXPercent / 100.0
 
-    local blur =
-        Config.Minimap.Blur
+    local deltaY =
+        deltaYPercent / 100.0
 
+    local map = Config.Minimap.Map
+    local mask = Config.Minimap.Mask
+    local blur = Config.Minimap.Blur
 
     SetMinimapClipType(0)
 
-
     --=====================================================
-    -- ACTUAL MAP
+    -- MAP
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -239,16 +185,18 @@ local function ApplyNativeMinimap(
         'L',
         'B',
 
-        map.x + offsetX,
-        map.y + offsetY,
+        map.x + deltaX,
+
+        -- HTML Y increases going DOWN.
+        -- Native bottom-anchored Y works opposite.
+        map.y - deltaY,
 
         map.width,
         map.height
     )
 
-
     --=====================================================
-    -- MAP MASK
+    -- MASK
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -256,16 +204,15 @@ local function ApplyNativeMinimap(
         'L',
         'B',
 
-        mask.x + offsetX,
-        mask.y + offsetY,
+        mask.x + deltaX,
+        mask.y - deltaY,
 
         mask.width,
         mask.height
     )
 
-
     --=====================================================
-    -- MAP BLUR
+    -- BLUR
     --=====================================================
 
     SetMinimapComponentPosition(
@@ -273,8 +220,8 @@ local function ApplyNativeMinimap(
         'L',
         'B',
 
-        blur.x + offsetX,
-        blur.y + offsetY,
+        blur.x + deltaX,
+        blur.y - deltaY,
 
         blur.width,
         blur.height
@@ -282,9 +229,8 @@ local function ApplyNativeMinimap(
 
 end
 
-
 --=========================================================
--- REFRESH RADAR
+-- RADAR REFRESH
 --=========================================================
 
 local function RefreshRadar()
@@ -294,7 +240,7 @@ local function RefreshRadar()
         false
     )
 
-    Wait(40)
+    Wait(50)
 
     SetRadarBigmapEnabled(
         false,
@@ -303,50 +249,41 @@ local function RefreshRadar()
 
 end
 
-
 --=========================================================
--- APPLY FULL LAYOUT
+-- APPLY ENTIRE LAYOUT
 --=========================================================
 
 local function ApplyLayout(layout)
 
-    layout =
-        SanitizeLayout(layout)
-
-
-    minimapOffsetX =
-        layout.minimap.offsetX
-
-    minimapOffsetY =
-        layout.minimap.offsetY
-
+    layout = SanitizeLayout(layout)
 
     --=====================================================
-    -- APPLY HTML COMPONENTS
+    -- HTML / NUI
     --=====================================================
 
     SendNUIMessage({
 
-        action =
-            'applyHudLayout',
+        action = 'applyHudLayout',
 
-        layout =
-            layout
+        layout = layout,
+
+        minimapFrame = {
+            width = Config.MinimapFrame.width,
+            height = Config.MinimapFrame.height
+        }
 
     })
 
-
     --=====================================================
-    -- APPLY NATIVE GTA MINIMAP
+    -- ACTUAL GTA RADAR
     --=====================================================
 
     ApplyNativeMinimap(
-        minimapOffsetX,
-        minimapOffsetY
+        layout.minimap.x,
+        layout.minimap.y
     )
 
 end
-
 
 --=========================================================
 -- LOAD SAVED LAYOUT
@@ -359,9 +296,7 @@ local function LoadLayout()
             Config.HudEditor.KvpName
         )
 
-
-    if not raw
-    or raw == '' then
+    if not raw or raw == '' then
 
         savedLayout =
             GetDefaultLayout()
@@ -370,13 +305,11 @@ local function LoadLayout()
 
     end
 
-
     local success, decoded =
         pcall(
             json.decode,
             raw
         )
-
 
     if not success
     or type(decoded) ~= 'table' then
@@ -388,18 +321,15 @@ local function LoadLayout()
 
     end
 
-
     savedLayout =
         SanitizeLayout(decoded)
-
 
     return savedLayout
 
 end
 
-
 --=========================================================
--- SAVE LAYOUT
+-- SAVE
 --=========================================================
 
 local function SaveLayout(layout)
@@ -407,24 +337,17 @@ local function SaveLayout(layout)
     savedLayout =
         SanitizeLayout(layout)
 
-
     SetResourceKvp(
         Config.HudEditor.KvpName,
-        json.encode(
-            savedLayout
-        )
+        json.encode(savedLayout)
     )
 
-
-    ApplyLayout(
-        savedLayout
-    )
+    ApplyLayout(savedLayout)
 
 end
 
-
 --=========================================================
--- OPEN EDITOR
+-- OPEN
 --=========================================================
 
 local function OpenEditor()
@@ -433,116 +356,76 @@ local function OpenEditor()
         return
     end
 
-
     if not savedLayout then
-
         LoadLayout()
-
     end
 
-
     workingLayout =
-        DeepCopy(
-            savedLayout
-        )
+        DeepCopy(savedLayout)
 
-
-    minimapOffsetX =
-        workingLayout
-            .minimap
-            .offsetX
-        or 0.0
-
-
-    minimapOffsetY =
-        workingLayout
-            .minimap
-            .offsetY
-        or 0.0
-
-
-    editorOpen =
-        true
-
+    editorOpen = true
 
     SetNuiFocus(
         true,
         true
     )
 
-
-    SetNuiFocusKeepInput(
-        false
-    )
-
+    SetNuiFocusKeepInput(false)
 
     SendNUIMessage({
 
-        action =
-            'openHudEditor',
+        action = 'openHudEditor',
 
-        layout =
-            workingLayout,
+        layout = workingLayout,
 
         defaults =
-            GetDefaultLayout()
+            GetDefaultLayout(),
+
+        minimapFrame = {
+            width = Config.MinimapFrame.width,
+            height = Config.MinimapFrame.height
+        }
 
     })
 
 end
 
-
 --=========================================================
--- CLOSE EDITOR
+-- CLOSE
 --=========================================================
 
-local function CloseEditor(
-    restoreSaved
-)
+local function CloseEditor(restoreSaved)
 
     if not editorOpen then
         return
     end
 
-
-    editorOpen =
-        false
-
+    editorOpen = false
 
     SetNuiFocus(
         false,
         false
     )
 
-
-    SetNuiFocusKeepInput(
-        false
-    )
-
+    SetNuiFocusKeepInput(false)
 
     if restoreSaved then
 
         ApplyLayout(
             savedLayout
-            or
-            GetDefaultLayout()
+            or GetDefaultLayout()
         )
 
     end
 
-
     SendNUIMessage({
-
-        action =
-            'closeHudEditor'
-
+        action = 'closeHudEditor'
     })
 
 end
 
-
 --=========================================================
--- EDIT HUD COMMAND
+-- /edithud
 --=========================================================
 
 RegisterCommand(
@@ -555,9 +438,8 @@ RegisterCommand(
     false
 )
 
-
 --=========================================================
--- RESET HUD COMMAND
+-- /resethud
 --=========================================================
 
 RegisterCommand(
@@ -568,39 +450,26 @@ RegisterCommand(
             Config.HudEditor.KvpName
         )
 
-
         savedLayout =
             GetDefaultLayout()
 
-
         workingLayout =
-            DeepCopy(
-                savedLayout
-            )
+            DeepCopy(savedLayout)
 
-
-        minimapOffsetX =
-            0.0
-
-        minimapOffsetY =
-            0.0
-
-
-        ApplyLayout(
-            savedLayout
-        )
-
+        ApplyLayout(savedLayout)
 
         RefreshRadar()
 
-
         SendNUIMessage({
 
-            action =
-                'hudEditorReset',
+            action = 'hudEditorReset',
 
-            layout =
-                savedLayout
+            layout = savedLayout,
+
+            minimapFrame = {
+                width = Config.MinimapFrame.width,
+                height = Config.MinimapFrame.height
+            }
 
         })
 
@@ -608,9 +477,8 @@ RegisterCommand(
     false
 )
 
-
 --=========================================================
--- NORMAL HUD PREVIEW
+-- PREVIEW NORMAL HUD
 --=========================================================
 
 RegisterNUICallback(
@@ -627,8 +495,8 @@ RegisterNUICallback(
 
         end
 
-
-        if type(data) ~= 'table' then
+        if type(data) ~= 'table'
+        or type(data.layout) ~= 'table' then
 
             cb({
                 success = false
@@ -638,12 +506,10 @@ RegisterNUICallback(
 
         end
 
-
         workingLayout =
             SanitizeLayout(
                 data.layout
             )
-
 
         cb({
             success = true
@@ -652,13 +518,12 @@ RegisterNUICallback(
     end
 )
 
-
 --=========================================================
--- MOVE NATIVE MINIMAP
+-- ABSOLUTE MINIMAP POSITION
 --=========================================================
 
 RegisterNUICallback(
-    'moveMinimap',
+    'setMinimapPosition',
     function(data, cb)
 
         if not editorOpen then
@@ -671,7 +536,6 @@ RegisterNUICallback(
 
         end
 
-
         if type(data) ~= 'table' then
 
             cb({
@@ -682,123 +546,62 @@ RegisterNUICallback(
 
         end
 
-
-        --=================================================
-        -- Mouse movement sent from JavaScript as a
-        -- normalized screen delta.
-        --=================================================
-
-        local dx =
-            tonumber(
-                data.dx
-            )
-            or 0.0
-
-
-        local dy =
-            tonumber(
-                data.dy
-            )
-            or 0.0
-
-
-        --=================================================
-        -- HORIZONTAL
-        --
-        -- Positive = right
-        -- Negative = left
-        --=================================================
-
-        minimapOffsetX =
+        local x =
             Clamp(
-                minimapOffsetX + dx,
-                -0.08,
-                0.68
+                data.x,
+                0.0,
+                100.0 - Config.MinimapFrame.width
             )
 
-
-        --=================================================
-        -- VERTICAL
-        --
-        -- The native minimap uses bottom anchoring.
-        --
-        -- Mouse down = positive dy
-        -- Native map down = positive offsetY
-        --
-        -- Because of how the B anchor behaves here,
-        -- subtract the mouse delta.
-        --=================================================
-
-        minimapOffsetY =
+        local y =
             Clamp(
-                minimapOffsetY - dy,
-                -0.70,
-                0.08
+                data.y,
+                0.0,
+                100.0 - Config.MinimapFrame.height
             )
-
-
-        --=================================================
-        -- UPDATE WORKING LAYOUT
-        --=================================================
 
         if not workingLayout then
-
-            workingLayout =
-                GetDefaultLayout()
-
+            workingLayout = GetDefaultLayout()
         end
 
-
         workingLayout.minimap = {
-
-            offsetX =
-                minimapOffsetX,
-
-            offsetY =
-                minimapOffsetY
-
+            x = x,
+            y = y
         }
 
-
         --=================================================
-        -- MOVE THE ACTUAL GTA RADAR
+        -- ABSOLUTE POSITION.
+        --
+        -- No delta accumulation.
         --=================================================
 
         ApplyNativeMinimap(
-            minimapOffsetX,
-            minimapOffsetY
+            x,
+            y
         )
-
-
-        --=================================================
-        -- RETURN CURRENT POSITION TO JS
-        --=================================================
 
         cb({
 
             success = true,
 
-            offsetX =
-                minimapOffsetX,
-
-            offsetY =
-                minimapOffsetY
+            x = x,
+            y = y
 
         })
 
     end
 )
 
-
 --=========================================================
--- SAVE HUD
+-- SAVE
 --=========================================================
 
 RegisterNUICallback(
     'saveHudLayout',
     function(data, cb)
 
-        if type(data) ~= 'table' then
+        if type(data) ~= 'table'
+        or type(data.layout) ~= 'table' then
 
             cb({
                 success = false
@@ -808,43 +611,32 @@ RegisterNUICallback(
 
         end
 
-
         local incoming =
-            data.layout
-            or {}
-
-
-        --=================================================
-        -- Force the actual native minimap values into
-        -- the saved layout.
-        --=================================================
-
-        incoming.minimap = {
-
-            offsetX =
-                minimapOffsetX,
-
-            offsetY =
-                minimapOffsetY
-
-        }
-
-
-        SaveLayout(
-            incoming
-        )
-
-
-        workingLayout =
-            DeepCopy(
-                savedLayout
+            SanitizeLayout(
+                data.layout
             )
 
+        --=================================================
+        -- Use working minimap position, because that is
+        -- the actual radar position currently previewed.
+        --=================================================
 
-        CloseEditor(
-            false
-        )
+        if workingLayout
+        and workingLayout.minimap then
 
+            incoming.minimap =
+                DeepCopy(
+                    workingLayout.minimap
+                )
+
+        end
+
+        SaveLayout(incoming)
+
+        workingLayout =
+            DeepCopy(savedLayout)
+
+        CloseEditor(false)
 
         cb({
             success = true
@@ -852,7 +644,6 @@ RegisterNUICallback(
 
     end
 )
-
 
 --=========================================================
 -- RESET FROM EDITOR
@@ -866,68 +657,49 @@ RegisterNUICallback(
             Config.HudEditor.KvpName
         )
 
-
         savedLayout =
             GetDefaultLayout()
 
-
         workingLayout =
-            DeepCopy(
-                savedLayout
-            )
+            DeepCopy(savedLayout)
 
-
-        minimapOffsetX =
-            0.0
-
-        minimapOffsetY =
-            0.0
-
-
-        ApplyLayout(
-            savedLayout
-        )
-
+        ApplyLayout(savedLayout)
 
         RefreshRadar()
 
-
         SendNUIMessage({
 
-            action =
-                'hudEditorReset',
+            action = 'hudEditorReset',
 
-            layout =
-                savedLayout
+            layout = savedLayout,
+
+            minimapFrame = {
+                width = Config.MinimapFrame.width,
+                height = Config.MinimapFrame.height
+            }
 
         })
-
 
         cb({
 
             success = true,
 
-            layout =
-                savedLayout
+            layout = savedLayout
 
         })
 
     end
 )
 
-
 --=========================================================
--- CANCEL EDITOR
+-- CANCEL
 --=========================================================
 
 RegisterNUICallback(
     'closeHudEditor',
     function(_, cb)
 
-        CloseEditor(
-            true
-        )
-
+        CloseEditor(true)
 
         cb({
             success = true
@@ -936,34 +708,39 @@ RegisterNUICallback(
     end
 )
 
+--=========================================================
+-- EXTERNAL EVENT
+--=========================================================
+
+RegisterNetEvent(
+    'lemon-hud:client:openEditor',
+    function()
+
+        OpenEditor()
+
+    end
+)
 
 --=========================================================
--- RESOURCE START
+-- INITIAL LOAD
 --=========================================================
 
 CreateThread(function()
 
-    Wait(1500)
-
+    Wait(1600)
 
     LoadLayout()
 
-
-    ApplyLayout(
-        savedLayout
-    )
-
+    ApplyLayout(savedLayout)
 
     Wait(100)
-
 
     RefreshRadar()
 
 end)
 
-
 --=========================================================
--- RESOURCE STOP SAFETY
+-- RESOURCE STOP
 --=========================================================
 
 AddEventHandler(
@@ -976,19 +753,12 @@ AddEventHandler(
             return
         end
 
+        SetNuiFocus(
+            false,
+            false
+        )
 
-        if editorOpen then
-
-            SetNuiFocus(
-                false,
-                false
-            )
-
-            SetNuiFocusKeepInput(
-                false
-            )
-
-        end
+        SetNuiFocusKeepInput(false)
 
     end
 )

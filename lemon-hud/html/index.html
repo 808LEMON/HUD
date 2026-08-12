@@ -21,8 +21,6 @@
     <link rel="stylesheet" href="css/compass.css">
     <link rel="stylesheet" href="css/status.css">
     <link rel="stylesheet" href="css/vehicle.css">
-
-    <!-- HUD EDITOR -->
     <link rel="stylesheet" href="css/editor.css">
 
 </head>
@@ -47,7 +45,6 @@
 
         </div>
 
-
         <!-- PLAYER ID -->
 
         <div class="player-row">
@@ -69,7 +66,6 @@
             </div>
 
         </div>
-
 
         <!-- CASH -->
 
@@ -93,7 +89,6 @@
 
         </div>
 
-
         <!-- BANK -->
 
         <div class="player-row">
@@ -115,7 +110,6 @@
             </div>
 
         </div>
-
 
         <!-- JOB -->
 
@@ -145,14 +139,14 @@
 
 
     <!--==================================================
-        COMPASS / STREET NAMES
+        COMPASS / STREET
     ===================================================-->
 
     <div id="compass-wrapper">
 
         <div class="compass-top">
 
-            <!-- DIRECTION -->
+            <!-- CURRENT DIRECTION -->
 
             <div class="direction-pill">
 
@@ -171,7 +165,6 @@
                     NW
                 </div>
 
-
                 <div class="compass-center">
 
                     <div class="compass-arrow"></div>
@@ -182,7 +175,6 @@
 
                 </div>
 
-
                 <div id="compass-label-right">
                     NE
                 </div>
@@ -192,7 +184,7 @@
         </div>
 
 
-        <!-- STREET -->
+        <!-- STREET INFORMATION -->
 
         <div id="street-wrapper">
 
@@ -213,7 +205,6 @@
 
     <div id="status-bars">
 
-
         <!-- HEALTH -->
 
         <div
@@ -221,9 +212,7 @@
             class="status-row"
         >
 
-            <div
-                class="status-icon health-icon"
-            >
+            <div class="status-icon health-icon">
                 ♥
             </div>
 
@@ -246,9 +235,7 @@
             class="status-row"
         >
 
-            <div
-                class="status-icon armor-icon"
-            >
+            <div class="status-icon armor-icon">
                 ◆
             </div>
 
@@ -271,9 +258,7 @@
             class="status-row"
         >
 
-            <div
-                class="status-icon hunger-icon"
-            >
+            <div class="status-icon hunger-icon">
                 ●
             </div>
 
@@ -296,9 +281,7 @@
             class="status-row"
         >
 
-            <div
-                class="status-icon thirst-icon"
-            >
+            <div class="status-icon thirst-icon">
                 ▼
             </div>
 
@@ -323,7 +306,6 @@
     <div id="vehicle-hud">
 
         <div class="gauge-shell">
-
 
             <!--==========================================
                 RPM SVG
@@ -365,16 +347,45 @@
 
             <div class="rpm-scale">
 
-                <span class="rpm-number n1">1</span>
-                <span class="rpm-number n2">2</span>
-                <span class="rpm-number n3">3</span>
-                <span class="rpm-number n4">4</span>
-                <span class="rpm-number n5">5</span>
-                <span class="rpm-number n6">6</span>
-                <span class="rpm-number n7">7</span>
-                <span class="rpm-number n8">8</span>
-                <span class="rpm-number n9">9</span>
-                <span class="rpm-number n10">10</span>
+                <span class="rpm-number n1">
+                    1
+                </span>
+
+                <span class="rpm-number n2">
+                    2
+                </span>
+
+                <span class="rpm-number n3">
+                    3
+                </span>
+
+                <span class="rpm-number n4">
+                    4
+                </span>
+
+                <span class="rpm-number n5">
+                    5
+                </span>
+
+                <span class="rpm-number n6">
+                    6
+                </span>
+
+                <span class="rpm-number n7">
+                    7
+                </span>
+
+                <span class="rpm-number n8">
+                    8
+                </span>
+
+                <span class="rpm-number n9">
+                    9
+                </span>
+
+                <span class="rpm-number n10">
+                    10
+                </span>
 
             </div>
 
@@ -411,7 +422,7 @@
 
 
             <!--==========================================
-                VEHICLE INDICATORS
+                VEHICLE ICONS
             ===========================================-->
 
             <div class="vehicle-icons">
@@ -438,7 +449,7 @@
                 </div>
 
 
-                <!-- CRUISE CONTROL -->
+                <!-- CRUISE -->
 
                 <div
                     id="cruise-icon"
@@ -455,9 +466,7 @@
                 FUEL
             ===========================================-->
 
-            <div
-                class="side-meter fuel-meter"
-            >
+            <div class="side-meter fuel-meter">
 
                 <div class="side-meter-label">
                     F
@@ -479,9 +488,7 @@
                 ENGINE
             ===========================================-->
 
-            <div
-                class="side-meter engine-meter"
-            >
+            <div class="side-meter engine-meter">
 
                 <div class="side-meter-label">
                     E
@@ -518,10 +525,13 @@
     <!--==================================================
         MINIMAP FRAME
 
-        This is NOT the GTA minimap itself.
+        This is the border around the native GTA minimap.
 
-        It visually surrounds the native minimap and acts
-        as the drag surface while /edithud is active.
+        Normal mode:
+        subtle permanent border.
+
+        /edithud:
+        becomes draggable.
     ===================================================-->
 
     <div id="minimap-frame">
@@ -534,7 +544,7 @@
 
 
     <!--==================================================
-        EDITOR OVERLAY
+        HUD EDITOR SCREEN OVERLAY
     ===================================================-->
 
     <div id="hud-editor-overlay"></div>
@@ -545,7 +555,6 @@
     ===================================================-->
 
     <div id="hud-editor-panel">
-
 
         <!-- HEADER -->
 
@@ -569,8 +578,8 @@
             Drag each highlighted HUD component anywhere
             on your screen.
 
-            Drag the border surrounding the minimap to
-            reposition the native GTA radar.
+            Drag the border around the minimap to move the
+            actual native GTA radar.
 
         </div>
 
@@ -578,7 +587,6 @@
         <!-- BUTTONS -->
 
         <div class="editor-buttons">
-
 
             <!-- SAVE -->
 
@@ -612,11 +620,10 @@
                 CANCEL
             </button>
 
-
         </div>
 
 
-        <!-- POSITION -->
+        <!-- CURRENT POSITION -->
 
         <div id="editor-position-readout">
             DRAG A HUD COMPONENT

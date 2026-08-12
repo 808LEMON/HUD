@@ -53,6 +53,33 @@ Config.Minimap = {
 }
 
 --=========================================================
+-- MINIMAP FRAME
+--=========================================================
+--
+-- This is the HTML border drawn around the VISIBLE map.
+--
+-- Values are percentages:
+--
+-- x      = left
+-- y      = top
+-- width  = screen width %
+-- height = screen height %
+--
+-- Once you get this frame sitting PERFECTLY around the
+-- actual map, we can bake your final values in here.
+--=========================================================
+
+Config.MinimapFrame = {
+
+    x = 1.50,
+    y = 73.15,
+
+    width = 12.30,
+    height = 10.85
+
+}
+
+--=========================================================
 -- VEHICLE HUD
 --=========================================================
 
@@ -75,21 +102,16 @@ Config.UpdateInterval = 250
 Config.VehicleUpdateInterval = 75
 Config.CompassUpdateInterval = 75
 
-
 --=========================================================
 -- HUD EDITOR
 --=========================================================
 
 Config.HudEditor = {}
 
-Config.HudEditor.Command =
-    'edithud'
+Config.HudEditor.Command = 'edithud'
+Config.HudEditor.ResetCommand = 'resethud'
 
-Config.HudEditor.ResetCommand =
-    'resethud'
-
-Config.HudEditor.KvpName =
-    'lemon_hud_layout'
+Config.HudEditor.KvpName = 'lemon_hud_layout_v2'
 
 Config.HudEditor.DefaultLayout = {
 
@@ -103,11 +125,6 @@ Config.HudEditor.DefaultLayout = {
         y = 64.0
     },
 
-    minimap = {
-        x = 1.5,
-        y = 72.0
-    },
-
     status = {
         x = 1.5,
         y = 88.0
@@ -116,6 +133,11 @@ Config.HudEditor.DefaultLayout = {
     vehicle = {
         x = 82.0,
         y = 68.0
+    },
+
+    minimap = {
+        x = Config.MinimapFrame.x,
+        y = Config.MinimapFrame.y
     }
 
 }
