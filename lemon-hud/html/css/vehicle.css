@@ -1,58 +1,107 @@
+/*=========================================================
+    808LEMON HUD
+    VEHICLE SPEEDOMETER
+=========================================================*/
+
+
+/*=========================================================
+    VEHICLE HUD ROOT
+=========================================================*/
+
 #vehicle-hud {
     position: absolute;
 
-    right: 1.75vw;
-    bottom: 2.25vh;
+    right: 1.5vw;
+    bottom: 2vh;
 
-    width: 280px;
-    height: 280px;
+    width: 310px;
+    height: 310px;
 
     display: none;
 
-    color: white;
+    color: #ffffff;
+
+    pointer-events: none;
 
     filter:
         drop-shadow(
-            0 8px 20px rgba(0, 0, 0, 0.45)
+            0 10px 26px
+            rgba(0, 0, 0, 0.48)
         );
 }
 
 
-/* =====================================================
-   MAIN GAUGE
-===================================================== */
+/*=========================================================
+    MAIN SHELL
+=========================================================*/
 
-.gauge-shell {
+.speedometer-shell {
     position: relative;
 
-    width: 280px;
-    height: 280px;
+    width: 310px;
+    height: 310px;
 
     border-radius: 50%;
 
+    overflow: visible;
+
     background:
         radial-gradient(
-            circle at center,
-            rgba(5, 35, 49, 0.98) 0%,
-            rgba(4, 28, 42, 0.98) 52%,
-            rgba(5, 18, 29, 0.96) 74%,
-            rgba(4, 12, 20, 0.92) 100%
+            circle at 50% 48%,
+            rgba(9, 34, 47, 0.985) 0%,
+            rgba(5, 25, 37, 0.985) 47%,
+            rgba(4, 17, 27, 0.975) 72%,
+            rgba(3, 11, 18, 0.95) 100%
         );
 
     border:
-        1px solid rgba(90, 190, 235, 0.20);
+        1px solid
+        rgba(66, 161, 213, 0.23);
 
     box-shadow:
-        inset 0 0 32px rgba(30, 180, 235, 0.08),
-        0 0 24px rgba(0, 0, 0, 0.25);
+        inset 0 0 42px
+        rgba(41, 161, 218, 0.055),
+
+        inset 0 -28px 35px
+        rgba(0, 0, 0, 0.22),
+
+        0 0 28px
+        rgba(0, 0, 0, 0.26);
 }
 
 
-/* =====================================================
-   SVG RINGS
-===================================================== */
+/*=========================================================
+    SUBTLE TOP ACCENT
+=========================================================*/
 
-.gauge-svg {
+.speedometer-shell::before {
+    content: '';
+
+    position: absolute;
+
+    left: 76px;
+    right: 76px;
+    top: 7px;
+
+    height: 1px;
+
+    z-index: 10;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(223, 255, 69, 0.48),
+            transparent
+        );
+}
+
+
+/*=========================================================
+    TACHOMETER SVG
+=========================================================*/
+
+.tachometer-svg {
     position: absolute;
 
     inset: 0;
@@ -62,346 +111,794 @@
 
     transform:
         rotate(135deg);
+
+    overflow: visible;
 }
 
-.gauge-svg circle {
+
+.tachometer-svg circle {
     fill: none;
 }
 
-.gauge-bg-ring {
+
+/*=========================================================
+    TACH TRACK
+=========================================================*/
+
+.tach-track {
     stroke:
-        rgba(255, 255, 255, 0.09);
+        rgba(255, 255, 255, 0.085);
 
-    stroke-width: 8;
+    stroke-width:
+        8;
 
-    stroke-linecap: round;
+    stroke-linecap:
+        round;
 
     stroke-dasharray:
-        593 199;
+        593.76 197.92;
 }
 
-.gauge-progress {
-    stroke-width: 9;
 
-    stroke-linecap: round;
+/*=========================================================
+    RPM PROGRESS
+=========================================================*/
+
+.tach-progress {
+    stroke:
+        #57c9ef;
+
+    stroke-width:
+        9;
+
+    stroke-linecap:
+        round;
 
     stroke-dasharray:
-        0 792;
+        0 791.68;
 
     transition:
-        stroke-dasharray 0.07s linear;
-}
-
-.rpm-ring {
-    stroke:
-        rgba(50, 200, 245, 0.95);
+        stroke-dasharray 0.075s linear,
+        stroke 0.15s ease,
+        filter 0.15s ease;
 
     filter:
         drop-shadow(
-            0 0 5px rgba(50, 200, 245, 0.35)
+            0 0 6px
+            rgba(72, 194, 238, 0.42)
         );
 }
 
-.gauge-inner-ring {
-    stroke:
-        rgba(255, 255, 255, 0.055);
 
-    stroke-width: 1;
+.speedometer-shell.redline
+.tach-progress {
+    stroke:
+        #ff6262;
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            rgba(255, 75, 75, 0.48)
+        );
 }
 
 
-/* =====================================================
-   RPM NUMBERS
-===================================================== */
+/*=========================================================
+    INNER RING
+=========================================================*/
+
+.tach-inner-ring {
+    stroke:
+        rgba(255, 255, 255, 0.055);
+
+    stroke-width:
+        1;
+}
+
+
+/*=========================================================
+    RPM NUMBERS
+=========================================================*/
 
 .rpm-number {
     position: absolute;
 
-    color:
-        rgba(225, 238, 245, 0.88);
+    z-index: 5;
 
-    font-size: 11px;
-    font-weight: 700;
+    color:
+        rgba(206, 224, 235, 0.76);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1;
+
+    transition:
+        color 0.12s ease,
+        text-shadow 0.12s ease;
 }
 
-.n1  { left: 45px;  top: 205px; }
-.n2  { left: 29px;  top: 167px; }
-.n3  { left: 30px;  top: 124px; }
-.n4  { left: 48px;  top: 83px; }
-.n5  { left: 83px;  top: 52px; }
-.n6  { left: 128px; top: 39px; }
-.n7  { right: 82px; top: 52px; }
-.n8  { right: 46px; top: 84px; }
-.n9  { right: 29px; top: 125px; }
-.n10 { right: 29px; top: 169px; }
+
+.n1 {
+    left: 49px;
+    top: 225px;
+}
 
 
-/* =====================================================
-   CENTER
-===================================================== */
+.n2 {
+    left: 29px;
+    top: 185px;
+}
+
+
+.n3 {
+    left: 27px;
+    top: 139px;
+}
+
+
+.n4 {
+    left: 44px;
+    top: 94px;
+}
+
+
+.n5 {
+    left: 80px;
+    top: 59px;
+}
+
+
+.n6 {
+    left: 145px;
+    top: 44px;
+}
+
+
+.n7 {
+    right: 78px;
+    top: 59px;
+}
+
+
+.n8 {
+    right: 42px;
+    top: 95px;
+}
+
+
+.n9 {
+    right: 26px;
+    top: 140px;
+}
+
+
+.n10 {
+    right: 29px;
+    top: 186px;
+
+    color:
+        rgba(255, 104, 104, 0.78);
+}
+
+
+/*=========================================================
+    RPM LABEL
+=========================================================*/
+
+.rpm-label {
+    position: absolute;
+
+    left: 39px;
+    bottom: 65px;
+
+    transform:
+        rotate(57deg);
+
+    color:
+        rgba(137, 164, 181, 0.57);
+
+    font-size:
+        7px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.5px;
+}
+
+
+/*=========================================================
+    VEHICLE ICONS
+=========================================================*/
+
+.vehicle-icons {
+    position: absolute;
+
+    left: 50%;
+    top: 25px;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    z-index: 10;
+}
+
+
+.vehicle-icon {
+    width: 18px;
+    height: 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color:
+        rgba(146, 170, 187, 0.34);
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+
+.vehicle-icon svg {
+    width: 15px;
+    height: 15px;
+
+    fill: none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.7;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+}
+
+
+.vehicle-icon.active {
+    color:
+        #f4f9fc;
+
+    filter:
+        drop-shadow(
+            0 0 5px
+            rgba(255, 255, 255, 0.35)
+        );
+}
+
+
+#seatbelt-icon.warning {
+    color:
+        rgba(255, 83, 83, 0.90);
+
+    animation:
+        seatbelt-pulse
+        1.25s ease-in-out infinite;
+}
+
+
+#seatbelt-icon.active {
+    color:
+        #dfff45;
+
+    animation:
+        none;
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            rgba(223, 255, 69, 0.40)
+        );
+}
+
+
+#cruise-icon.active {
+    color:
+        #5fd4ff;
+}
+
+
+@keyframes seatbelt-pulse {
+
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+}
+
+
+/*=========================================================
+    CENTER DISPLAY
+=========================================================*/
 
 .vehicle-center {
     position: absolute;
 
     left: 50%;
-    top: 50%;
+    top: 47%;
 
     transform:
-        translate(-50%, -47%);
+        translate(-50%, -50%);
+
+    width: 175px;
 
     display: flex;
     flex-direction: column;
 
     align-items: center;
+
+    z-index: 8;
 }
 
 
-.gear-circle {
-    width: 31px;
-    height: 31px;
+/*=========================================================
+    GEAR
+=========================================================*/
 
+.gear-block {
     display: flex;
+
     align-items: center;
-    justify-content: center;
 
-    margin-bottom: 7px;
+    gap: 6px;
 
-    border-radius: 50%;
+    margin-bottom: 2px;
+}
+
+
+.gear-label {
+    color:
+        rgba(137, 162, 178, 0.58);
+
+    font-size:
+        7px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.9px;
+}
+
+
+#gear {
+    min-width:
+        26px;
+
+    height:
+        26px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        50%;
 
     background:
-        rgba(248, 251, 253, 0.96);
+        rgba(244, 249, 252, 0.96);
 
     color:
-        rgba(6, 32, 45, 1);
+        rgba(6, 27, 39, 1);
 
-    font-size: 15px;
-    font-weight: 900;
+    font-size:
+        13px;
+
+    font-weight:
+        950;
+
+    box-shadow:
+        0 0 9px
+        rgba(255, 255, 255, 0.10);
 }
 
+
+/*=========================================================
+    SPEED
+=========================================================*/
 
 #speed {
-    min-width: 100px;
+    min-width:
+        135px;
 
-    text-align: center;
+    margin-top:
+        2px;
 
-    color: white;
+    text-align:
+        center;
 
-    font-size: 55px;
+    color:
+        rgba(249, 252, 254, 1);
 
-    font-weight: 800;
+    font-size:
+        60px;
 
-    line-height: 50px;
+    font-weight:
+        900;
 
-    letter-spacing: -2px;
+    line-height:
+        55px;
+
+    letter-spacing:
+        -3px;
+
+    font-variant-numeric:
+        tabular-nums;
+
+    text-shadow:
+        0 4px 13px
+        rgba(0, 0, 0, 0.48);
 }
 
+
+/*=========================================================
+    SPEED UNIT
+=========================================================*/
 
 #speed-unit {
-    margin-top: 6px;
+    margin-top:
+        5px;
 
     color:
-        rgba(170, 195, 210, 0.70);
+        rgba(151, 180, 198, 0.70);
 
-    font-size: 11px;
-    font-weight: 800;
+    font-size:
+        10px;
 
-    letter-spacing: 0.7px;
+    font-weight:
+        900;
+
+    letter-spacing:
+        1.2px;
 }
 
 
-.rpm-label {
+/*=========================================================
+    CONDITION PANEL
+=========================================================*/
+
+.vehicle-condition-panel {
     position: absolute;
-
-    left: 43px;
-    bottom: 69px;
-
-    transform:
-        rotate(62deg);
-
-    color:
-        rgba(150, 175, 190, 0.64);
-
-    font-size: 7px;
-    font-weight: 700;
-
-    letter-spacing: 0.4px;
-}
-
-
-/* =====================================================
-   SIDE METERS
-===================================================== */
-
-.side-meter {
-    position: absolute;
-
-    bottom: 52px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 4px;
-}
-
-.fuel-meter {
-    left: 11px;
-}
-
-.engine-meter {
-    right: 11px;
-
-    flex-direction: row-reverse;
-}
-
-.side-meter-label {
-    color:
-        rgba(220, 235, 245, 0.88);
-
-    font-size: 8px;
-    font-weight: 900;
-}
-
-.side-meter-track {
-    position: relative;
-
-    width: 7px;
-    height: 65px;
-
-    overflow: hidden;
-
-    border-radius: 20px;
-
-    background:
-        rgba(255, 255, 255, 0.08);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.06);
-}
-
-.side-meter-fill {
-    position: absolute;
-
-    left: 0;
-    bottom: 0;
-
-    width: 100%;
-    height: 100%;
-
-    border-radius: inherit;
-
-    transition:
-        height 0.15s ease;
-}
-
-#fuel-fill {
-    background:
-        linear-gradient(
-            0deg,
-            #34aaff,
-            #74d8ff
-        );
-}
-
-#engine-fill {
-    background:
-        linear-gradient(
-            0deg,
-            #37d67a,
-            #8affaa
-        );
-}
-
-
-/* =====================================================
-   ICONS
-===================================================== */
-
-.vehicle-icons {
-    position: absolute;
-
-    top: 16px;
 
     left: 50%;
+    bottom: 47px;
 
     transform:
         translateX(-50%);
 
+    width:
+        150px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:
+        12px;
+
+    z-index:
+        10;
+}
+
+
+/*=========================================================
+    CONDITION ROW
+=========================================================*/
+
+.condition-row {
+    min-width:
+        0;
+}
+
+
+/*=========================================================
+    CONDITION HEADER
+=========================================================*/
+
+.condition-header {
     display: flex;
 
-    gap: 17px;
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom:
+        4px;
 }
 
-.vehicle-icon {
-    min-width: 15px;
 
-    text-align: center;
-
+.condition-label {
     color:
-        rgba(165, 185, 200, 0.40);
+        rgba(130, 157, 175, 0.60);
 
-    font-size: 9px;
-    font-weight: 800;
+    font-size:
+        6px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.7px;
+}
+
+
+#fuel-value,
+#engine-value {
+    color:
+        rgba(223, 235, 242, 0.83);
+
+    font-size:
+        7px;
+
+    font-weight:
+        900;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/*=========================================================
+    CONDITION TRACK
+=========================================================*/
+
+.condition-track {
+    position: relative;
+
+    width:
+        100%;
+
+    height:
+        5px;
+
+    overflow:
+        hidden;
+
+    border-radius:
+        100px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    box-shadow:
+        inset 0 1px 2px
+        rgba(0, 0, 0, 0.45);
+}
+
+
+/*=========================================================
+    CONDITION FILL
+=========================================================*/
+
+.condition-fill {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius:
+        inherit;
 
     transition:
-        color 0.15s ease,
-        text-shadow 0.15s ease;
+        width 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
-.vehicle-icon.active {
-    color: white;
 
-    text-shadow:
-        0 0 6px rgba(255, 255, 255, 0.35);
+.fuel-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #2f9ddd,
+            #6bd0f7
+        );
+
+    box-shadow:
+        0 0 5px
+        rgba(55, 180, 235, 0.26);
 }
 
-.vehicle-icon.warning {
+
+.engine-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #3acb72,
+            #74ec96
+        );
+
+    box-shadow:
+        0 0 5px
+        rgba(75, 220, 110, 0.23);
+}
+
+
+/*=========================================================
+    LOW FUEL
+=========================================================*/
+
+#fuel-meter.low-fuel
+#fuel-value {
     color:
-        rgba(240, 85, 70, 0.92);
-}
-
-.vehicle-icon.warning.active {
-    color: #dfff45;
-
-    text-shadow:
-        0 0 7px rgba(223, 255, 69, 0.40);
+        #ffbd54;
 }
 
 
-/* =====================================================
-   MILEAGE
-===================================================== */
+#fuel-meter.low-fuel
+.fuel-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #d98826,
+            #ffbc4d
+        );
+
+    box-shadow:
+        0 0 7px
+        rgba(255, 170, 55, 0.37);
+
+    animation:
+        low-fuel-pulse
+        1.2s ease-in-out infinite;
+}
+
+
+@keyframes low-fuel-pulse {
+
+    0%,
+    100% {
+        opacity: 0.72;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+}
+
+
+/*=========================================================
+    BAD ENGINE
+=========================================================*/
+
+#engine-meter.engine-warning
+#engine-value {
+    color:
+        #ff6464;
+}
+
+
+#engine-meter.engine-warning
+.engine-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #d74444,
+            #ff6969
+        );
+
+    box-shadow:
+        0 0 7px
+        rgba(255, 70, 70, 0.34);
+}
+
+
+/*=========================================================
+    ODOMETER
+=========================================================*/
 
 .mileage {
     position: absolute;
 
     left: 50%;
-    bottom: 24px;
+    bottom: 20px;
 
     transform:
         translateX(-50%);
 
-    min-width: 88px;
+    min-width:
+        92px;
 
     padding:
-        3px 7px;
+        3px 8px;
 
-    text-align: center;
+    text-align:
+        center;
 
-    border-radius: 4px;
+    border-radius:
+        4px;
 
     background:
-        rgba(3, 12, 18, 0.75);
+        rgba(2, 10, 16, 0.72);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.035);
 
     color:
-        rgba(225, 235, 240, 0.86);
-
-    font-size: 9px;
+        rgba(215, 229, 237, 0.78);
 
     font-family:
         Consolas,
         monospace;
 
-    font-weight: 700;
+    font-size:
+        8px;
 
-    letter-spacing: 0.5px;
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.6px;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/*=========================================================
+    SMALLER RESOLUTIONS
+=========================================================*/
+
+@media screen and (max-width: 1400px) {
+
+    #vehicle-hud {
+        width:
+            280px;
+
+        height:
+            280px;
+    }
+
+
+    .speedometer-shell {
+        width:
+            280px;
+
+        height:
+            280px;
+
+        transform:
+            scale(0.92);
+
+        transform-origin:
+            bottom right;
+    }
+
 }
